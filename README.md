@@ -24,7 +24,7 @@ banner instructions which will be printed.
   at around 2000 digits).  It considerably reduces the memory footprints,
   and uses multi precisions for the `RealField` objects.
 
-- [irwin_v4.sage](irwin_v4sage) adds some "parallelization" attempt.  This is
+- `irwin_v4.sage` (Not Yet) adds some "parallelization" attempt.  This is
   experimental and mainly effective when computing the `beta(m+1)` sums of
   inverse powers on integers having a number of digits equal to the `level`
   parameter of the algorithm.  *attow this file is not yet pushed to the
