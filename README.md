@@ -19,10 +19,16 @@ banner instructions which will be printed.
   available at [my arXiv paper](https://arxiv.org/abs/2402.09083), in the
   version last updated there at v4.
 
-- [irwin_v3.sage](irwin_v3.sage) is an evolution ot the latter which
-  is better suited to computing thousands of digits (say, starting
-  at around 2000 digits).  It considerably reduces the memory footprints,
-  and uses multi precisions for the `RealField` objects.
+- [irwin_v3.sage](irwin_v3.sage) is an evolution ot the latter which is better
+  suited to computing thousands of digits (say, starting at around 2000
+  digits).  It considerably reduces the memory footprint, and has some speed
+  gain from using multiple precisions for the `RealField` objects.  On a
+  current personal computer it will obtain 50000 digits of the classic Kempner
+  sum in a matter of hours (depending on your hardware).  This computation
+  attempted with the 2024 version would have (with level=3, hence needing
+  binomial coeffients up to `N=25000`) would need circa 470 gigabytes of
+  computer memory.  In contrast, the 2025 version needs less than 113
+  megabytes...
 
 - `irwin_v4.sage` (Not Yet) adds some "parallelization" attempt.  This is
   experimental and mainly effective when computing the `beta(m+1)` sums of
