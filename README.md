@@ -16,8 +16,8 @@ SageMath session and at the `sage` prompt, enter `load("<FOO>.sage")`.  Follow
 banner instructions which will be printed.
 
 - [irwinfloat.py](irwinfloat.py) and [irwin.sage](irwin.sage) are the files
-  available at [my arXiv paper](https://arxiv.org/abs/2402.09083), in the
-  version last updated there at v4.
+  available at [my arXiv paper](https://arxiv.org/abs/2402.09083). They were
+  last updated there at v4 of April 6, 2024.
 
 - [irwin_v3.sage](irwin_v3.sage) is an evolution ot the latter which is better
   suited to computing thousands of digits (say, starting at around 2000
