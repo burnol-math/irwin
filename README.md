@@ -25,8 +25,8 @@ banner instructions which will be printed.
   gain from using multiple precisions for the `RealField` objects.  On a
   current personal computer it will obtain 50000 digits of the classic Kempner
   sum in a matter of hours (depending on your hardware).  This computation
-  attempted with the 2024 version would have (with level=3, hence needing
-  binomial coeffients up to `N=25000`) would need circa 470 gigabytes of
+  attempted with the 2024 version would have needed (with level=3, hence
+  needing binomial coefficients up to `N=25000`) circa 470 gigabytes of
   computer memory.  In contrast, the 2025 version needs less than 113
   megabytes...
 
