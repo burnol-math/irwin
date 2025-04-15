@@ -30,6 +30,10 @@ banner instructions which will be printed.
   computer memory.  In contrast, the 2025 version needs less than 113
   megabytes...
 
+  *Thanks to Arnaud Bodin and Yusuf Emin Akpınar for their interest
+  which motivated me to revisit the 2024 code with the perspective
+  to go beyond 10000 digits easily*.
+  
 - `irwin_v4.sage` (Not Yet) adds some "parallelization" attempt.  This is
   experimental and mainly effective when computing the `beta(m+1)` sums of
   inverse powers on integers having a number of digits equal to the `level`
