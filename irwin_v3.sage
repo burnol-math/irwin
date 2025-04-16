@@ -3,7 +3,7 @@
 # irwin_v3.sage
 # Use via load("irwin_v3.sage") in sage interactive mode
 
-irwin_docstring = """
+irwin_v3_docstring = """
 This file is an evolution of irwin.sage as available at
 
     https://arxiv.org/src/2402.09083v5/anc
@@ -1064,14 +1064,10 @@ def irwinpos(b, d, k,
 
 if __name__ == "__main__":
     print("""
-Hello, this module implements the formulas of Burnol's article:
-
-    https://arxiv.org/abs/2402.09083
-
-for computing the harmonic series keeping only those terms 1/n
-with n having in radix b a given number k of occurrences of a
-given digit d.  It provides two functions irwin() and irwinpos().
-See their docstrings for help as well as the irwin_docstring
-variable.
+Hello, this file irwin_v3.sage provides two functions irwin()
+and irwinpos().  Check their docstrings for help.  General
+information is also available in the irwin_v3_docstring variable.
+When computing thousands of digits it is recommended to pass
+showtimes=True to the functions.
 """
           )
