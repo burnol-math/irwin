@@ -604,11 +604,11 @@ def irwin(b, d, k,
             if multitime < singletime:
                 if useparallel:
                     print(f"\nPoursuite car {singletime:.3f}s>{multitime:.3f}s"
-                          " en parallèle (m={m})", end="")
+                          f" en parallèle (m={m})", end="")
                 else:
                     useparallel = True
                     print(f"\nBasculement car {singletime:.3f}s>{multitime:.3f}s"
-                          f"en parallèle (maxworkers={maxworkers}, m={m})", end="")
+                          f" en parallèle (maxworkers={maxworkers}, m={m})", end="")
             else:
                 if useparallel:
                     useparallel = False
@@ -1086,11 +1086,11 @@ def irwinpos(b, d, k,
             if multitime < singletime:
                 if useparallel:
                     print(f"\nPoursuite car {singletime:.3f}s>{multitime:.3f}s"
-                          " en parallèle (m={m})", end="")
+                          f" en parallèle (m={m})", end="")
                 else:
                     useparallel = True
                     print(f"\nBasculement car {singletime:.3f}s>{multitime:.3f}s"
-                          f"en parallèle (maxworkers={maxworkers}, m={m})", end="")
+                          f" en parallèle (maxworkers={maxworkers}, m={m})", end="")
             else:
                 if useparallel:
                     useparallel = False
