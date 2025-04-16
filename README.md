@@ -82,7 +82,11 @@ perspective to make it easier and less demanding on the hardware to obtain
   store in computer memory the Pascal triangle up (or rather down) to a
   certain row, or the memory needed to store only one such row.
 
+## TODO
+
+Add some additional bibliographical references.
+
 ## License
 
-The contributed files (Python, SageMath) are distributed under the
+The files in this repository are distributed under the
 CC-BY-SA 4.0 License.  See [LICENSE](LiCENSE).
