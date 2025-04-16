@@ -64,14 +64,15 @@ perspective to make it easier and less demanding on the hardware to obtain
   [irwin_v3.sage](irwin_v3.sage) into the same interactive SageMath session.
   See the comments therein.  No guarantees though.
 
-- `irwin_v4.sage` (Not Yet) adds some "parallelization" attempt.  This is
-  experimental and mainly effective when computing the `beta(m+1)`'s.  *attow
-  this file is not yet pushed to the repository*.
+- [irwin_v4.sage](irwin_v4.sage) adds some "parallelization".  This is
+  experimental and mainly effective when computing the `beta(m+1)`'s.
 
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
   correctly rounded to `N` decimal places.  They are currently:
   * [k_prec_1000](k_prec_1000)
+  * [k_prec_2000](k_prec_2000)
+  * [k_prec_5000](k_prec_5000)
   * [k_prec_10000](k_prec_10000)
   * [k_prec_20000](k_prec_20000)
   * [k_prec_25000](k_prec_25000)
