@@ -59,9 +59,10 @@ perspective to make it easier and less demanding on the hardware to obtain
   digits (say 5 more)...
 
 - [irwin_v3_loader.py](irwin_v3_loader.py) and
-  [irwin_loader.py](irwin_loader.py) and similarly named file can be used to
-  load concurrently `irwin.sage` and `irwin_v3.sage` into the same interactive
-  SageMath session.  See the comments therein.  No guarantees though.
+  [irwin_loader.py](irwin_loader.py) and similarly named files can be used to
+  load concurrently [irwin.sage](irwin.sage) and
+  [irwin_v3.sage](irwin_v3.sage) into the same interactive SageMath session.
+  See the comments therein.  No guarantees though.
 
 - `irwin_v4.sage` (Not Yet) adds some "parallelization" attempt.  This is
   experimental and mainly effective when computing the `beta(m+1)`'s.  *attow
