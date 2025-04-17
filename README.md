@@ -67,6 +67,8 @@ perspective to make it easier and less demanding on the hardware to obtain
 - [irwin_v4.sage](irwin_v4.sage) adds some "parallelization".  This is
   experimental and mainly effective when computing the `beta(m+1)`'s.
 
+  See #1 for a very disconcerting behavior.  I am 99% sure it is not my fault!
+  
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
   correctly rounded to `N` decimal places.  They are currently:
