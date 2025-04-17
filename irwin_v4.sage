@@ -380,6 +380,25 @@ def _setup_blocks(b, d, level):
     return blocks
 
 
+def _comp_um_print_timeinfo(single, multi, para, wrkrs, m):
+    """Auxiliary shared between irwin() and irwinpos()
+    """
+    if multi < single:
+        if para:
+            print(f"\nPoursuite car {single:.3f}s>{multi:.3f}s"
+                  f" en parallèle (m={m})", end="")
+        else:
+            print(f"\nBasculement car {single:.3f}s>{multi:.3f}s"
+                  f" en parallèle (maxworkers={wrkrs}, m={m})", end="")
+    else:
+        if para:
+            print(f"\nOn quitte car {single:.3f}s<{multi:.3f}s"
+                  f" l'exécution parallèle (m={m}) ", end="")
+        else:
+            print(f"\nPas utile ({single:.3f}s<{multi:.3f}s)"
+                  f" d'exécuter en parallèle (m={m}) ", end="")
+
+
 def irwin(b, d, k,
           nbdigits=34,
           level=3,
@@ -551,7 +570,7 @@ def irwin(b, d, k,
 
     PascalRow = [1, 1]
     useparallel = False
-    if Mmax > 511:
+    if Mmax > 511 and showtimes and verbose:
         print("\n    L'algorithme teste tous les 512 coefficients s'il est bénéfique")
         print("    d'utiliser la procédure décorée par @parallel.  Ce test n'est fait")
         print("    que pour le calcul des u_{0;m}.  Le premier nombre indiqué sera")
@@ -600,23 +619,12 @@ def irwin(b, d, k,
                        for i in range(1,m+1)) / Rm(b**(m+1) - bmoinsun) ]
 
             singletime = time.time() - localstarttime
-            
-            if multitime < singletime:
-                if useparallel:
-                    print(f"\nPoursuite car {singletime:.3f}s>{multitime:.3f}s"
-                          f" en parallèle (m={m})", end="")
-                else:
-                    useparallel = True
-                    print(f"\nBasculement car {singletime:.3f}s>{multitime:.3f}s"
-                          f" en parallèle (maxworkers={maxworkers}, m={m})", end="")
-            else:
-                if useparallel:
-                    useparallel = False
-                    print(f"\nOn quitte car {singletime:.3f}s<{multitime:.3f}s"
-                          f" l'exécution parallèle (m={m}) ", end="")
-                else:
-                    print(f"\nPas utile ({singletime:.3f}s<{multitime:.3f}s)"
-                          f" d'exécuter en parallèle (m={m}) ", end="")
+
+            if showtimes:
+                _comp_um_print_timeinfo(singletime, multitime,
+                                        useparallel, maxworkers, m)
+
+            useparallel = (multitime < singletime)
 
         if useparallel:
             for j in range(1,k+1):
@@ -1021,7 +1029,7 @@ def irwinpos(b, d, k,
 
     PascalRow = [1, 1]
     useparallel = False
-    if Mmax > 511:
+    if Mmax > 511 and showtimes and verbose:
         print("\n    L'algorithme teste tous les 512 coefficients s'il est bénéfique")
         print("    d'utiliser la procédure décorée par @parallel.  Ce test n'est fait")
         print("    que pour le calcul des v_{0;m}.  Le premier nombre indiqué sera")
@@ -1083,22 +1091,11 @@ def irwinpos(b, d, k,
 
             singletime = time.time() - localstarttime
             
-            if multitime < singletime:
-                if useparallel:
-                    print(f"\nPoursuite car {singletime:.3f}s>{multitime:.3f}s"
-                          f" en parallèle (m={m})", end="")
-                else:
-                    useparallel = True
-                    print(f"\nBasculement car {singletime:.3f}s>{multitime:.3f}s"
-                          f" en parallèle (maxworkers={maxworkers}, m={m})", end="")
-            else:
-                if useparallel:
-                    useparallel = False
-                    print(f"\nOn quitte car {singletime:.3f}s<{multitime:.3f}s"
-                          f" l'exécution parallèle (m={m}) ", end="")
-                else:
-                    print(f"\nPas utile ({singletime:.3f}s<{multitime:.3f}s)"
-                          f" d'exécuter en parallèle (m={m}) ", end="")
+            if showtimes:
+                _comp_um_print_timeinfo(singletime, multitime,
+                                        useparallel, maxworkers, m)
+
+            useparallel = (multitime < singletime)
 
         if useparallel:
             for j in range(1,k+1):
