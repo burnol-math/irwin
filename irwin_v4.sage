@@ -62,8 +62,8 @@ Thanks to Arnaud Bodin and Yusuf Emin Akpinar for interactions.
 Copyright (C) 2025 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
 
-version = 1.4.5
-date    = 2025/04/16
+version = 1.4.6
+date    = 2025/04/17
 """
 
 import time
