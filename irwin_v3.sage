@@ -57,10 +57,11 @@ Thanks to Arnaud Bodin and Yusuf Emin Akpinar for interactions.
 
 Copyright (C) 2025 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
-
-version = 1.3.2
-date    = 2025/04/10
 """
+
+__version__   = "1.3.2"
+__date__      = "2025/04/10"
+__filename__  = "irwin_v3.sage"
 
 import time
 
@@ -93,7 +94,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
                For k>0 and increasing, the effect diminishes.
                (One can use verbose=True to examine the size of
                the smallest kept term).
-    
+
                For the positive series, there is no such factor
                but the beta(m+1) is smaller for level=2 roughly
                by (b/(b+1))**m (for d=1 this will be rather with
@@ -101,12 +102,12 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
                have a similar phenomenon of using too many terms
                but for other reasons.  For level=3 (which is the
                default) effect will be lower than for level=2.
-    
+
                With k=0 (only) and excluded digit 1, we use way
                too many terms due to roughly a 2**-m factor not
                taken into account.  User can set Mmax
                explicitly to their own choosing.
-    
+
                Here we choose Mmax according to an analysis
                which is supposed to work for all k's and d's
                and level>1.
@@ -134,7 +135,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     else:
         nbbits = 32 * ceil((nbbits_final + nbguardbits)/32)
     R = RealField(nbbits)
- 
+
     # We estimate how many terms are needed according to level and
     # targeted final precision. This estimate relies on two things:
     # - a priori lower bound for the final result
@@ -150,7 +151,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     # is bounded above by (1/b**(l-1) + 1/m)/b**((l-1)m) with here
     # l=level.  For k=0 and d=1, we can improve that to
     # (1/2b**(l-1)+1/m)/2**m/b**((l-1)m).
-    
+
     # We know from Farhi's theorem that blog(b) is a lower bound
     # of total sum if k>0 or if k=0 and d=0.  If k=0 and d>0 we
     # have Proposition 6 in my Irwin paper which says S > b*log(b)
@@ -164,13 +165,13 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     #
     # Testing the worst case m=1, we have log(b/2)>(1/(2b)+1)/2
     # starting at b=4, and log(2b/3)>1/b + 1 for b at least 5.
-    # 
+    #
     # For m=2, we have log(b/2)>(1/(2b)+1/2)/4 for b at least 3
     # and log(2b/3)>1/b+1/2 for b at least 4.  But for b=3, the
     # difficulty with m=2 is for for k=0 and d neither 0 (as
     # log(3)>1>1/3+1/2) or 1, hence d=2. One finds numerically
     # S>2.682, and S/3>0.894>1/3+1/2.
-    # 
+    #
     # Only remains to check for b=2.  The only Irwin sum not
     # >2log(2) is with k=0 and d=1, it is the empty sum with value
     # zero. Use irwin(2,1,0) or irwinpos(2,1,0) at your own
@@ -179,7 +180,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     # For level=2, beta(m+1) for b=2 is bounded above by
     # 1/2**(m+1)+1/3**(m+1) and u_{k;m} by 2/(m+1).  We want to
     # compare this with 2 log(2)/2**m. It is less already for m=1.
-    # 
+    #
     # For the positive series we have 2(1/3**(m+1)+1/4**(m+1)) to
     # compare with 2log(2)/2**m. Again it is less already for m=1.
     #
@@ -192,7 +193,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     # b**(-(l-1)m) using only v_{k;m}<= b. And we need to compare
     # with 2 log(2). So we check if (1/5+1/m)*(4/5)**m is less
     # than log(2). This is true for m at least 2.
-    
+
     # In conclusion it is always true that for m at least 2 the m
     # th term of the series contributes a fraction less than
     # b**(-(l-1)m) of the total sum (we could make a detailed
@@ -214,7 +215,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     # nbbits - (l-1)*m*log(b,2) but we will use precisions
     # of the type nbbits - j T with T = PrecStep.
     # So we have nbbits -jT >= nbguardbits/2
-    NbOfPrec = 1 + floor((nbbits - nbguardbits/2)/PrecStep)  
+    NbOfPrec = 1 + floor((nbbits - nbguardbits/2)/PrecStep)
 
     # We add an overhead or pre-creating all used RealFields.
     # Maybe a bit stupid.
@@ -369,7 +370,7 @@ def irwin(b, d, k,
     :param int b: the integer base
     :param int d: the digit
     :param int k: the number of occurrences
-    :param int nbdigits: (optional, default 34) 
+    :param int nbdigits: (optional, default 34)
         The whished-for number of decimal digits for the result.
     :param int level: (optional, default 3)
         The level must be 2, 3 or 4.
@@ -500,7 +501,7 @@ def irwin(b, d, k,
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
-        print(f"Calcul des coefficients u_{{j;m}} pour 0<=j<={k}...", 
+        print(f"Calcul des coefficients u_{{j;m}} pour 0<=j<={k}...",
               end = ' ', flush = True)
         starttime = time.time()
 
@@ -534,7 +535,7 @@ def irwin(b, d, k,
             PascalRow.extend(reversed(L))
 
         Rm = IndexToR[m]
-        
+
         cm = [ (sum(PascalRow[i]*Rm(lesgammas[i])*Rm(touslescoeffs[m-i][0])
                     for i in range(1,m+1))
                 / Rm(b**(m+1) - bmoinsun)
@@ -556,7 +557,7 @@ def irwin(b, d, k,
     if showtimes:
         stoptime = time.time()
         print("{:.3f}s".format(stoptime - starttime))
-   
+
     # boucle pour évaluer si all = True également les j < k
     Sk = []
 
@@ -593,7 +594,7 @@ def irwin(b, d, k,
             if verbose:
                 print("Somme avec niveau 3 pour d = %s et j = %s:" % (d, j))
                 print(S)
-        
+
         # jusqu'à j répétitions ; si j >= level, on s'arrête à
         # level répétitions max
         S += b * (sum(sum(1/R(x) for x in maxblock[i])
@@ -624,7 +625,7 @@ def irwin(b, d, k,
         bubu = touslescoeffs[Mmax][j] * sum(1/Rm(n ** (Mmax+1))
                                             for n in maxblock[0])
 
-        if j >= 1: 
+        if j >= 1:
             bubu += touslescoeffs[Mmax][j-1] * sum(1/Rm(n ** (Mmax+1))
                                                    for n in maxblock[1])
         if j >= 2:
@@ -636,13 +637,13 @@ def irwin(b, d, k,
         if (level == 4) and (j >= 4):
             bubu += touslescoeffs[Mmax][j-4] * sum(1/Rm(n ** (Mmax+1))
                                                    for n in maxblock[4])
-                
+
         if verbose:
             lastterm = -bubu if Mmax&1 else bubu
             if float(lastterm) == 0.:
                 u, E = _shorten_small_real(lastterm)
                 print(f"The {Mmax}th term is about {u:f} 10^{E} i.e. ",
-                      end = "", flush = True) 
+                      end = "", flush = True)
             else:
                 print(f"The {Mmax}th term is about {lastterm:.3e} i.e. ",
                       end = "", flush = True)
@@ -694,7 +695,7 @@ def irwin(b, d, k,
     if all:
         for j in range(k+1):
             print(f"(k={j}) {Rfinal(Sk[j])}")
-            
+
     if verbose:
         print("b = %s, d = %s, k = %s, level = %s" % (b, d, k, level))
 
@@ -718,7 +719,7 @@ def irwinpos(b, d, k,
     :param int b: the integer base
     :param int d: the digit
     :param int k: the number of occurrences
-    :param int nbdigits: (optional, default 34) 
+    :param int nbdigits: (optional, default 34)
         The whished-for number of decimal digits for the result.
     :param int level: (optional, default 3)
         The level must be 2, 3 or 4.
@@ -822,7 +823,7 @@ def irwinpos(b, d, k,
     # COMPARED TO FEB 2024 VERSION WE SHIFT BY +1 ALL INTEGERS IN
     # SUBLISTS OF maxblock. This is to avoid having to use n+1
     # afterwards for inverse power sums.
-    maxblockshifted = [[ n + 1  for n in L] for L in maxblock] 
+    maxblockshifted = [[ n + 1  for n in L] for L in maxblock]
     # NOTA BENE: maxblockshifted will have as last element an empty []
     #            if d=0
     #            This empty [] will not cause problems for the sum()'s
@@ -910,8 +911,8 @@ def irwinpos(b, d, k,
     if showtimes:
         stoptime = time.time()
         print("{:.3f}s".format(stoptime - starttime))
-   
-   
+
+
     # boucle pour évaluer si all = True également les j < k
     Sk = []
 
@@ -948,7 +949,7 @@ def irwinpos(b, d, k,
             if verbose:
                 print("Somme avec niveau 3 pour d = %s et j = %s:" % (d, j))
                 print(S)
-        
+
         # Attention à emploi de maxblockshifted ici
         S += b * (sum(sum(1/R(x) for x in maxblockshifted[i])
                       for i in range(1 + min(j,level))))
@@ -977,7 +978,7 @@ def irwinpos(b, d, k,
         bubu = touslescoeffs[Mmax][j] * sum(1/Rm(n ** (Mmax+1))
                                             for n in maxblockshifted[0])
 
-        if j >= 1: 
+        if j >= 1:
             bubu += touslescoeffs[Mmax][j-1] * sum(1/Rm(n ** (Mmax+1))
                                                    for n in maxblockshifted[1])
         if j >= 2:
@@ -989,7 +990,7 @@ def irwinpos(b, d, k,
         if (level == 4) and (j >= 4):
             bubu += touslescoeffs[Mmax][j-4] * sum(1/Rm(n ** (Mmax+1))
                                                    for n in maxblockshifted[4])
-                
+
         if verbose:
             lastterm = bubu  # the Feb 2024 version had a bug here
                              # doing -bubu if Mmax odd
@@ -997,11 +998,11 @@ def irwinpos(b, d, k,
             if float(lastterm) == 0.:
                 u, E = _shorten_small_real(lastterm)
                 print(f"The {Mmax}th term is about {u:f} 10^{E} i.e. ",
-                      end = "", flush = True) 
+                      end = "", flush = True)
             else:
                 print(f"The {Mmax}th term is about {lastterm:.3e} i.e. ",
                       end = "", flush = True)
- 
+
         # COMPUTATION OF THE MAIN SERIES BUILDING UP FROM SMALLEST TERMS
         # Rm will be the RealField. When m decreases Rm changes from time to
         # time regularly and automatically to use more bits.
@@ -1055,7 +1056,7 @@ def irwinpos(b, d, k,
     if all:
         for j in range(k+1):
             print(f"(k={j}) {Rfinal(Sk[j])}")
-            
+
     if verbose:
         print("b = %s, d = %s, k = %s, level = %s" % (b, d, k, level))
 
@@ -1063,11 +1064,13 @@ def irwinpos(b, d, k,
 
 
 if __name__ == "__main__":
-    print("""
-Hello, this file irwin_v3.sage provides two functions irwin()
-and irwinpos().  Check their docstrings for help.  General
-information is also available in the irwin_v3_docstring variable.
-When computing thousands of digits it is recommended to pass
-showtimes=True to the functions.
+    print(f"""
+Hello, this file {__filename__} provides two functions irwin()
+and irwinpos().  Use help(irwin) or help(irwinpos) for help.
+
+This is version {__version__} of {__date__}.
+
+General information is also available in the irwin_v3_docstring
+variable.
 """
           )
