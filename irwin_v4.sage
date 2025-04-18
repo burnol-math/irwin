@@ -62,8 +62,8 @@ Thanks to Arnaud Bodin and Yusuf Emin Akpinar for interactions.
 Copyright (C) 2025 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
 
-version = 1.4.6
-date    = 2025/04/17
+version = 1.4.7
+date    = 2025/04/18
 """
 
 import time
@@ -86,11 +86,22 @@ assert maxworkers < 1000, f"Sorry maxworkers={maxworkers} must be less than 1000
 def para_um(a, P, G, T, R, j, m):
     return sum(P[i]*R(G[i])*R(T[m-i][j]) for i in range(a,m+1,maxworkers))
 
-# Si p_iter="multiprocessing"
-# ValueError: Cannot pickle code objects from closures
+def para_beta_aux(m, R, nblock):
+    return sum(1/R(n ** (m+1)) for n in nblock)
+
+# legacy comment, kept in case
+#   Si p_iter="multiprocessing"
+#   ValueError: Cannot pickle code objects from closures
+# TODO: check efficiency of way of passing the RealField.
+#       earlier version passed directly a RealField
+#       here we pass the whole IndexToR, but as
+#       this is called now only exactly maxworkers
+#       times, it should be rather efficient. I don't
+#       have time now, and will not have access to
+#       multi-core computer for a while.
 @parallel(ncpus=maxworkers)
-def para_beta(m, R, block):
-    return sum(1/R(n ** (m+1)) for n in block)
+def para_beta(mlist, IR, nblock):
+    return list(para_beta_aux(m, IR[m], nblock) for m in mlist)
 
 nbguardbits = 12
 
@@ -662,9 +673,20 @@ def irwin(b, d, k,
         print(f"Calcul parallélisé des beta(m+1) avec maxworkers={maxworkers}")
         # We want to display some visual sign or progress
         # Find the largest multiple of maxworkers at most 1000
+        # HOWEVER THIS COSTS IN CODE SIMPLICITY AND EFFICIENCY
         # ATTENTION maxworkers must be < 1000...
         mSize = (1000 // maxworkers) * maxworkers
-
+        q, r = divmod(mSize, maxworkers)
+        I = 0
+        indices = []
+        for i in range(r):
+            indices.append(I)
+            I += q + 1
+        for i in range(maxworkers - r):
+            indices.append(I)
+            I += q
+        # assert I == mSize, "check your math"
+        indices.append(I)
         def map_para_beta(j):
             print(f"({j} occ.)...", end = ' ', flush = True)
             starttime = time.time()
@@ -673,54 +695,74 @@ def irwin(b, d, k,
             for i in range(Mmax//mSize):
                 mbegin = 1 + i*mSize
                 mend   = mbegin + mSize
-                results = list(para_beta((m, IndexToR[m], maxblock[j])
-                                         for m in range(mbegin, mend)))
-                L.extend(result[1] for result in sorted(results))
+                # TODO: find a way to not "instantiate" m range and keep
+                #       it as a generator but I have to become more
+                #       knowledgeable in Python and impact will be minor
+                #       anyhow
+                mrange = list(range(mbegin, mend))
+                inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblock[j])
+                               for i in range(maxworkers)]
+                results_1 = [result[1] for result 
+                             in sorted(list(para_beta(inputblocks)))]
+                L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
 
             if mend < Mmax+1:
-                results = list(para_beta((m, IndexToR[m], maxblock[j])
-                                         for m in range(mend, Mmax + 1)))
-                L.extend(result[1] for result in sorted(results))
+                mrange = list(range(mend, Mmax + 1))
+                qlast, rlast = divmod(len(mrange), maxworkers)
+                I = 0
+                indiceslast = []
+                for i in range(rlast):
+                    indiceslast.append(I)
+                    I += qlast + 1
+                for i in range(maxworkers - rlast):
+                    indiceslast.append(I)
+                    I += qlast
+                indiceslast.append(I)
+                inputblocks = [(mrange[indiceslast[i]:indiceslast[i+1]], IndexToR,
+                                maxblock[j])
+                               for i in range(maxworkers)]
+                results_1 = [result[1] for result 
+                             in sorted(list(para_beta(inputblocks)))]
+                L.extend(sum([result for result in results_1], []))
                 print(f"m<{Mmax+1} (done)", end = " ", flush=True)
             stoptime = time.time()
             print("{:.3f}s".format(stoptime - starttime))
             return L
-
-        lesbetas_maxblock0 = map_para_beta(0)
-
-        if k >= 1:
-            lesbetas_maxblock1 = map_para_beta(1)
-
-        if k >= 2:
-            lesbetas_maxblock2 = map_para_beta(2)
-
-        if (k >= 3) and (level > 2):
-            lesbetas_maxblock3 = map_para_beta(3)
-
-        if (k >= 4) and (level > 3):
-            lesbetas_maxblock4 = map_para_beta(4)
     else:
-        results = list(para_beta((m, IndexToR[m], maxblock[0])
-                                 for m in range(0, Mmax+1)))
-        lesbetas_maxblock0 = [result[1] for result in sorted(results)]
-        if k >= 1:  
-            results = list(para_beta((m, IndexToR[m], maxblock[1])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblock1 = [result[1] for result in sorted(results)]
-        if k >= 2:  
-            results = list(para_beta((m, IndexToR[m], maxblock[2])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblock2 = [result[1] for result in sorted(results)]
-        if (k >= 3) and (level > 2):
-            results = list(para_beta((m, IndexToR[m], maxblock[3])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblock3 = [result[1] for result in sorted(results)]
-        if (k >= 4) and (level > 3):
-            results = list(para_beta((m, IndexToR[m], maxblock[4])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblock4 = [result[1] for result in sorted(results)]
+        q, r = divmod(Mmax, maxworkers)
+        I = 0
+        indices = []
+        for i in range(r):
+            indices.append(I)
+            I += q + 1
+        for i in range(maxworkers - r):
+            indices.append(I)
+            I += q
+        indices.append(I)
+        def map_para_beta(j):
+            L = [0]
+            mrange = list(range(1, Mmax + 1))
+            inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblock[j])
+                           for i in range(maxworkers)]
+            results_1 = [result[1] for result 
+                         in sorted(list(para_beta(inputblocks)))]
+            L.extend(sum([result for result in results_1], []))
+            return L
 
+    lesbetas_maxblock0 = map_para_beta(0)
+
+    if k >= 1:
+        lesbetas_maxblock1 = map_para_beta(1)
+        
+    if k >= 2:
+        lesbetas_maxblock2 = map_para_beta(2)
+
+    if (k >= 3) and (level > 2):
+        lesbetas_maxblock3 = map_para_beta(3)
+
+    if (k >= 4) and (level > 3):
+        lesbetas_maxblock4 = map_para_beta(4)
 
     # boucle pour évaluer également les j < k si all = True 
     Sk = []
@@ -1128,15 +1170,26 @@ def irwinpos(b, d, k,
     if showtimes:
         stoptime = time.time()
         print("{:.3f}s".format(stoptime - starttime))
-   
+
     # calcul parallèle des beta (sommes d'inverses de puissances)
     if showtimes:
         print(f"Calcul parallélisé des beta(m+1) avec maxworkers={maxworkers}")
         # We want to display some visual sign or progress
         # Find the largest multiple of maxworkers at most 1000
+        # HOWEVER THIS COSTS IN CODE SIMPLICITY AND EFFICIENCY
         # ATTENTION maxworkers must be < 1000...
         mSize = (1000 // maxworkers) * maxworkers
-
+        q, r = divmod(mSize, maxworkers)
+        I = 0
+        indices = []
+        for i in range(r):
+            indices.append(I)
+            I += q + 1
+        for i in range(maxworkers - r):
+            indices.append(I)
+            I += q
+        # assert I == mSize, "check your math"
+        indices.append(I)
         def map_para_beta(j):
             print(f"({j} occ.)...", end = ' ', flush = True)
             starttime = time.time()
@@ -1145,55 +1198,75 @@ def irwinpos(b, d, k,
             for i in range(Mmax//mSize):
                 mbegin = 1 + i*mSize
                 mend   = mbegin + mSize
-                results = list(para_beta((m, IndexToR[m], maxblockshifted[j])
-                                         for m in range(mbegin, mend)))
-                L.extend(result[1] for result in sorted(results))
+                # TODO: find a way to not "instantiate" m range and keep
+                #       it as a generator but I have to become more
+                #       knowledgeable in Python and impact will be minor
+                #       anyhow
+                mrange = list(range(mbegin, mend))
+                inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblockshifted[j])
+                               for i in range(maxworkers)]
+                results_1 = [result[1] for result 
+                             in sorted(list(para_beta(inputblocks)))]
+                L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
 
             if mend < Mmax+1:
-                results = list(para_beta((m, IndexToR[m], maxblockshifted[j])
-                                         for m in range(mend, Mmax + 1)))
-                L.extend(result[1] for result in sorted(results))
+                mrange = list(range(mend, Mmax + 1))
+                qlast, rlast = divmod(len(mrange), maxworkers)
+                I = 0
+                indiceslast = []
+                for i in range(rlast):
+                    indiceslast.append(I)
+                    I += qlast + 1
+                for i in range(maxworkers - rlast):
+                    indiceslast.append(I)
+                    I += qlast
+                indiceslast.append(I)
+                inputblocks = [(mrange[indiceslast[i]:indiceslast[i+1]], IndexToR,
+                                maxblockshifted[j])
+                               for i in range(maxworkers)]
+                results_1 = [result[1] for result 
+                             in sorted(list(para_beta(inputblocks)))]
+                L.extend(sum([result for result in results_1], []))
                 print(f"m<{Mmax+1} (done)", end = " ", flush=True)
             stoptime = time.time()
             print("{:.3f}s".format(stoptime - starttime))
             return L
-
-        lesbetas_maxblockshifted0 = map_para_beta(0)
-
-        if k >= 1:
-            lesbetas_maxblockshifted1 = map_para_beta(1)
-
-        if k >= 2:
-            lesbetas_maxblockshifted2 = map_para_beta(2)
-
-        if (k >= 3) and (level > 2):
-            lesbetas_maxblockshifted3 = map_para_beta(3)
-
-        if (k >= 4) and (level > 3):
-            lesbetas_maxblockshifted4 = map_para_beta(4)
     else:
-        results = list(para_beta((m, IndexToR[m], maxblockshifted[0])
-                                 for m in range(0, Mmax+1)))
-        lesbetas_maxblockshifted0 = [result[1] for result in sorted(results)]
-        if k >= 1:  
-            results = list(para_beta((m, IndexToR[m], maxblockshifted[1])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblockshifted1 = [result[1] for result in sorted(results)]
-        if k >= 2:  
-            results = list(para_beta((m, IndexToR[m], maxblockshifted[2])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblockshifted2 = [result[1] for result in sorted(results)]
-        if (k >= 3) and (level > 2):
-            results = list(para_beta((m, IndexToR[m], maxblockshifted[3])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblockshifted3 = [result[1] for result in sorted(results)]
-        if (k >= 4) and (level > 3):
-            results = list(para_beta((m, IndexToR[m], maxblockshifted[4])
-                                     for m in range(0, Mmax+1)))
-            lesbetas_maxblockshifted4 = [result[1] for result in sorted(results)]
-
+        q, r = divmod(Mmax, maxworkers)
+        I = 0
+        indices = []
+        for i in range(r):
+            indices.append(I)
+            I += q + 1
+        for i in range(maxworkers - r):
+            indices.append(I)
+            I += q
+        indices.append(I)
+        def map_para_beta(j):
+            L = [0]
+            mrange = list(range(1, Mmax + 1))
+            inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblockshifted[j])
+                           for i in range(maxworkers)]
+            results_1 = [result[1] for result 
+                         in sorted(list(para_beta(inputblocks)))]
+            L.extend(sum([result for result in results_1], []))
+            return L
    
+    lesbetas_maxblockshifted0 = map_para_beta(0)
+
+    if k >= 1:
+        lesbetas_maxblockshifted1 = map_para_beta(1)
+        
+    if k >= 2:
+        lesbetas_maxblockshifted2 = map_para_beta(2)
+
+    if (k >= 3) and (level > 2):
+        lesbetas_maxblockshifted3 = map_para_beta(3)
+
+    if (k >= 4) and (level > 3):
+        lesbetas_maxblockshifted4 = map_para_beta(4)
+
     # boucle pour évaluer si all = True également les j < k
     Sk = []
 

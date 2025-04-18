@@ -67,15 +67,7 @@ perspective to make it easier and less demanding on the hardware to obtain
 - [irwin_v4.sage](irwin_v4.sage) adds some "parallelization".  This is
   experimental and mainly effective when computing the `beta(m+1)`'s.
 
-  See #1 for a very disconcerting behavior, which is probably OS specific, and
-  might even depend on CPU memory management details.  Loading into a Sage
-  interactive session file [test_parallel.sage](test_parallel.sage) and
-  issuing repeatedly `%time test(1000)` will demonstrate the issue on
-  affected systems.  Known problematic configuration is macOS 15.4.1 with M4
-  Pro.  If you read this and can test on your system, please be so kind to
-  comment at #1 or at the
-  [sagemath ticket](https://github.com/sagemath/sage/issues/39960) which I
-  have opened.
+  (*last updated on April 18, 2024*)
   
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
