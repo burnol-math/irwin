@@ -102,28 +102,18 @@ irwin_fn_docstring = """\
     :rtype: :class:`sage.rings.real_mpfr.RealNumber`
     :return: la somme d'Irwin de hauteur k pour le chiffre d en base b
 
-    Le meilleur choix entre level=2 et level=3 (défaut) dépend de b,
-    nbdigits et k:
-
-    - pour b=10, level=3 appears to be better than level=2
-      beyond a certain number of decimal digits. Very roughly:
-      * k=0: 700
-      * k=1: 300
-      * k=2: 160
-      * k=3: 120
-      * k=4:  90
-      * k=5:  70
-      These thresholds are lower than with the 2024 code which
-      used the same precision throughout the computations.
-      The default is now level=3, because it is fun to compute
-      thousands of digits, and important then to optimize
-      computation time.
-
-      TODO: the above was for irwin_v3, it has not been checked
-      with irwin_v4.
-
-    - pour de plus petites bases, level=3 voire même level=4 sont
-      préférables à level=2 même pour nbdigits assez petit.
+    The Burnol algorithm depends on a choice of "level".  The
+    default is level=3 which is appropriate for obtaining
+    hundreds of digits or more.  Setting level=4 seems to be
+    useful only for small bases b such as b=2 or 3, it seems not
+    to be useful for b=10.  The higher the k parameter is
+    (required number of occurrences of the digit d), the sooner
+    level=3 (which is default) is better choice than level=2.
+    Actual thresholds may depend on the maxworkers setting and
+    number of cores actually available on your computing device,
+    which the code does not try to query, it is up to user to
+    set maxworkers appropriately prior to (re-) loading the
+    module.
 
     Example:
     --------
@@ -492,7 +482,7 @@ def irwin(b, d, k,
           Mmax=-1):
     """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
 
-    Utilise l'algorithme de Burnol, série alternée de niveau 2, 3 ou 4
+    Utilise l'algorithme de Burnol, série alternée de niveau 2, 3 ou 4.
 
     {0}
     """
