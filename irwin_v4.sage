@@ -12,13 +12,9 @@ with three main enhancements relevant to targeting 1000 or
 more decimal digits of precision:
 
 - Use of decreasing precision for higher terms in the series.
-  This is done with a granularity of PrecStep bits.
-  It is an optional parameter to irwin() and irwinpos()
-  which defaults to 500.
-
-  Only for getting thousands of digits will there be a net gain,
-  compared to 2024 version.  For b=10, d=9, k=0, and 10002 decimal
-  digits, this gave a speed gain of about 2.2.
+  This is done with a granularity of PrecStep bits.  It is an
+  optional parameter to irwin() and irwinpos() which defaults to
+  500.
 
 - There is no pre-computation of the Pascal triangle up to N=1000
   anymore.  Only two rows of the Pascal triangle are kept at any
@@ -39,11 +35,12 @@ more decimal digits of precision:
 
 Miscellaneous remarks:
 
-* The default level is now 3 (it used to be 2). When one goes into
-  hundreds of digits it is advantageous, and for less digits the
-  computation is fast anyhow, and faster with the 2024 code which
-  has precomputed binomial coefficients, and uses in general
-  a bit less terms of the series.
+* The default level is now 3 (it used to be 2). When one goes
+  into hundreds of digits it is advantageous, and for less
+  digits the computation is fast enough anyhow (info: for circa
+  less than 100-150 decimal digits one can get faster execution
+  times from using the irwin_v3.sage provided irwin(), which
+  uses level=2 per default and has no parallelization).
 
 * The original 2024 version, if used with "all = True" printed
   with 2 or 3 extra decimal digits the intermediate Irwin sums.
