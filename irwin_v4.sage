@@ -3,6 +3,10 @@
 # irwin_v4.sage
 # Use via load("irwin_v4.sage") in sage interactive mode
 
+__version__  = "1.4.7"
+__date__     = "2025/04/18"
+__filename__ = "irwin_v4.sage"
+
 irwin_v4_docstring = """
 This file is an evolution of irwin.sage as available at
 
@@ -60,9 +64,78 @@ Copyright (C) 2025 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
 """
 
-__version__  = "1.4.7"
-__date__     = "2025/04/18"
-__filename__ = "irwin_v4.sage"
+# https://stackoverflow.com/a/10308363
+def docstring_parameter(*sub):
+    def dec(obj):
+        obj.__doc__ = obj.__doc__.format(*sub)
+        return obj
+    return dec
+
+irwin_fn_docstring = """\
+    :param int b: the integer base
+    :param int d: the digit
+    :param int k: the number of occurrences
+    :param int nbdigits: (optional, default 34)
+        The whished-for number of decimal digits for the result.
+    :param int level: (optional, default 3)
+        The level must be 2, 3 or 4.
+    :param int PrecStep: (optional, default ``500``)
+        Terms of the series are computed with a RealField
+        of evolving precision, which differs from the maximal
+        precision by a suitable multiple of PrecStep.
+    :param bool all: (optional, default ``False``)
+        If ``True``  print all irwin sums for ``j`` occurrences
+        with ``j`` from ``0`` to ``k``.
+    :param bool showtimes: (optional, default ``False``)
+        Whether to print out timings for various steps.
+    :param bool verbose: (optional, default ``False``)
+        Whether to print the values of intermediate contributions
+        to the final value, in particular to confirm enough
+        terms of the series were used.
+    :param int Mmax: (optional, default ``-1``)
+        If not ``-1`` the number of terms of the series to use.
+        Use only if the auto-choice is excessive (this will be
+        the case for k=0 and d=1, and to a lesser extent when
+        d=b-1).  Use ``verbose=True`` to check how many terms
+        are used by default.
+
+    :rtype: :class:`sage.rings.real_mpfr.RealNumber`
+    :return: la somme d'Irwin de hauteur k pour le chiffre d en base b
+
+    Le meilleur choix entre level=2 et level=3 (défaut) dépend de b,
+    nbdigits et k:
+
+    - pour b=10, level=3 appears to be better than level=2
+      beyond a certain number of decimal digits. Very roughly:
+      * k=0: 700
+      * k=1: 300
+      * k=2: 160
+      * k=3: 120
+      * k=4:  90
+      * k=5:  70
+      These thresholds are lower than with the 2024 code which
+      used the same precision throughout the computations.
+      The default is now level=3, because it is fun to compute
+      thousands of digits, and important then to optimize
+      computation time.
+
+      TODO: the above was for irwin_v3, it has not been checked
+      with irwin_v4.
+
+    - pour de plus petites bases, level=3 voire même level=4 sont
+      préférables à level=2 même pour nbdigits assez petit.
+
+    Example:
+    --------
+
+    sage: irwin(10, 9, 4, 52, all=True)
+    (k=0) 22.92067661926415034816365709437593191494476243699848
+    (k=1) 23.04428708074784831967594930973617482538959203064774
+    (k=2) 23.02604026596124378845022249787272342108112267542086
+    (k=3) 23.02585299837244431714290384468012275518705238435290
+    (k=4) 23.02585095265829261377053973815542996035002267989413
+    23.02585095265829261377053973815542996035002267989413
+"""
 
 import time
 
@@ -408,6 +481,7 @@ def _comp_um_print_timeinfo(single, multi, para, wrkrs, m):
                   f" d'exécuter en parallèle (m={m}) ", end="")
 
 
+@docstring_parameter(irwin_fn_docstring)
 def irwin(b, d, k,
           nbdigits=34,
           level=3,
@@ -419,72 +493,8 @@ def irwin(b, d, k,
     """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
 
     Utilise l'algorithme de Burnol, série alternée de niveau 2, 3 ou 4
-    This code reduces memory footprint via storing at any given time only
-    two successive rows of the Pascal triangle.
 
-    :param int b: the integer base
-    :param int d: the digit
-    :param int k: the number of occurrences
-    :param int nbdigits: (optional, default 34)
-        The whished-for number of decimal digits for the result.
-    :param int level: (optional, default 3)
-        The level must be 2, 3 or 4.
-    :param int PrecStep: (optional, default ``500``)
-        Terms of the series are computed with a RealField
-        of evolving precision, which differs from the maximal
-        precision by a suitable multiple of PrecStep.
-    :param bool all: (optional, default ``False``)
-        If ``True``  print all irwin sums for ``j`` occurrences
-        with ``j`` from ``0`` to ``k``.
-    :param bool showtimes: (optional, default ``False``)
-        Whether to print out timings for various steps.
-    :param bool verbose: (optional, default ``False``)
-        Whether to print the values of intermediate contributions
-        to the final value, in particular to confirm enough
-        terms of the series were used.
-    :param int Mmax: (optional, default ``-1``)
-        If not ``-1`` the number of terms of the series to use.
-        Use only if the auto-choice is excessive (this will be
-        the case for k=0 and d=1, and to a lesser extent when
-        d=b-1).  Use ``verbose=True`` to check how many terms
-        are used by default.
-
-    :rtype: :class:`sage.rings.real_mpfr.RealNumber`
-    :return: la somme d'Irwin de hauteur k pour le chiffre d en base b
-
-    Le meilleur choix entre level=2 et level=3 (défaut) dépend de b,
-    nbdigits et k:
-
-    - pour b=10, level=3 appears to be better than level=2
-      beyond a certain number of decimal digits. Very roughly:
-      * k=0: 700
-      * k=1: 300
-      * k=2: 160
-      * k=3: 120
-      * k=4:  90
-      * k=5:  70
-      These thresholds are lower than with the 2024 code which
-      used the same precision throughout the computations.
-      The default is now level=3, because it is fun to compute
-      thousands of digits, and important then to optimize
-      computation time.
-
-      TODO: the above was for irwin_v3, it has not been checked
-      with irwin_v4.
-
-    - pour de plus petites bases, level=3 voire même level=4 sont
-      préférables à level=2 même pour nbdigits assez petit.
-
-    Example:
-    --------
-
-    sage: irwin(10, 9, 4, 52, all=True)
-    (k=0) 22.92067661926415034816365709437593191494476243699848
-    (k=1) 23.04428708074784831967594930973617482538959203064774
-    (k=2) 23.02604026596124378845022249787272342108112267542086
-    (k=3) 23.02585299837244431714290384468012275518705238435290
-    (k=4) 23.02585095265829261377053973815542996035002267989413
-    23.02585095265829261377053973815542996035002267989413
+    {0}
     """
 
     assert 1 < level <= 4, "Le niveau (level) doit être 2 ou 3 ou 4"
@@ -894,6 +904,7 @@ def irwin(b, d, k,
     return Rfinal(S)
 
 
+@docstring_parameter(irwin_fn_docstring)
 def irwinpos(b, d, k,
              nbdigits=34,
              level=3,
@@ -905,72 +916,8 @@ def irwinpos(b, d, k,
     """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
 
     Utilise algorithme de Burnol, série positive de niveau 2, 3 ou 4.
-    This code reduces memory footprint via storing at any given time only
-    two successive rows of the Pascal triangle.
 
-    :param int b: the integer base
-    :param int d: the digit
-    :param int k: the number of occurrences
-    :param int nbdigits: (optional, default 34)
-        The whished-for number of decimal digits for the result.
-    :param int level: (optional, default 3)
-        The level must be 2, 3 or 4.
-    :param int PrecStep: (optional, default ``500``)
-        Terms of the series are computed with a RealField
-        of evolving precision, which differs from the maximal
-        precision by a suitable multiple of PrecStep.
-    :param bool all: (optional, default ``False``)
-        If ``True``  print all irwin sums for ``j`` occurrences
-        with ``j`` from ``0`` to ``k``.
-    :param bool showtimes: (optional, default ``False``)
-        Whether to print out timings for various steps.
-    :param bool verbose: (optional, default ``False``)
-        Whether to print the values of intermediate contributions
-        to the final value, in particular to confirm enough
-        terms of the series were used.
-    :param int Mmax: (optional, default ``-1``)
-        If not ``-1`` the number of terms of the series to use.
-        Use only if the auto-choice is excessive (this will be
-        the case for k=0 and d=1, and to a lesser extent when
-        d=b-1).  Use ``verbose=True`` to check how many terms
-        are used by default.
-
-    :rtype: :class:`sage.rings.real_mpfr.RealNumber`
-    :return: la somme d'Irwin de hauteur k pour le chiffre d en base b
-
-    Le meilleur choix entre level=2 et level=3 (défaut) dépend de b,
-    nbdigits et k:
-
-    - pour b=10, level=3 appears to be better than level=2
-      beyond a certain number of decimal digits. Very roughly:
-      * k=0: 700
-      * k=1: 300
-      * k=2: 160
-      * k=3: 120
-      * k=4:  90
-      * k=5:  70
-      These thresholds are lower than with the 2024 code which
-      used the same precision throughout the computations.
-      The default is now level=3, because it is fun to compute
-      thousands of digits, and important then to optimize
-      computation time.
-
-      TODO: the above was for irwin_v3, it has not been checked
-      with irwin_v4.
-
-    - pour de plus petites bases, level=3 voire même level=4 sont
-      préférables à level=2 même pour nbdigits assez petit.
-
-    Example:
-    --------
-
-    sage: irwinpos(10, 9, 4, 52, all=True)
-    (k=0) 22.92067661926415034816365709437593191494476243699848
-    (k=1) 23.04428708074784831967594930973617482538959203064774
-    (k=2) 23.02604026596124378845022249787272342108112267542086
-    (k=3) 23.02585299837244431714290384468012275518705238435290
-    (k=4) 23.02585095265829261377053973815542996035002267989413
-    23.02585095265829261377053973815542996035002267989413
+    {0}
     """
 
     assert 1 < level <= 4, "Le niveau (level) doit être 2 ou 3 ou 4"
