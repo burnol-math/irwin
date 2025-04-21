@@ -558,7 +558,10 @@ def irwin(b, d, k,
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
-        print(f"Calcul des coefficients u_{{j;m}} pour 0<=j<={k} ...")
+        if k == 0:
+            print(f"Calcul des u_{{0;m}} pour m<={Mmax} ...")
+        else:
+            print(f"Calcul des u_{{j;m}} pour j<={k} et m<={Mmax} ...")
         starttime = time.time()
 
     # calcul récursif des moments
@@ -661,7 +664,8 @@ def irwin(b, d, k,
 
     if showtimes:
         stoptime = time.time()
-        print(f"... m<={Mmax}, j<={k} (done) {stoptime-starttime:.3f}s")
+        print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
+              + f"{stoptime-starttime:.3f}s")
 
     # calcul parallèle des beta (sommes d'inverses de puissances)
     if showtimes:
@@ -684,24 +688,29 @@ def irwin(b, d, k,
         # assert I == mSize, "check your math"
         indices.append(I)
         def map__v4_beta(j):
-            print(f"... ({j} occ.)", end = ' ', flush = True)
+            print(f"... ({j} occ.) ", end = "", flush = True)
             starttime = time.time()
+            mbegin = 1
             mend = 1
             L = [0]
-            for i in range(Mmax//mSize):
-                mbegin = 1 + i*mSize
-                mend   = mbegin + mSize
+            for rep in range(Mmax//mSize):
+                mend = mbegin + mSize
                 # TODO: find a way to not "instantiate" m range and keep
                 #       it as a generator but I have to become more
                 #       knowledgeable in Python and impact will be minor
                 #       anyhow
                 mrange = list(range(mbegin, mend))
-                inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblock[j])
+                inputblocks = [(mrange[indices[i]:indices[i+1]],
+                                IndexToR,
+                                maxblock[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
                              in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
+                if (rep + 1) & 7 == 0:
+                    print(f"\n" + " " * 12, end = " ")
+                mbegin = mend
 
             if mend < Mmax+1:
                 mrange = list(range(mend, Mmax + 1))
@@ -721,7 +730,7 @@ def irwin(b, d, k,
                 results_1 = [result[1] for result
                              in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
-                print(f"m<{Mmax+1} (done)", end = " ", flush=True)
+                print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
             stoptime = time.time()
             print("{:.3f}s".format(stoptime - starttime))
             return L
@@ -983,7 +992,10 @@ def irwinpos(b, d, k,
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
-        print(f"Calcul des coefficients v_{{j;m}} pour 0<=j<={k} ...")
+        if k == 0:
+            print(f"Calcul des v_{{0;m}} pour m<={Mmax} ...")
+        else:
+            print(f"Calcul des v_{{j;m}} pour j<={k} et m<={Mmax} ...")
         starttime = time.time()
 
     # calcul récursif des moments
@@ -1100,7 +1112,8 @@ def irwinpos(b, d, k,
 
     if showtimes:
         stoptime = time.time()
-        print(f"... m<={Mmax}, j<={k} (done) {stoptime-starttime:.3f}s")
+        print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
+              + f"{stoptime-starttime:.3f}s")
 
     # calcul parallèle des beta (sommes d'inverses de puissances)
     if showtimes:
@@ -1123,24 +1136,25 @@ def irwinpos(b, d, k,
         # assert I == mSize, "check your math"
         indices.append(I)
         def map__v4_beta(j):
-            print(f"... ({j} occ.) ", end = ' ', flush = True)
+            print(f"... ({j} occ.) ", end = "", flush = True)
             starttime = time.time()
+            mbegin = 1
             mend = 1
             L = [0]
-            for i in range(Mmax//mSize):
-                mbegin = 1 + i*mSize
+            for rep in range(Mmax//mSize):
                 mend   = mbegin + mSize
-                # TODO: find a way to not "instantiate" m range and keep
-                #       it as a generator but I have to become more
-                #       knowledgeable in Python and impact will be minor
-                #       anyhow
                 mrange = list(range(mbegin, mend))
-                inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblockshifted[j])
+                inputblocks = [(mrange[indices[i]:indices[i+1]],
+                                IndexToR,
+                                maxblockshifted[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
                              in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
+                if (rep + 1) & 7 == 0:
+                    print(f"\n" + " " * 12, end = " ")
+                mbegin = mend
 
             if mend < Mmax+1:
                 mrange = list(range(mend, Mmax + 1))
@@ -1160,7 +1174,7 @@ def irwinpos(b, d, k,
                 results_1 = [result[1] for result
                              in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
-                print(f"m<{Mmax+1} (done)", end = " ", flush=True)
+                print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
             stoptime = time.time()
             print("{:.3f}s".format(stoptime - starttime))
             return L
