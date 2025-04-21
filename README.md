@@ -69,7 +69,7 @@ perspective to make it easier and less demanding on the hardware to obtain
   the `beta(m+1)`'s.
 
   The `v5` version differs from `v4` mainly in the following manner: `v4`
-  tries to compute each new `u_{j;m}` (or `v_{j;m}` for the Burnol recurrences
+  tries to compute each new `u_{j;m}` (or `v_{j;m}` for the recurrences
   with positive terms) via dividing the sum defining it into a number of
   chunks equal to the value of `maxworkers`.  So each new coefficient will
   cost the forking of subprocesses.  In contrast `v5` does not divide such
@@ -81,8 +81,10 @@ perspective to make it easier and less demanding on the hardware to obtain
   the Pascal triangle are in memory rather than only `2` for `v4`.
 
   (*testing of `v5` has been only so far on an old hardware with only two
-  cores, and runs where perhaps `v5` could prove more efficient take too long,
-  of the order of many minutes, so comparisons have remained very limited*)
+  cores; a `30%` speed-up was observed for `irwin(10,9,4,10002,showtimes=True)`
+  due to parallelization being triggered for the computation of the `u_{j;m}`'s
+  and being effective; more extensive testing will have to wait for author
+  to have access to faster hardware.*)
 
   Also `v5` has a new optional Boolean `persistentpara` (defaults to `True`)
   which if set to `True` tells to not test anymore during the computations of
