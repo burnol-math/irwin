@@ -3,8 +3,8 @@
 # irwin_v4.sage
 # Use via load("irwin_v4.sage") in sage interactive mode
 
-__version__  = "1.4.7"
-__date__     = "2025/04/18"
+__version__  = "1.4.8"
+__date__     = "2025/04/21"
 __filename__ = "irwin_v4.sage"
 
 irwin_v4_docstring = """
@@ -65,13 +65,13 @@ License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
 """
 
 # https://stackoverflow.com/a/10308363
-def docstring_parameter(*sub):
+def _docstring_parameter(*sub):
     def dec(obj):
         obj.__doc__ = obj.__doc__.format(*sub)
         return obj
     return dec
 
-irwin_fn_docstring = """\
+irwin_v4_fndocstring = """\
     :param int b: the integer base
     :param int d: the digit
     :param int k: the number of occurrences
@@ -144,12 +144,11 @@ except NameError:
 assert maxworkers < 1000, f"Sorry maxworkers={maxworkers} must be less than 1000"
 
 @parallel(ncpus=maxworkers)
-def para_um(a, P, G, T, R, j, m):
+def _v4_um(a, P, G, T, R, j, m):
     return sum(P[i]*R(G[i])*R(T[m-i][j]) for i in range(a,m+1,maxworkers))
 
-def para_beta_aux(m, R, nblock):
+def _v4_beta_aux(m, R, nblock):
     return sum(1/R(n ** (m+1)) for n in nblock)
-
 # legacy comment, kept in case
 #   Si p_iter="multiprocessing"
 #   ValueError: Cannot pickle code objects from closures
@@ -161,12 +160,12 @@ def para_beta_aux(m, R, nblock):
 #       have time now, and will not have access to
 #       multi-core computer for a while.
 @parallel(ncpus=maxworkers)
-def para_beta(mlist, IR, nblock):
-    return list(para_beta_aux(m, IR[m], nblock) for m in mlist)
+def _v4_beta(mlist, IR, nblock):
+    return list(_v4_beta_aux(m, IR[m], nblock) for m in mlist)
 
 nbguardbits = 12
 
-def _shorten_small_real(rr):
+def _v4_shorten_small_real(rr):
     """Get magnitude order of a tiny real number
 
     Probably very clumsy.
@@ -180,7 +179,7 @@ def _shorten_small_real(rr):
     return s*10**float(y-N+1), N-1
 
 
-def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
+def _v4_setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     """Preparation of an array mapping index to a RealField
 
     NOTE BENE: with d=b-1, there is an additional factor
@@ -378,7 +377,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     return nbbits, nbbits_final, R, Rfinal, Mmax, IndexToR, NbOfPrec
 
 
-def _setup_blocks(b, d, level):
+def _v4_setup_blocks(b, d, level):
     """Organize integers according to nb of digits and d count
 
     """
@@ -452,26 +451,26 @@ def _setup_blocks(b, d, level):
     return blocks
 
 
-def _comp_um_print_timeinfo(single, multi, para, wrkrs, m):
+def _v4_umtimeinfo(single, multi, para, wrkrs, m):
     """Auxiliary shared between irwin() and irwinpos()
     """
     if multi < single:
         if para:
-            print(f"\nPoursuite car {single:.3f}s>{multi:.3f}s"
-                  f" en parallèle (m={m})", end="")
+            print(f"... poursuite car {single:.3f}s>{multi:.3f}s"
+                  f" en parallèle (m={m})")
         else:
-            print(f"\nBasculement car {single:.3f}s>{multi:.3f}s"
-                  f" en parallèle (maxworkers={wrkrs}, m={m})", end="")
+            print(f"... basculement car {single:.3f}s>{multi:.3f}s"
+                  f" en parallèle (maxworkers={wrkrs}, m={m})")
     else:
         if para:
-            print(f"\nOn quitte car {single:.3f}s<{multi:.3f}s"
-                  f" l'exécution parallèle (m={m}) ", end="")
+            print(f"... on quitte car {single:.3f}s<{multi:.3f}s"
+                  f" l'exécution parallèle (m={m}) ")
         else:
-            print(f"\nPas utile ({single:.3f}s<{multi:.3f}s)"
-                  f" d'exécuter en parallèle (m={m}) ", end="")
+            print(f"... pas utile ({single:.3f}s<{multi:.3f}s)"
+                  f" d'exécuter en parallèle (m={m}) ")
 
 
-@docstring_parameter(irwin_fn_docstring)
+@_docstring_parameter(irwin_v4_fndocstring)
 def irwin(b, d, k,
           nbdigits=34,
           level=3,
@@ -507,7 +506,7 @@ def irwin(b, d, k,
      Rfinal,
      Mmax,
      IndexToR,
-     NbOfPrec) = _setup_realfields(nbdigits, PrecStep, b, level, Mmax)
+     NbOfPrec) = _v4_setup_realfields(nbdigits, PrecStep, b, level, Mmax)
 
     if showtimes:
         stoptime = time.time()
@@ -521,7 +520,7 @@ def irwin(b, d, k,
               end = ' ', flush = True)
         starttime = time.time()
 
-    blocks = _setup_blocks(b, d, level)
+    blocks = _v4_setup_blocks(b, d, level)
     block1 = blocks[0]
     block2 = blocks[1]
     if level >2:
@@ -559,8 +558,7 @@ def irwin(b, d, k,
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
-        print(f"Calcul des coefficients u_{{j;m}} pour 0<=j<={k}...",
-              end = ' ', flush = True)
+        print(f"Calcul des coefficients u_{{j;m}} pour 0<=j<={k} ...")
         starttime = time.time()
 
     # calcul récursif des moments
@@ -580,11 +578,10 @@ def irwin(b, d, k,
     PascalRow = [1, 1]
     useparallel = False
     if Mmax > 511 and showtimes and verbose:
-        print("\n    L'algorithme teste tous les 512 coefficients s'il est bénéfique")
+        print("    L'algorithme teste tous les 512 coefficients s'il est bénéfique")
         print("    d'utiliser la procédure décorée par @parallel.  Ce test n'est fait")
         print("    que pour le calcul des u_{0;m}.  Le premier nombre indiqué sera")
-        print("    la durée du calcul normal, le second avec @parallel, pour u_{0;m}.",
-              end = "", flush = True)
+        print("    la durée du calcul normal, le second avec @parallel, pour u_{0;m}.")
 
     for m in range(2, Mmax+1):
         prevPascalRow = PascalRow.copy()
@@ -602,7 +599,7 @@ def irwin(b, d, k,
         Rm = IndexToR[m]
         if m&511:
             if useparallel:
-                results = list(para_um(((a, PascalRow, lesgammas, touslescoeffs, Rm, 0, m,)
+                results = list(_v4_um(((a, PascalRow, lesgammas, touslescoeffs, Rm, 0, m,)
                                        for a in range(1, maxworkers + 1))))
                 partial_sums = [result[1] for result in results]
                 # De toute façon on ne peut pas faire que ce soit exactement
@@ -617,8 +614,8 @@ def irwin(b, d, k,
                            for i in range(1,m+1)) / Rm(b**(m+1) - bmoinsun) ]
         else:
             localstarttime = time.time()
-            results = list(para_um(((a, PascalRow, lesgammas, touslescoeffs, Rm, 0, m,)
-                                    for a in range(1, maxworkers + 1))))
+            results = list(_v4_um(((a, PascalRow, lesgammas, touslescoeffs, Rm, 0, m,)
+                                   for a in range(1, maxworkers + 1))))
             partial_sums = [result[1] for result in results]
             x = [ sum(partial_sums) / Rm(b**(m+1) - bmoinsun) ]
             multitime = time.time() - localstarttime
@@ -630,21 +627,21 @@ def irwin(b, d, k,
             singletime = time.time() - localstarttime
 
             if showtimes:
-                _comp_um_print_timeinfo(singletime, multitime,
-                                        useparallel, maxworkers, m)
+                _v4_umtimeinfo(singletime, multitime,
+                               useparallel, maxworkers, m)
 
             useparallel = (multitime < singletime)
 
         if useparallel:
             for j in range(1,k+1):
-                results = list(para_um(((a, PascalRow, lesgammas,
-                                            touslescoeffs, Rm, j, m,)
-                                        for a in range(1, maxworkers + 1))))
+                results = list(_v4_um(((a, PascalRow, lesgammas,
+                                        touslescoeffs, Rm, j, m,)
+                                       for a in range(1, maxworkers + 1))))
                 x = sum(p[1] for p in results)
                 x += cm[-1]
-                results = list(para_um(((a, PascalRow, lespuissancesded,
-                                            touslescoeffs, Rm, j-1, m,)
-                                        for a in range(1, maxworkers + 1))))
+                results = list(_v4_um(((a, PascalRow, lespuissancesded,
+                                        touslescoeffs, Rm, j-1, m,)
+                                       for a in range(1, maxworkers + 1))))
                 x += sum(p[1] for p in results)
                 x = x / Rm(b**(m+1) - bmoinsun)
                 cm.append(x)
@@ -664,11 +661,12 @@ def irwin(b, d, k,
 
     if showtimes:
         stoptime = time.time()
-        print("{:.3f}s".format(stoptime - starttime))
+        print(f"... m<={Mmax}, j<={k} (done) {stoptime-starttime:.3f}s")
 
     # calcul parallèle des beta (sommes d'inverses de puissances)
     if showtimes:
-        print(f"Calcul parallélisé des beta(m+1) avec maxworkers={maxworkers}")
+        print("Calcul parallélisé des beta(m+1) avec "
+              f"maxworkers={maxworkers} ...")
         # We want to display some visual sign or progress
         # Find the largest multiple of maxworkers at most 1000
         # HOWEVER THIS COSTS IN CODE SIMPLICITY AND EFFICIENCY
@@ -685,8 +683,8 @@ def irwin(b, d, k,
             I += q
         # assert I == mSize, "check your math"
         indices.append(I)
-        def map_para_beta(j):
-            print(f"({j} occ.)...", end = ' ', flush = True)
+        def map__v4_beta(j):
+            print(f"... ({j} occ.)", end = ' ', flush = True)
             starttime = time.time()
             mend = 1
             L = [0]
@@ -701,7 +699,7 @@ def irwin(b, d, k,
                 inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblock[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
 
@@ -721,7 +719,7 @@ def irwin(b, d, k,
                                 maxblock[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{Mmax+1} (done)", end = " ", flush=True)
             stoptime = time.time()
@@ -738,29 +736,29 @@ def irwin(b, d, k,
             indices.append(I)
             I += q
         indices.append(I)
-        def map_para_beta(j):
+        def map__v4_beta(j):
             L = [0]
             mrange = list(range(1, Mmax + 1))
             inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblock[j])
                            for i in range(maxworkers)]
             results_1 = [result[1] for result
-                         in sorted(list(para_beta(inputblocks)))]
+                         in sorted(list(_v4_beta(inputblocks)))]
             L.extend(sum([result for result in results_1], []))
             return L
 
-    lesbetas_maxblock0 = map_para_beta(0)
+    lesbetas_maxblock0 = map__v4_beta(0)
 
     if k >= 1:
-        lesbetas_maxblock1 = map_para_beta(1)
+        lesbetas_maxblock1 = map__v4_beta(1)
 
     if k >= 2:
-        lesbetas_maxblock2 = map_para_beta(2)
+        lesbetas_maxblock2 = map__v4_beta(2)
 
     if (k >= 3) and (level > 2):
-        lesbetas_maxblock3 = map_para_beta(3)
+        lesbetas_maxblock3 = map__v4_beta(3)
 
     if (k >= 4) and (level > 3):
-        lesbetas_maxblock4 = map_para_beta(4)
+        lesbetas_maxblock4 = map__v4_beta(4)
 
     # boucle pour évaluer également les j < k si all = True
     Sk = []
@@ -782,7 +780,7 @@ def irwin(b, d, k,
                 S = 1/R(d)
 
         if verbose:
-            print("Somme du niveau 1 pour d = %s et j = %s:" % (d, j))
+            print("\nSomme du niveau 1 pour d = %s et j = %s:" % (d, j))
             print(S)
 
         if 2 < level:
@@ -840,7 +838,7 @@ def irwin(b, d, k,
         if verbose:
             lastterm = -bubu if Mmax&1 else bubu
             if float(lastterm) == 0.:
-                u, E = shorten_small_real(lastterm)
+                u, E = _v4_shorten_small_real(lastterm)
                 print("The %sth term is about %f times 10^%s and it represents" % (Mmax, u, E))
             else:
                 print("The %sth term is about %.3e and it represents" % (Mmax, lastterm))
@@ -873,7 +871,7 @@ def irwin(b, d, k,
         if verbose:
             ratio = lastterm/S
             if float(ratio) == 0.:
-                u, E = _shorten_small_real(ratio)
+                u, E = _v4_shorten_small_real(ratio)
                 print("%.3f 10^%s of the total." % (u, E))
             else:
                 print("%.3e of the total." % ratio)
@@ -894,7 +892,7 @@ def irwin(b, d, k,
     return Rfinal(S)
 
 
-@docstring_parameter(irwin_fn_docstring)
+@_docstring_parameter(irwin_v4_fndocstring)
 def irwinpos(b, d, k,
              nbdigits=34,
              level=3,
@@ -930,7 +928,7 @@ def irwinpos(b, d, k,
      Rfinal,
      Mmax,
      IndexToR,
-     NbOfPrec) = _setup_realfields(nbdigits, PrecStep, b, level, Mmax)
+     NbOfPrec) = _v4_setup_realfields(nbdigits, PrecStep, b, level, Mmax)
 
     if showtimes:
         stoptime = time.time()
@@ -944,7 +942,7 @@ def irwinpos(b, d, k,
               end = ' ', flush = True)
         starttime = time.time()
 
-    blocks = _setup_blocks(b, d, level)
+    blocks = _v4_setup_blocks(b, d, level)
     block1 = blocks[0]
     block2 = blocks[1]
     if level >2:
@@ -985,8 +983,7 @@ def irwinpos(b, d, k,
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
-        print(f"Calcul des coefficients v_{{j;m}} pour 0<=j<={k}...",
-              end = ' ', flush = True)
+        print(f"Calcul des coefficients v_{{j;m}} pour 0<=j<={k} ...")
         starttime = time.time()
 
     # calcul récursif des moments
@@ -1007,11 +1004,10 @@ def irwinpos(b, d, k,
     PascalRow = [1, 1]
     useparallel = False
     if Mmax > 511 and showtimes and verbose:
-        print("\n    L'algorithme teste tous les 512 coefficients s'il est bénéfique")
+        print("    L'algorithme teste tous les 512 coefficients s'il est bénéfique")
         print("    d'utiliser la procédure décorée par @parallel.  Ce test n'est fait")
         print("    que pour le calcul des v_{0;m}.  Le premier nombre indiqué sera")
-        print("    la durée du calcul normal, le second avec @parallel, pour v_{0;m}.",
-              end = "", flush = True)
+        print("    la durée du calcul normal, le second avec @parallel, pour v_{0;m}.")
 
     for m in range(2, Mmax+1):
         prevPascalRow = PascalRow.copy()
@@ -1030,9 +1026,9 @@ def irwinpos(b, d, k,
 
         if m&511:
             if useparallel:
-                results = list(para_um(((a, PascalRow, lesgammasprime,
-                                         touslescoeffs, Rm, 0, m,)
-                                        for a in range(1, maxworkers + 1))))
+                results = list(_v4_um(((a, PascalRow, lesgammasprime,
+                                        touslescoeffs, Rm, 0, m,)
+                                       for a in range(1, maxworkers + 1))))
                 partial_sums = [result[1] for result in results]
                 # De toute façon on ne peut pas faire que ce soit exactement
                 # le même calcul qu'en non-parallèle puisque les termes ont
@@ -1051,9 +1047,9 @@ def irwinpos(b, d, k,
                         ) / Rm(b**(m+1) - bmoinsun) ]
         else:
             localstarttime = time.time()
-            results = list(para_um(((a, PascalRow, lesgammasprime,
-                                     touslescoeffs, Rm, 0, m,)
-                                    for a in range(1, maxworkers + 1))))
+            results = list(_v4_um(((a, PascalRow, lesgammasprime,
+                                    touslescoeffs, Rm, 0, m,)
+                                   for a in range(1, maxworkers + 1))))
             partial_sums = [result[1] for result in results]
             x = [ (Rm(b ** (m+1)) + sum(partial_sums)) / Rm(b**(m+1) - bmoinsun) ]
             multitime = time.time() - localstarttime
@@ -1069,21 +1065,21 @@ def irwinpos(b, d, k,
             singletime = time.time() - localstarttime
 
             if showtimes:
-                _comp_um_print_timeinfo(singletime, multitime,
-                                        useparallel, maxworkers, m)
+                _v4_umtimeinfo(singletime, multitime,
+                               useparallel, maxworkers, m)
 
             useparallel = (multitime < singletime)
 
         if useparallel:
             for j in range(1,k+1):
-                results = list(para_um(((a, PascalRow, lesgammasprime,
-                                            touslescoeffs, Rm, j, m,)
-                                        for a in range(1, maxworkers + 1))))
+                results = list(_v4_um(((a, PascalRow, lesgammasprime,
+                                        touslescoeffs, Rm, j, m,)
+                                       for a in range(1, maxworkers + 1))))
                 x = sum(p[1] for p in results)
                 x += cm[-1]
-                results = list(para_um(((a, PascalRow, lespuissancesdedprime,
-                                            touslescoeffs, Rm, j-1, m,)
-                                        for a in range(1, maxworkers + 1))))
+                results = list(_v4_um(((a, PascalRow, lespuissancesdedprime,
+                                        touslescoeffs, Rm, j-1, m,)
+                                       for a in range(1, maxworkers + 1))))
                 x += sum(p[1] for p in results)
                 x = x / Rm(b**(m+1) - bmoinsun)
                 cm.append(x)
@@ -1104,11 +1100,12 @@ def irwinpos(b, d, k,
 
     if showtimes:
         stoptime = time.time()
-        print("{:.3f}s".format(stoptime - starttime))
+        print(f"... m<={Mmax}, j<={k} (done) {stoptime-starttime:.3f}s")
 
     # calcul parallèle des beta (sommes d'inverses de puissances)
     if showtimes:
-        print(f"Calcul parallélisé des beta(m+1) avec maxworkers={maxworkers}")
+        print(f"Calcul parallélisé des beta(m+1) avec "
+              f"maxworkers={maxworkers} ...")
         # We want to display some visual sign or progress
         # Find the largest multiple of maxworkers at most 1000
         # HOWEVER THIS COSTS IN CODE SIMPLICITY AND EFFICIENCY
@@ -1125,8 +1122,8 @@ def irwinpos(b, d, k,
             I += q
         # assert I == mSize, "check your math"
         indices.append(I)
-        def map_para_beta(j):
-            print(f"({j} occ.)...", end = ' ', flush = True)
+        def map__v4_beta(j):
+            print(f"... ({j} occ.) ", end = ' ', flush = True)
             starttime = time.time()
             mend = 1
             L = [0]
@@ -1141,7 +1138,7 @@ def irwinpos(b, d, k,
                 inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblockshifted[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
 
@@ -1161,7 +1158,7 @@ def irwinpos(b, d, k,
                                 maxblockshifted[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v4_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{Mmax+1} (done)", end = " ", flush=True)
             stoptime = time.time()
@@ -1178,29 +1175,29 @@ def irwinpos(b, d, k,
             indices.append(I)
             I += q
         indices.append(I)
-        def map_para_beta(j):
+        def map__v4_beta(j):
             L = [0]
             mrange = list(range(1, Mmax + 1))
             inputblocks = [(mrange[indices[i]:indices[i+1]], IndexToR, maxblockshifted[j])
                            for i in range(maxworkers)]
             results_1 = [result[1] for result
-                         in sorted(list(para_beta(inputblocks)))]
+                         in sorted(list(_v4_beta(inputblocks)))]
             L.extend(sum([result for result in results_1], []))
             return L
 
-    lesbetas_maxblockshifted0 = map_para_beta(0)
+    lesbetas_maxblockshifted0 = map__v4_beta(0)
 
     if k >= 1:
-        lesbetas_maxblockshifted1 = map_para_beta(1)
+        lesbetas_maxblockshifted1 = map__v4_beta(1)
 
     if k >= 2:
-        lesbetas_maxblockshifted2 = map_para_beta(2)
+        lesbetas_maxblockshifted2 = map__v4_beta(2)
 
     if (k >= 3) and (level > 2):
-        lesbetas_maxblockshifted3 = map_para_beta(3)
+        lesbetas_maxblockshifted3 = map__v4_beta(3)
 
     if (k >= 4) and (level > 3):
-        lesbetas_maxblockshifted4 = map_para_beta(4)
+        lesbetas_maxblockshifted4 = map__v4_beta(4)
 
     # boucle pour évaluer si all = True également les j < k
     Sk = []
@@ -1222,7 +1219,7 @@ def irwinpos(b, d, k,
                 S = 1/R(d)
 
         if verbose:
-            print("Somme du niveau 1 pour d = %s et j = %s:" % (d, j))
+            print("\nSomme du niveau 1 pour d = %s et j = %s:" % (d, j))
             print(S)
 
         if 2 < level:
@@ -1280,7 +1277,7 @@ def irwinpos(b, d, k,
                              # doing -bubu if Mmax was odd
                              # (as copy pasted from alternating series code)
             if float(lastterm) == 0.:
-                u, E = _shorten_small_real(lastterm)
+                u, E = _v4_shorten_small_real(lastterm)
                 print(f"The {Mmax}th term is about {u:f} 10^{E} i.e. ",
                       end = "", flush = True)
             else:
@@ -1321,7 +1318,7 @@ def irwinpos(b, d, k,
         if verbose:
             ratio = lastterm/S
             if float(ratio) == 0.:
-                u, E = _shorten_small_real(ratio)
+                u, E = _v4_shorten_small_real(ratio)
                 print("%.3f 10^%s of the total." % (u, E))
             else:
                 print("%.3e of the total." % ratio)

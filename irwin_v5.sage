@@ -3,7 +3,7 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.0"
+__version__  = "1.5.1"
 __date__     = "2025/04/21"
 __filename__ = "irwin_v5.sage"
 
@@ -151,12 +151,12 @@ assert maxworkers < 200, f"Sorry maxworkers={maxworkers} must be less than 200"
 # ignoring the u_{j;m}'s for 0<j<=k.  Now unused, because timings
 # are done inclusive of all j's <=k.
 @parallel(ncpus=maxworkers)
-def para_u0m_partial(a, m, P, G, D, T, R):
+def _v5_u0m_partial(a, m, P, G, D, T, R):
     # m -a will be the same value in all simultaneous calls
     return sum(P[i]*R(G[i])*R(T[m - i][0]) for i in range(a, m + 1))
 
 @parallel(ncpus=maxworkers)
-def para_ukm_partial(a, m, P, G, D, T, R, k):
+def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     # m -a will be the same value in all simultaneous calls
     A = list(sum(P[i]*R(G[i])*R(T[m - i][j]) for i in range(a, m + 1))
              for j in range(k + 1))
@@ -165,9 +165,8 @@ def para_ukm_partial(a, m, P, G, D, T, R, k):
              for j in range(1, k + 1))
     return [ A[j] + B[j] for j in range(k + 1) ]
 
-def para_beta_aux(m, R, nblock):
+def _v5_beta_aux(m, R, nblock):
     return sum(1/R(n ** (m+1)) for n in nblock)
-
 # legacy comment, kept in case
 #   Si p_iter="multiprocessing"
 #   ValueError: Cannot pickle code objects from closures
@@ -179,12 +178,12 @@ def para_beta_aux(m, R, nblock):
 #       have time now, and will not have access to
 #       multi-core computer for a while.
 @parallel(ncpus=maxworkers)
-def para_beta(mlist, IR, nblock):
-    return list(para_beta_aux(m, IR[m], nblock) for m in mlist)
+def _v5_beta(mlist, IR, nblock):
+    return list(_v5_beta_aux(m, IR[m], nblock) for m in mlist)
 
 nbguardbits = 12
 
-def _shorten_small_real(rr):
+def _v5_shorten_small_real(rr):
     """Get magnitude order of a tiny real number
 
     Probably very clumsy.
@@ -198,7 +197,7 @@ def _shorten_small_real(rr):
     return s*10**float(y-N+1), N-1
 
 
-def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
+def _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     """Preparation of an array mapping index to a RealField
 
     NOTE BENE: with d=b-1, there is an additional factor
@@ -396,7 +395,7 @@ def _setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
     return nbbits, nbbits_final, R, Rfinal, Mmax, IndexToR, NbOfPrec
 
 
-def _setup_blocks(b, d, level):
+def _v5_setup_blocks(b, d, level):
     """Organize integers according to nb of digits and d count
 
     """
@@ -470,7 +469,7 @@ def _setup_blocks(b, d, level):
     return blocks
 
 
-def _print_umtimeinfo(single, multi, para, wrkrs, M, s):
+def _v5_umtimeinfo(single, multi, para, wrkrs, M, s):
     """Auxiliary shared between irwin() and irwinpos()
     """
     if multi < single:
@@ -527,7 +526,7 @@ def irwin(b, d, k,
      Rfinal,
      Mmax,
      IndexToR,
-     NbOfPrec) = _setup_realfields(nbdigits, PrecStep, b, level, Mmax)
+     NbOfPrec) = _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax)
 
     if showtimes:
         stoptime = time.time()
@@ -541,7 +540,7 @@ def irwin(b, d, k,
               end = ' ', flush = True)
         starttime = time.time()
 
-    blocks = _setup_blocks(b, d, level)
+    blocks = _v5_setup_blocks(b, d, level)
     block1 = blocks[0]
     block2 = blocks[1]
     if level >2:
@@ -575,7 +574,7 @@ def irwin(b, d, k,
             Rj = IndexToR[j]
             lespuissancesded.append(Rj(d**j))
     else:
-        # we need the name to be defined when calling para_ukm_partial
+        # we need the name to be defined when calling _v5_ukm_partial
         lespuissancesded = None        
 
     if showtimes:
@@ -632,13 +631,13 @@ def irwin(b, d, k,
             # # Things are a bit involved here because we want to measure
             # # time only for the computation of maxworkers new u_{0;m}
             # starttime = time.time()
-            # results = para_u0m_partial(((a, M + a,
-            #                              PascalRows[a],
-            #                              lesgammas,
-            #                              lespuissancesded,
-            #                              touslescoeffs,
-            #                              IndexToR[M + a])
-            #                             for a in range(1, step + 1)))
+            # results = _v5_u0m_partial(((a, M + a,
+            #                             PascalRows[a],
+            #                             lesgammas,
+            #                             lespuissancesded,
+            #                             touslescoeffs,
+            #                             IndexToR[M + a])
+            #                            for a in range(1, step + 1)))
             # u0m_partial = [ None ]
             # u0m_partial.extend([result[1] for result in sorted(list(results))])
             # multitime = time.time() - starttime
@@ -670,14 +669,14 @@ def irwin(b, d, k,
             #     ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
 
             starttime = time.time()
-            results = para_ukm_partial(((a, M + a,
-                                         PascalRows[a],
-                                         lesgammas,
-                                         lespuissancesded,
-                                         touslescoeffs,
-                                         IndexToR[M + a],
-                                         k)
-                                        for a in range(1, step + 1)))
+            results = _v5_ukm_partial(((a, M + a,
+                                        PascalRows[a],
+                                        lesgammas,
+                                        lespuissancesded,
+                                        touslescoeffs,
+                                        IndexToR[M + a],
+                                        k)
+                                       for a in range(1, step + 1)))
             ukm_partial = [ None ]
             ukm_partial.extend([result[1] for result in sorted(list(results))])
             multitime = time.time() - starttime
@@ -705,20 +704,20 @@ def irwin(b, d, k,
                 singletime = time.time() - starttime
 
                 if showtimes:
-                    _print_umtimeinfo(singletime, multitime, useparallel,
-                                      maxworkers, M, step)
+                    _v5_umtimeinfo(singletime, multitime, useparallel,
+                                   maxworkers, M, step)
 
                 useparallel = multitime < singletime
 
         elif useparallel:
-            results = para_ukm_partial(((a, M + a,
-                                         PascalRows[a],
-                                         lesgammas,
-                                         lespuissancesded,
-                                         touslescoeffs,
-                                         IndexToR[M + a],
-                                         k)
-                                        for a in range(1, step + 1)))
+            results = _v5_ukm_partial(((a, M + a,
+                                        PascalRows[a],
+                                        lesgammas,
+                                        lespuissancesded,
+                                        touslescoeffs,
+                                        IndexToR[M + a],
+                                        k)
+                                       for a in range(1, step + 1)))
             ukm_partial = [ None ]
             ukm_partial.extend([result[1] for result in sorted(list(results))])
 
@@ -807,7 +806,7 @@ def irwin(b, d, k,
             I += q
         # assert I == mSize, "check your math"
         indices.append(I)
-        def map_para_beta(j):
+        def map__v5_beta(j):
             print(f"... ({j} occ.)", end = ' ', flush = True)
             starttime = time.time()
             mend = 1
@@ -825,7 +824,7 @@ def irwin(b, d, k,
                                 maxblock[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v5_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
 
@@ -846,7 +845,7 @@ def irwin(b, d, k,
                                 maxblock[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v5_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{Mmax+1} (done)", end = " ", flush=True)
             stoptime = time.time()
@@ -863,7 +862,7 @@ def irwin(b, d, k,
             indices.append(I)
             I += q
         indices.append(I)
-        def map_para_beta(j):
+        def map__v5_beta(j):
             L = [0]
             mrange = list(range(1, Mmax + 1))
             inputblocks = [(mrange[indices[i]:indices[i+1]],
@@ -871,23 +870,23 @@ def irwin(b, d, k,
                             maxblock[j])
                            for i in range(maxworkers)]
             results_1 = [result[1] for result
-                         in sorted(list(para_beta(inputblocks)))]
+                         in sorted(list(_v5_beta(inputblocks)))]
             L.extend(sum([result for result in results_1], []))
             return L
 
-    lesbetas_maxblock0 = map_para_beta(0)
+    lesbetas_maxblock0 = map__v5_beta(0)
 
     if k >= 1:
-        lesbetas_maxblock1 = map_para_beta(1)
+        lesbetas_maxblock1 = map__v5_beta(1)
 
     if k >= 2:
-        lesbetas_maxblock2 = map_para_beta(2)
+        lesbetas_maxblock2 = map__v5_beta(2)
 
     if (k >= 3) and (level > 2):
-        lesbetas_maxblock3 = map_para_beta(3)
+        lesbetas_maxblock3 = map__v5_beta(3)
 
     if (k >= 4) and (level > 3):
-        lesbetas_maxblock4 = map_para_beta(4)
+        lesbetas_maxblock4 = map__v5_beta(4)
 
     # boucle pour évaluer également les j < k si all = True
     Sk = []
@@ -909,7 +908,7 @@ def irwin(b, d, k,
                 S = 1/Rmax(d)
 
         if verbose:
-            print("Somme du niveau 1 pour d = %s et j = %s:" % (d, j))
+            print("\nSomme du niveau 1 pour d = %s et j = %s:" % (d, j))
             print(S)
 
         if 2 < level:
@@ -967,7 +966,7 @@ def irwin(b, d, k,
         if verbose:
             lastterm = -bubu if Mmax&1 else bubu
             if float(lastterm) == 0.:
-                u, E = shorten_small_real(lastterm)
+                u, E = _v5_shorten_small_real(lastterm)
                 print("The %sth term is about %f times 10^%s and it represents" % (Mmax, u, E))
             else:
                 print("The %sth term is about %.3e and it represents" % (Mmax, lastterm))
@@ -1000,7 +999,7 @@ def irwin(b, d, k,
         if verbose:
             ratio = lastterm/S
             if float(ratio) == 0.:
-                u, E = _shorten_small_real(ratio)
+                u, E = _v5_shorten_small_real(ratio)
                 print("%.3f 10^%s of the total." % (u, E))
             else:
                 print("%.3e of the total." % ratio)
@@ -1059,7 +1058,7 @@ def irwinpos(b, d, k,
      Rfinal,
      Mmax,
      IndexToR,
-     NbOfPrec) = _setup_realfields(nbdigits, PrecStep, b, level, Mmax)
+     NbOfPrec) = _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax)
 
     if showtimes:
         stoptime = time.time()
@@ -1073,7 +1072,7 @@ def irwinpos(b, d, k,
               end = ' ', flush = True)
         starttime = time.time()
 
-    blocks = _setup_blocks(b, d, level)
+    blocks = _v5_setup_blocks(b, d, level)
     block1 = blocks[0]
     block2 = blocks[1]
     if level >2:
@@ -1157,14 +1156,14 @@ def irwinpos(b, d, k,
         # This will check each times m becomes larger by 50 * maxworkers
         if stepindex % 50 == 0:
             starttime = time.time()
-            results = para_ukm_partial(((a, M + a,
-                                         PascalRows[a],
-                                         lesgammasprime,
-                                         lespuissancesdedprime,
-                                         touslescoeffs,
-                                         IndexToR[M + a],
-                                         k)
-                                        for a in range(1, step + 1)))
+            results = _v5_ukm_partial(((a, M + a,
+                                        PascalRows[a],
+                                        lesgammasprime,
+                                        lespuissancesdedprime,
+                                        touslescoeffs,
+                                        IndexToR[M + a],
+                                        k)
+                                       for a in range(1, step + 1)))
             vkm_partial = [ None ]
             vkm_partial.extend([result[1] for result in sorted(list(results))])
             multitime = time.time() - starttime
@@ -1192,20 +1191,20 @@ def irwinpos(b, d, k,
                 singletime = time.time() - starttime
 
                 if showtimes:
-                    _print_umtimeinfo(singletime, multitime, useparallel,
-                                      maxworkers, M, step)
+                    _v5_umtimeinfo(singletime, multitime, useparallel,
+                                   maxworkers, M, step)
 
                 useparallel = multitime < singletime
             
         elif useparallel:
-            results = para_ukm_partial(((a, M + a,
-                                         PascalRows[a],
-                                         lesgammasprime,
-                                         lespuissancesdedprime,
-                                         touslescoeffs,
-                                         IndexToR[M + a],
-                                         k)
-                                        for a in range(1, step + 1)))
+            results = _v5_ukm_partial(((a, M + a,
+                                        PascalRows[a],
+                                        lesgammasprime,
+                                        lespuissancesdedprime,
+                                        touslescoeffs,
+                                        IndexToR[M + a],
+                                        k)
+                                       for a in range(1, step + 1)))
             vkm_partial = [ None ]
             vkm_partial.extend([result[1] for result in sorted(list(results))])
 
@@ -1296,7 +1295,7 @@ def irwinpos(b, d, k,
             I += q
         # assert I == mSize, "check your math"
         indices.append(I)
-        def map_para_beta(j):
+        def map__v5_beta(j):
             print(f"... ({j} occ.) ", end = ' ', flush = True)
             starttime = time.time()
             mend = 1
@@ -1314,7 +1313,7 @@ def irwinpos(b, d, k,
                                 maxblockshifted[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v5_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{mend}", end = " ", flush= True)
 
@@ -1335,7 +1334,7 @@ def irwinpos(b, d, k,
                                 maxblockshifted[j])
                                for i in range(maxworkers)]
                 results_1 = [result[1] for result
-                             in sorted(list(para_beta(inputblocks)))]
+                             in sorted(list(_v5_beta(inputblocks)))]
                 L.extend(sum([result for result in results_1], []))
                 print(f"m<{Mmax+1} (done)", end = " ", flush=True)
             stoptime = time.time()
@@ -1352,7 +1351,7 @@ def irwinpos(b, d, k,
             indices.append(I)
             I += q
         indices.append(I)
-        def map_para_beta(j):
+        def map__v5_beta(j):
             L = [0]
             mrange = list(range(1, Mmax + 1))
             inputblocks = [(mrange[indices[i]:indices[i+1]],
@@ -1360,23 +1359,23 @@ def irwinpos(b, d, k,
                             maxblockshifted[j])
                            for i in range(maxworkers)]
             results_1 = [result[1] for result
-                         in sorted(list(para_beta(inputblocks)))]
+                         in sorted(list(_v5_beta(inputblocks)))]
             L.extend(sum([result for result in results_1], []))
             return L
 
-    lesbetas_maxblockshifted0 = map_para_beta(0)
+    lesbetas_maxblockshifted0 = map__v5_beta(0)
 
     if k >= 1:
-        lesbetas_maxblockshifted1 = map_para_beta(1)
+        lesbetas_maxblockshifted1 = map__v5_beta(1)
 
     if k >= 2:
-        lesbetas_maxblockshifted2 = map_para_beta(2)
+        lesbetas_maxblockshifted2 = map__v5_beta(2)
 
     if (k >= 3) and (level > 2):
-        lesbetas_maxblockshifted3 = map_para_beta(3)
+        lesbetas_maxblockshifted3 = map__v5_beta(3)
 
     if (k >= 4) and (level > 3):
-        lesbetas_maxblockshifted4 = map_para_beta(4)
+        lesbetas_maxblockshifted4 = map__v5_beta(4)
 
     # boucle pour évaluer si all = True également les j < k
     Sk = []
@@ -1398,7 +1397,7 @@ def irwinpos(b, d, k,
                 S = 1/Rmax(d)
 
         if verbose:
-            print("Somme du niveau 1 pour d = %s et j = %s:" % (d, j))
+            print("\nSomme du niveau 1 pour d = %s et j = %s:" % (d, j))
             print(S)
 
         if 2 < level:
@@ -1456,7 +1455,7 @@ def irwinpos(b, d, k,
                              # doing -bubu if Mmax was odd
                              # (as copy pasted from alternating series code)
             if float(lastterm) == 0.:
-                u, E = _shorten_small_real(lastterm)
+                u, E = _v5_shorten_small_real(lastterm)
                 print(f"The {Mmax}th term is about {u:f} 10^{E} i.e. ",
                       end = "", flush = True)
             else:
@@ -1497,7 +1496,7 @@ def irwinpos(b, d, k,
         if verbose:
             ratio = lastterm/S
             if float(ratio) == 0.:
-                u, E = _shorten_small_real(ratio)
+                u, E = _v5_shorten_small_real(ratio)
                 print("%.3f 10^%s of the total." % (u, E))
             else:
                 print("%.3e of the total." % ratio)

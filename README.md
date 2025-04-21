@@ -68,30 +68,28 @@ perspective to make it easier and less demanding on the hardware to obtain
   "parallelization".  This is experimental and mainly effective when computing
   the `beta(m+1)`'s.
 
-  The `v5` version (April 21, 2025) differs from `v4` (code last updated April
-  18, 2025) mainly in the following manner: `v4` tries to compute each new
-  `u_{j;m}` (or `v_{j;m}` for the Burnol recurrences with positive terms) via
-  dividing the sum defining it into a number of chunks equal to the value of
-  `maxworkers`.  So each new coefficient will cost the forking of
-  subprocesses.  In contrast `v5` does not divide such sums into subsums, but
-  computes complete sums "in parallel" for successive `m=M+1`, ...,
-  `m=M+maxworkers` (up to finitely many additive corrections done after; for
-  all `j`'s from `0` to `k`). This requires more complex code, especially for
-  handling the `k>0` case, due to the nature of the recurrences.  The memory
-  foot-print is higher because `maxworkers+1` rows of the Pascal triangle are
-  in memory rather than only `2` for `v4`.
+  The `v5` version differs from `v4` mainly in the following manner: `v4`
+  tries to compute each new `u_{j;m}` (or `v_{j;m}` for the Burnol recurrences
+  with positive terms) via dividing the sum defining it into a number of
+  chunks equal to the value of `maxworkers`.  So each new coefficient will
+  cost the forking of subprocesses.  In contrast `v5` does not divide such
+  sums into subsums, but computes complete sums "in parallel" for successive
+  `m=M+1`, ..., `m=M+maxworkers` (up to finitely many additive corrections
+  done after; for all `j`'s from `0` to `k`). This requires more complex code,
+  especially for handling the `k>0` case, due to the nature of the
+  recurrences.  The memory foot-print is higher because `maxworkers+1` rows of
+  the Pascal triangle are in memory rather than only `2` for `v4`.
 
   (*testing of `v5` has been only so far on an old hardware with only two
   cores, and runs where perhaps `v5` could prove more efficient take too long,
   of the order of many minutes, so comparisons have remained very limited*)
 
-  Also `v5` has a new optional Boolean `persistentpara` (currently defaults to
-  `False`) which if set to `True` tells to not test anymore during the
-  computations of the recurrences if it is favourable to keep on using
-  parallelization.  To see a printed trace of such tests, use `showtimes=True`
-  in the function calls.  For `k>0`, `v5` when doing such timing tests
-  computes with all `j`'s up to `k` included whereas `v4` decided on the basis
-  of `j=0` alone.
+  Also `v5` has a new optional Boolean `persistentpara` (defaults to `True`)
+  which if set to `True` tells to not test anymore during the computations of
+  the recurrences if it is favourable to keep on using parallelization.  To
+  see a printed trace of such tests, use `showtimes=True` in the function
+  calls.  For `k>0`, `v5` when doing such timing tests computes with all `j`'s
+  up to `k` included whereas `v4` decided on the basis of `j=0` alone.
   
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
