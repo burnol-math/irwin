@@ -96,7 +96,7 @@ irwin_v5_fn_docstring = """\
         the case for k=0 and d=1, and to a lesser extent when
         d=b-1).  Use ``verbose=True`` to check how many terms
         are used by default.
-    :param bool persistentpara: (optional, default ``False``)
+    :param bool persistentpara: (optional, default ``True``)
         Whether once parallel mode is chosen to compute the
         coefficients u_{j;m} or v_{j;m} to check again if
         non-parallel would be better.
@@ -497,8 +497,8 @@ def irwin(b, d, k,
           all=False,
           showtimes=False,
           verbose=False,
-          Mmax=-1,
-          persistentpara=False
+          persistentpara=True,
+          Mmax=-1
           ):
     """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
 
@@ -1029,8 +1029,8 @@ def irwinpos(b, d, k,
              all=False,
              showtimes=False,
              verbose=False,
-             Mmax=-1,
-             persistentpara=False
+             persistentpara=True,
+             Mmax=-1
              ):
     """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
 
