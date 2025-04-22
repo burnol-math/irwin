@@ -164,6 +164,157 @@ def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     return [ A[j] + B[j] for j in range(k + 1) ]
 
 
+def _v5_umtimeinfo(single, multi, para, wrkrs, M, s):
+    """Auxiliary shared between irwin() and irwinpos()
+    """
+    if multi < single:
+        if para:
+            print(f"... poursuite car {single:.3f}s>{multi:.3f}s"
+                  f" en parallèle ({M}<m<={M+s})")
+        else:
+            print(f"... basculement car {single:.3f}s>{multi:.3f}s"
+                  f" en parallèle (maxworkers={wrkrs}, {M}<m<={M+s})")
+    else:
+        if para:
+            print(f"... on quitte car {single:.3f}s<{multi:.3f}s"
+                  f" l'exécution parallèle ({M}<m<={M+s})")
+        else:
+            print(f"... pas utile ({single:.3f}s<{multi:.3f}s)"
+                  f" d'exécuter en parallèle ({M}<m<={M+s})")
+
+
+def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
+                              PascalRows, IndexToR, b, bmoinsun, k,
+                              showtimes, persistentpara, is_for_vm):
+    def _v5_para_recurrence(m, step, useparallel):
+        del PascalRows[:-1]
+        for i in range(step):
+            m += 1
+            newPascalRow = [ 1 ]
+            halfm = m // 2
+            newPascalRow.extend([PascalRows[-1][j-1] + 
+                                 PascalRows[-1][j] for j in range(1, halfm)])
+            if not (m&1):
+                halfPascalRow = newPascalRow.copy()
+            newPascalRow.append(PascalRows[-1][halfm-1]+PascalRows[-1][halfm])
+            if m&1:
+                newPascalRow.extend(reversed(newPascalRow))
+            else:
+                newPascalRow.extend(reversed(halfPascalRow))
+            PascalRows.append(newPascalRow)
+
+        M = m - step
+        if ((M - 400) % 500 < maxworkers):
+            starttime = time.time()
+            results = _v5_ukm_partial(((a, M + a,
+                                        PascalRows[a],
+                                        Gammas,
+                                        PuissancesDeD,
+                                        touslescoeffs,
+                                        IndexToR[M + a],
+                                        k)
+                                       for a in range(1, step + 1)))
+            ukm_partial = [ None ]
+            ukm_partial.extend([result[1] for result in sorted(list(results))])
+            multitime = time.time() - starttime
+
+            if useparallel and persistentpara:
+                # do not check again
+                if showtimes:
+                    print(f"... mode parallèle persistant ({multitime:.3f}s; "
+                          f"{M}<m<={M+step})")
+            else:
+                starttime = time.time()
+                m = M
+                ukm_partial = [ None ]
+                for j in range(1, 1 + step):
+                    m += 1
+                    Rm = IndexToR[m]
+                    Am = [ sum(PascalRows[j][i]
+                               * Rm(Gammas[i])
+                               * Rm(touslescoeffs[m-i][p])
+                               for i in range(j, m+1)) for p in range(k+1) ]
+                    Bm = [0]
+                    Bm.extend([ sum(PascalRows[j][i]
+                                    * Rm(PuissancesDeD[i])
+                                    * Rm(touslescoeffs[m-i][p-1])
+                                    for i in range(j, m+1)) for p in range(1, k+1) ]) 
+                    ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
+                singletime = time.time() - starttime
+
+                if showtimes:
+                    _v5_umtimeinfo(singletime, multitime,
+                                   useparallel,
+                                   maxworkers, M, step)
+
+                useparallel = multitime < singletime
+
+        elif useparallel:
+            results = _v5_ukm_partial(((a, M + a,
+                                        PascalRows[a],
+                                        Gammas,
+                                        PuissancesDeD,
+                                        touslescoeffs,
+                                        IndexToR[M + a],
+                                        k)
+                                       for a in range(1, step + 1)))
+            ukm_partial = [ None ]
+            ukm_partial.extend([result[1] for result in sorted(list(results))])
+
+        else:
+            m = M
+            ukm_partial = [ None ]
+            for j in range(1, 1 + step):
+                m += 1
+                Rm = IndexToR[m]
+                Am = [ sum(PascalRows[j][i]
+                           * Rm(Gammas[i])
+                           * Rm(touslescoeffs[m-i][p])
+                           for i in range(j, m+1)) for p in range(k+1) ]
+                Bm = [0]
+                Bm.extend([ sum(PascalRows[j][i]
+                                * Rm(PuissancesDeD[i])
+                                * Rm(touslescoeffs[m-i][p-1])
+                                for i in range(j, m+1)) for p in range(1, k+1) ]) 
+                ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
+
+        # now correct the um's (or vm's) (prior to dividing by b**(m+1)-b+1)
+        # with finitely missing contributions
+        m = M
+        for j in range(1, 1 + step):
+            m += 1
+            Rm = IndexToR[m]
+            D = Rm( b**(m+1) - bmoinsun )
+            # attention to the b**(m+1) extra term specific to v_m recurrence
+            # attension that parentheses are needed to delimit what "else"
+            # catches
+            cm = [ ((Rm(b ** (m+1)) if is_for_vm else 0)
+                    + ukm_partial[j][0]
+                    + sum(PascalRows[j][i]
+                          * Rm(Gammas[i])
+                          * Rm(touslescoeffs[m-i][0])
+                          for i in range(1, j))
+                    ) / D
+                  ]
+            for p in range(1, k+1):
+                _ = (ukm_partial[j][p]
+                     + sum(PascalRows[j][i]
+                           * Rm(Gammas[i])
+                           * Rm(touslescoeffs[m-i][p])
+                           for i in range(1, j))
+                     + cm[-1]
+                     + sum(PascalRows[j][i]
+                           * Rm(PuissancesDeD[i])
+                           * Rm(touslescoeffs[m-i][p-1])
+                           for i in range(1, j))
+                     ) / D
+                cm.append(_)
+            touslescoeffs.append(cm)
+        # update status
+        return useparallel
+    return _v5_para_recurrence
+
+
 def _v5_beta_aux(m, R, nblock):
     return sum(1/R(n ** (m+1)) for n in nblock)
 # legacy comment, kept in case
@@ -550,25 +701,6 @@ def _v5_setup_blocks(b, d, level):
     return blocks
 
 
-def _v5_umtimeinfo(single, multi, para, wrkrs, M, s):
-    """Auxiliary shared between irwin() and irwinpos()
-    """
-    if multi < single:
-        if para:
-            print(f"... poursuite car {single:.3f}s>{multi:.3f}s"
-                  f" en parallèle ({M}<m<={M+s})")
-        else:
-            print(f"... basculement car {single:.3f}s>{multi:.3f}s"
-                  f" en parallèle (maxworkers={wrkrs}, {M}<m<={M+s})")
-    else:
-        if para:
-            print(f"... on quitte car {single:.3f}s<{multi:.3f}s"
-                  f" l'exécution parallèle ({M}<m<={M+s})")
-        else:
-            print(f"... pas utile ({single:.3f}s<{multi:.3f}s)"
-                  f" d'exécuter en parallèle ({M}<m<={M+s})")
-
-
 @_docstring_parameter(irwin_v5_fn_docstring)
 def irwin(b, d, k,
           nbdigits=34,
@@ -683,197 +815,30 @@ def irwin(b, d, k,
         c1.append(((lesgammas[1] + d) * Rmax(b) + c1[-1])/Rmax(b * b - bmoinsun))
     touslescoeffs.append(c1)
 
-    # Note 1: PascalRows and useparallel do not have to have been
-    #         defined yet.
-    # Note 2: There is "nonlocal" keyword in Python3, which I prefer not to use
-    #         as I would prefer "parentvar" kind.
-    # Note 3: One can use lists via .append, or "del" as is done with
-    #         PascalRows, as long as no is attempted such as PascalRows = [].
-    # Note 4: I could make this a module auxiliary like I did to define
-    #         map__v5_beta to share with irwinpos(), and avoid code duplication
-    #         but it is a bit complicated due to the slight difference in the
-    #         recurrences.
-    def ComputeNewCoeffs(m, useparallel, step):
-        del PascalRows[:-1]
-        for i in range(step):
-            m += 1
-            newPascalRow = [ 1 ]
-            halfm = m // 2
-            newPascalRow.extend([PascalRows[-1][j-1] + 
-                                 PascalRows[-1][j] for j in range(1, halfm)])
-            if not (m&1):
-                halfPascalRow = newPascalRow.copy()
-            newPascalRow.append(PascalRows[-1][halfm-1]+PascalRows[-1][halfm])
-            if m&1:
-                newPascalRow.extend(reversed(newPascalRow))
-            else:
-                newPascalRow.extend(reversed(halfPascalRow))
-            PascalRows.append(newPascalRow)
-
-        M = m - step
-        # The very first recurrences (here M=1) have very few terms so in
-        # general comparing times serves nothing.  Let's test every 500
-        # coefficients and do it first at 400.  For large maxworkers this
-        # means we test often so let's hope persistentpara is True and
-        # parallel mode is chosen early.
-        # At some point I tested every 50 * maxworkers increase, which is fine
-        # with maxworkers = 8 but for large maxworkers this would have made the
-        # first check be done somewhat late.
-        if ((M - 400) % 500 < maxworkers):
-            # OBSOLETE Code branch which measure time only for the u_{0;m}'s.
-            #
-            # Finally I have reverted this to do the time measurement
-            # inclusive of the computation of the u_{j;m}, j>0. 
-            # # Things are a bit involved here because we want to measure
-            # # time only for the computation of maxworkers new u_{0;m}
-            # starttime = time.time()
-            # results = _v5_u0m_partial(((a, M + a,
-            #                             PascalRows[a],
-            #                             lesgammas,
-            #                             lespuissancesded,
-            #                             touslescoeffs,
-            #                             IndexToR[M + a])
-            #                            for a in range(1, step + 1)))
-            # u0m_partial = [ None ]
-            # u0m_partial.extend([result[1] for result in sorted(list(results))])
-            # multitime = time.time() - starttime
-            
-            # starttime = time.time()
-            # m = M
-            # u0m_partial = [ None ]
-            # for j in range(1, 1+step):
-            #     m += 1
-            #     Rm = IndexToR[m]
-            #     u0m_partial.append(sum(PascalRows[j][i] * Rm(lesgammas[i])
-            #                            * Rm(touslescoeffs[m-i][0])
-            #                            for i in range(j, m+1)))
-            # singletime = time.time() - starttime
-
-            # m = M
-            # ukm_partial = [ [None] * (k+1) ]
-            # for j in range(1, 1 + step):
-            #     m += 1
-            #     Rm = IndexToR[m]
-            #     Am = [ u0m_partial[j] ]
-            #     Am.extend(sum(PascalRows[j][i] * Rm(lesgammas[i])
-            #                   * Rm(touslescoeffs[m-i][p])
-            #                   for i in range(j, m+1)) for p in range(1, k+1))
-            #     Bm = [ 0 ]
-            #     Bm.extend([ sum(PascalRows[j][i] * Rm(lespuissancesded[i]) *
-            #                     Rm(touslescoeffs[m-i][p-1])
-            #                     for i in range(j, m+1)) for p in range(1, k+1) ]) 
-            #     ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-
-            starttime = time.time()
-            results = _v5_ukm_partial(((a, M + a,
-                                        PascalRows[a],
-                                        lesgammas,
-                                        lespuissancesded,
-                                        touslescoeffs,
-                                        IndexToR[M + a],
-                                        k)
-                                       for a in range(1, step + 1)))
-            ukm_partial = [ None ]
-            ukm_partial.extend([result[1] for result in sorted(list(results))])
-            multitime = time.time() - starttime
-
-            if useparallel and persistentpara:
-                # do not check again
-                if showtimes:
-                    print(f"... mode parallèle persistant ({multitime:.3f}s; "
-                          f"{M}<m<={M+step})")
-            else:
-                starttime = time.time()
-                m = M
-                ukm_partial = [ None ]
-                for j in range(1, 1 + step):
-                    m += 1
-                    Rm = IndexToR[m]
-                    Am = [ sum(PascalRows[j][i] * Rm(lesgammas[i])
-                               * Rm(touslescoeffs[m-i][p])
-                               for i in range(j, m+1)) for p in range(k+1) ]
-                    Bm = [0]
-                    Bm.extend([ sum(PascalRows[j][i] * Rm(lespuissancesded[i])
-                                    * Rm(touslescoeffs[m-i][p-1])
-                                    for i in range(j, m+1)) for p in range(1, k+1) ]) 
-                    ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-                singletime = time.time() - starttime
-
-                if showtimes:
-                    _v5_umtimeinfo(singletime, multitime, useparallel,
-                                   maxworkers, M, step)
-
-                useparallel = multitime < singletime
-
-        elif useparallel:
-            results = _v5_ukm_partial(((a, M + a,
-                                        PascalRows[a],
-                                        lesgammas,
-                                        lespuissancesded,
-                                        touslescoeffs,
-                                        IndexToR[M + a],
-                                        k)
-                                       for a in range(1, step + 1)))
-            ukm_partial = [ None ]
-            ukm_partial.extend([result[1] for result in sorted(list(results))])
-
-        else:
-            m = M
-            ukm_partial = [ None ]
-            for j in range(1, 1 + step):
-                m += 1
-                Rm = IndexToR[m]
-                Am = [ sum(PascalRows[j][i] * Rm(lesgammas[i])
-                           * Rm(touslescoeffs[m-i][p])
-                           for i in range(j, m+1)) for p in range(k+1) ]
-                Bm = [0]
-                Bm.extend([ sum(PascalRows[j][i] * Rm(lespuissancesded[i])
-                                * Rm(touslescoeffs[m-i][p-1])
-                                for i in range(j, m+1)) for p in range(1, k+1) ]) 
-                ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-
-        # now correct the u_{j;m}'s (prior to dividing by b**(m+1)-b+1)
-        # with finitely missing contributions
-        m = M
-        for j in range(1, 1 + step):
-            m += 1
-            Rm = IndexToR[m]
-            D = Rm( b**(m+1) - bmoinsun )
-            cm = [ (ukm_partial[j][0]
-                    + sum(PascalRows[j][i] * Rm(lesgammas[i])
-                          * Rm(touslescoeffs[m-i][0])
-                          for i in range(1, j))
-                    ) / D
-                  ]
-            for p in range(1, k+1):
-                x = (ukm_partial[j][p]
-                     + sum(PascalRows[j][i] * Rm(lesgammas[i])
-                           * Rm(touslescoeffs[m-i][p])
-                           for i in range(1, j))
-                     + cm[-1]
-                     + sum(PascalRows[j][i] * Rm(lespuissancesded[i])
-                           * Rm(touslescoeffs[m-i][p-1])
-                           for i in range(1, j))
-                     ) / D
-                cm.append(x)
-            touslescoeffs.append(cm)
-
-        # update status
-        return useparallel
-
-    m = 1
     PascalRows = [ [1,1] ]
     useparallel = False
+    _v5_para_recurrence = _v5_setup_para_recurrence(touslescoeffs,
+                                                    lesgammas,
+                                                    lespuissancesded,
+                                                    PascalRows,
+                                                    IndexToR,
+                                                    b, bmoinsun,
+                                                    k,
+                                                    showtimes,
+                                                    persistentpara,
+                                                    False)
+
+    m = 1
     Q, R = divmod(Mmax - 1, maxworkers)
     for P in range(Q):
-        useparallel = ComputeNewCoeffs(m, useparallel, maxworkers)
+        useparallel = _v5_para_recurrence(m, maxworkers, useparallel)
         m += maxworkers
     # Ici on va invoquer une procédure parallélisée avec <maxworkers, cela
     # risque-t-il de créer les problèmes observés avec v4 avant le fix de #1
     # lorsqu'on invoquait avec un nombre d'arguments très grand par rapport
     # à maxworkers ?
     if R > 0:
-        _= ComputeNewCoeffs(m, useparallel, R)
+        _ = _v5_para_recurrence(m, R, useparallel)
 
     if showtimes:
         stoptime = time.time()
@@ -1144,133 +1109,25 @@ def irwinpos(b, d, k,
         c1.append(( (lesgammasprime[1] + dprime) * Rmax(b) + c1[-1])/Rmax(b * b - bmoinsun))
     touslescoeffs.append(c1)
 
-    def ComputeNewCoeffs(m, useparallel, step):
-        del PascalRows[:-1]
-        for i in range(step):
-            m += 1
-            newPascalRow = [ 1 ]
-            halfm = m // 2
-            newPascalRow.extend([PascalRows[-1][j-1] + 
-                                 PascalRows[-1][j] for j in range(1, halfm)])
-            if not (m&1):
-                halfPascalRow = newPascalRow.copy()
-            newPascalRow.append(PascalRows[-1][halfm-1]+PascalRows[-1][halfm])
-            if m&1:
-                newPascalRow.extend(reversed(newPascalRow))
-            else:
-                newPascalRow.extend(reversed(halfPascalRow))
-            PascalRows.append(newPascalRow)
-
-        M = m - step
-        if ((M - 400) % 500 < maxworkers):
-            starttime = time.time()
-            results = _v5_ukm_partial(((a, M + a,
-                                        PascalRows[a],
-                                        lesgammasprime,
-                                        lespuissancesdedprime,
-                                        touslescoeffs,
-                                        IndexToR[M + a],
-                                        k)
-                                       for a in range(1, step + 1)))
-            vkm_partial = [ None ]
-            vkm_partial.extend([result[1] for result in sorted(list(results))])
-            multitime = time.time() - starttime
-
-            if useparallel and persistentpara:
-                # do not check again
-                if showtimes:
-                    print(f"... mode parallèle persistant ({multitime:.3f}s; "
-                          f"{M}<m<={M+step})")
-            else:
-                starttime = time.time()
-                m = M
-                vkm_partial = [ None ]
-                for j in range(1, 1 + step):
-                    m += 1
-                    Rm = IndexToR[m]
-                    Am = [ sum(PascalRows[j][i] * Rm(lesgammasprime[i])
-                               * Rm(touslescoeffs[m-i][p])
-                               for i in range(j, m+1)) for p in range(k+1) ]
-                    Bm = [0]
-                    Bm.extend([ sum(PascalRows[j][i] * Rm(lespuissancesdedprime[i])
-                                    * Rm(touslescoeffs[m-i][p-1])
-                                    for i in range(j, m+1)) for p in range(1, k+1) ]) 
-                    vkm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-                singletime = time.time() - starttime
-
-                if showtimes:
-                    _v5_umtimeinfo(singletime, multitime, useparallel,
-                                   maxworkers, M, step)
-
-                useparallel = multitime < singletime
-            
-        elif useparallel:
-            results = _v5_ukm_partial(((a, M + a,
-                                        PascalRows[a],
-                                        lesgammasprime,
-                                        lespuissancesdedprime,
-                                        touslescoeffs,
-                                        IndexToR[M + a],
-                                        k)
-                                       for a in range(1, step + 1)))
-            vkm_partial = [ None ]
-            vkm_partial.extend([result[1] for result in sorted(list(results))])
-
-        else:
-            m = M
-            vkm_partial = [ None ]
-            for j in range(1, 1 + step):
-                m += 1
-                Rm = IndexToR[m]
-                Am = [ sum(PascalRows[j][i] * Rm(lesgammasprime[i])
-                           * Rm(touslescoeffs[m-i][p])
-                           for i in range(j, m+1)) for p in range(k+1) ]
-                Bm = [0]
-                Bm.extend([ sum(PascalRows[j][i] * Rm(lespuissancesdedprime[i])
-                                * Rm(touslescoeffs[m-i][p-1])
-                                for i in range(j, m+1)) for p in range(1, k+1) ]) 
-                vkm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-
-        # now correct the um's (prior to dividing by b**(m+1)-b+1)
-        # with finitely missing contributions
-        m = M
-        for j in range(1, 1 + step):
-            m += 1
-            Rm = IndexToR[m]
-            D = Rm( b**(m+1) - bmoinsun )
-            #  attention to the b**(m+1) extra term specific to v_m recurrence
-            cm = [ (Rm(b ** (m+1))
-                    + vkm_partial[j][0]
-                    + sum(PascalRows[j][i] * Rm(lesgammasprime[i])
-                          * Rm(touslescoeffs[m-i][0])
-                          for i in range(1, j))
-                    ) / D
-                  ]
-            for p in range(1, k+1):
-                x = (vkm_partial[j][p]
-                     + sum(PascalRows[j][i] * Rm(lesgammasprime[i])
-                           * Rm(touslescoeffs[m-i][p])
-                           for i in range(1, j))
-                     + cm[-1]
-                     + sum(PascalRows[j][i] * Rm(lespuissancesdedprime[i])
-                           * Rm(touslescoeffs[m-i][p-1])
-                           for i in range(1, j))
-                     ) / D
-                cm.append(x)
-            touslescoeffs.append(cm)
-
-        # update status
-        return useparallel
-
-    m = 1
     PascalRows = [ [1,1] ]
     useparallel = False
+    _v5_para_recurrence = _v5_setup_para_recurrence(touslescoeffs,
+                                                    lesgammasprime,
+                                                    lespuissancesdedprime,
+                                                    PascalRows,
+                                                    IndexToR,
+                                                    b, bmoinsun,
+                                                    k,
+                                                    showtimes,
+                                                    persistentpara,
+                                                    True)
+    m = 1
     Q, R = divmod(Mmax - 1, maxworkers)
     for P in range(Q):
-        useparallel = ComputeNewCoeffs(m, useparallel, maxworkers)
+        useparallel = _v5_para_recurrence(m, maxworkers, useparallel)
         m += maxworkers
     if R > 0:
-        _= ComputeNewCoeffs(m, useparallel, R)
+        _= _v5_para_recurrence(m, R, useparallel)
 
     if showtimes:
         stoptime = time.time()
