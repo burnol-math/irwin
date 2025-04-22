@@ -3,8 +3,8 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.1"
-__date__     = "2025/04/21"
+__version__  = "1.5.2"
+__date__     = "2025/04/22"
 __filename__ = "irwin_v5.sage"
 
 irwin_v5_docstring = """
@@ -702,10 +702,10 @@ def irwin(b, d, k,
     #         defined yet. Same with stepindex.
     # Note 2: there is "nonlocal" keyword in Python3, which I prefer not to use
     #         as I would prefer "parentvar" kind.
-    # Note 3: one can use lists via .append, or "del" as is done with PascalRows,
-    #         as long as no is attempted such as PascalRows = [].
+    # Note 3: one can use lists via .append, or "del" as is done with
+    #         PascalRows, as long as no is attempted such as PascalRows = [].
     # Note 4: I could make this a module auxiliary like I did to define
-    #         map__v5_beta to share with irwinpos(), and avoid code duplication,
+    #         map__v5_beta to share with irwinpos(), and avoid code duplication
     #         but it is a bit complicated due to the slight difference in the
     #         recurrences.
     def ComputeNewCoeffs(m, useparallel, step):
