@@ -130,6 +130,7 @@ irwin_v5_fn_docstring = """\
 """
 
 import time
+nbguardbits = 12
 
 # print(f"Sage voit {sage.parallel.ncpus.ncpus()} CPUs, cela est-il normal ?")
 # voir https://ask.sagemath.org/question/42439/parallel-how-to-use-all-cpus/
@@ -143,8 +144,6 @@ except NameError:
     maxworkersinfostring = ("maxworkers variable has been created "
                             "and assigned value 8.")
 
-assert maxworkers < 200, f"Sorry maxworkers={maxworkers} must be less than 200"
-
 # Next one is to compute only u_{0;m} even if k>0, it was used at
 # one stage of the implementation when he test for turning on
 # parallelization was done on the computation of the u_{0;m}'s alone
@@ -155,6 +154,7 @@ def _v5_u0m_partial(a, m, P, G, D, T, R):
     # m -a will be the same value in all simultaneous calls
     return sum(P[i]*R(G[i])*R(T[m - i][0]) for i in range(a, m + 1))
 
+
 @parallel(ncpus=maxworkers)
 def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     # m -a will be the same value in all simultaneous calls
@@ -164,6 +164,7 @@ def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     B.extend(sum(P[i]*R(D[i])*R(T[m - i][j-1]) for i in range(a, m + 1))
              for j in range(1, k + 1))
     return [ A[j] + B[j] for j in range(k + 1) ]
+
 
 def _v5_beta_aux(m, R, nblock):
     return sum(1/R(n ** (m+1)) for n in nblock)
@@ -181,7 +182,102 @@ def _v5_beta_aux(m, R, nblock):
 def _v5_beta(mlist, IR, nblock):
     return list(_v5_beta_aux(m, IR[m], nblock) for m in mlist)
 
-nbguardbits = 12
+
+def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
+    """Auxiliary for sharing code between irwin() and irwinpos()
+    """
+    q, r = divmod(Mmax, maxworkers)
+    I = 0
+    indices = []
+    for i in range(r):
+        indices.append(I)
+        I += q + 1
+    for i in range(maxworkers - r):
+        indices.append(I)
+        I += q
+    indices.append(I)
+    def map__v5_beta(j):
+        L = [0]
+        mrange = list(range(1, Mmax + 1))
+        inputblocks = [(mrange[indices[i]:indices[i+1]],
+                        IndexToR,
+                        maxblock[j])
+                       for i in range(maxworkers)]
+        results_1 = [result[1] for result
+                     in sorted(list(_v5_beta(inputblocks)))]
+        L.extend(sum([result for result in results_1], []))
+        return L
+    return map__v5_beta
+
+
+def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
+    """Auxiliary for sharing code between irwin() and irwinpos()
+    """
+    # We want to display some visual sign of progress.
+    # Find the largest multiple of maxworkers at most 1000,
+    # do something reasonable if maxworkers is big
+    q = max(1000 // maxworkers, 32)
+    mSize = q * maxworkers
+    def map__v5_beta(j):
+        print(f"... ({j} occ.) ", end = "", flush = True)
+        starttime = time.time()
+        mbegin = 1
+        mend = 1
+        L = [0]
+        for rep in range(Mmax // mSize):
+            mend   = mbegin + mSize
+            # TODO: find a way to not "instantiate" m range and keep
+            #       it as a generator but I have to become more
+            #       knowledgeable in Python and impact will be minor
+            #       anyhow
+            # Memo: si j'utilise range(mbegin + i*q, mbegin + (i+1)*q)
+            #       comme premier argument des tuple, cela done l'erreur
+            # TypeError: '<' not supported between instances of 'range'
+            # and 'range'
+            mrange = list(range(mbegin, mend))
+            # In this loop, mSize is a multiple of q.
+            # We call the parallelized _v5_beta with exactly maxworkers
+            # arguments.
+            inputblocks = [(mrange[i*q:(i+1)*q],
+                            IndexToR,
+                            maxblock[j])
+                           for i in range(maxworkers)]
+            results_1 = [result[1] for result
+                         in sorted(list(_v5_beta(inputblocks)))]
+            L.extend(sum([result for result in results_1], []))
+            print(f"m<{mend}", end = " ", flush= True)
+            if (rep + 1) & 7 == 0:
+                print(f"\n" + " " * 12, end = " ")
+            mbegin = mend
+
+        if mend < Mmax+1:
+            mrange = list(range(mend, Mmax + 1))
+            qlast, rlast = divmod(len(mrange), maxworkers)
+            I = 0
+            indiceslast = []
+            for i in range(rlast):
+                indiceslast.append(I)
+                I += qlast + 1
+            for i in range(maxworkers - rlast):
+                indiceslast.append(I)
+                I += qlast
+            # Memo: it is possible here that qlast is zero.
+            # Then some calls below will be with an empty range,
+            # _v5_beta will return an empty list.  All is fine.
+            indiceslast.append(I)
+            inputblocks = [(mrange[indiceslast[i]:indiceslast[i+1]],
+                            IndexToR,
+                            maxblock[j])
+                           for i in range(maxworkers)]
+            results_1 = [result[1] for result
+                         in sorted(list(_v5_beta(inputblocks)))]
+            L.extend(sum([result for result in results_1], []))
+            print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
+        stoptime = time.time()
+        print("{:.3f}s".format(stoptime - starttime))
+        return L
+    return map__v5_beta
+
 
 def _v5_shorten_small_real(rr):
     """Get magnitude order of a tiny real number
@@ -794,92 +890,9 @@ def irwin(b, d, k,
     if showtimes:
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
-        # We want to display some visual sign or progress
-        # Find the largest multiple of maxworkers at most 1000
-        # HOWEVER THIS COSTS IN CODE SIMPLICITY AND EFFICIENCY
-        # ATTENTION maxworkers must be < 1000...
-        mSize = (1000 // maxworkers) * maxworkers
-        q, r = divmod(mSize, maxworkers)
-        I = 0
-        indices = []
-        for i in range(r):
-            indices.append(I)
-            I += q + 1
-        for i in range(maxworkers - r):
-            indices.append(I)
-            I += q
-        # assert I == mSize, "check your math"
-        indices.append(I)
-        def map__v5_beta(j):
-            print(f"... ({j} occ.) ", end = "", flush = True)
-            starttime = time.time()
-            mbegin = 1
-            mend = 1
-            L = [0]
-            for rep in range(Mmax//mSize):
-                mend   = mbegin + mSize
-                # TODO: find a way to not "instantiate" m range and keep
-                #       it as a generator but I have to become more
-                #       knowledgeable in Python and impact will be minor
-                #       anyhow
-                mrange = list(range(mbegin, mend))
-                inputblocks = [(mrange[indices[i]:indices[i+1]],
-                                IndexToR,
-                                maxblock[j])
-                               for i in range(maxworkers)]
-                results_1 = [result[1] for result
-                             in sorted(list(_v5_beta(inputblocks)))]
-                L.extend(sum([result for result in results_1], []))
-                print(f"m<{mend}", end = " ", flush= True)
-                if (rep + 1) & 7 == 0:
-                    print(f"\n" + " " * 12, end = " ")
-                mbegin = mend
-
-            if mend < Mmax+1:
-                mrange = list(range(mend, Mmax + 1))
-                qlast, rlast = divmod(len(mrange), maxworkers)
-                I = 0
-                indiceslast = []
-                for i in range(rlast):
-                    indiceslast.append(I)
-                    I += qlast + 1
-                for i in range(maxworkers - rlast):
-                    indiceslast.append(I)
-                    I += qlast
-                indiceslast.append(I)
-                inputblocks = [(mrange[indiceslast[i]:indiceslast[i+1]],
-                                IndexToR,
-                                maxblock[j])
-                               for i in range(maxworkers)]
-                results_1 = [result[1] for result
-                             in sorted(list(_v5_beta(inputblocks)))]
-                L.extend(sum([result for result in results_1], []))
-                print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
-            stoptime = time.time()
-            print("{:.3f}s".format(stoptime - starttime))
-            return L
+        map__v5_beta = _v5_map_beta_withtimes(Mmax, IndexToR, maxblock)
     else:
-        q, r = divmod(Mmax, maxworkers)
-        I = 0
-        indices = []
-        for i in range(r):
-            indices.append(I)
-            I += q + 1
-        for i in range(maxworkers - r):
-            indices.append(I)
-            I += q
-        indices.append(I)
-        def map__v5_beta(j):
-            L = [0]
-            mrange = list(range(1, Mmax + 1))
-            inputblocks = [(mrange[indices[i]:indices[i+1]],
-                            IndexToR,
-                            maxblock[j])
-                           for i in range(maxworkers)]
-            results_1 = [result[1] for result
-                         in sorted(list(_v5_beta(inputblocks)))]
-            L.extend(sum([result for result in results_1], []))
-            return L
+        map__v5_beta = _v5_map_beta_notimes(Mmax, IndexToR, maxblock)
 
     lesbetas_maxblock0 = map__v5_beta(0)
 
@@ -1290,88 +1303,9 @@ def irwinpos(b, d, k,
     if showtimes:
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
-        # We want to display some visual sign or progress
-        # Find the largest multiple of maxworkers at most 1000
-        # HOWEVER THIS COSTS IN CODE SIMPLICITY AND EFFICIENCY
-        # ATTENTION maxworkers must be < 1000...
-        mSize = (1000 // maxworkers) * maxworkers
-        q, r = divmod(mSize, maxworkers)
-        I = 0
-        indices = []
-        for i in range(r):
-            indices.append(I)
-            I += q + 1
-        for i in range(maxworkers - r):
-            indices.append(I)
-            I += q
-        # assert I == mSize, "check your math"
-        indices.append(I)
-        def map__v5_beta(j):
-            print(f"... ({j} occ.) ", end = "", flush = True)
-            starttime = time.time()
-            mbegin = 1
-            mend = 1
-            L = [0]
-            for rep in range(Mmax//mSize):
-                mend   = mbegin + mSize
-                mrange = list(range(mbegin, mend))
-                inputblocks = [(mrange[indices[i]:indices[i+1]],
-                                IndexToR,
-                                maxblockshifted[j])
-                               for i in range(maxworkers)]
-                results_1 = [result[1] for result
-                             in sorted(list(_v5_beta(inputblocks)))]
-                L.extend(sum([result for result in results_1], []))
-                print(f"m<{mend}", end = " ", flush= True)
-                if (rep + 1) & 7 == 0:
-                    print(f"\n" + " " * 12, end = " ")
-                mbegin = mend
-
-            if mend < Mmax+1:
-                mrange = list(range(mend, Mmax + 1))
-                qlast, rlast = divmod(len(mrange), maxworkers)
-                I = 0
-                indiceslast = []
-                for i in range(rlast):
-                    indiceslast.append(I)
-                    I += qlast + 1
-                for i in range(maxworkers - rlast):
-                    indiceslast.append(I)
-                    I += qlast
-                indiceslast.append(I)
-                inputblocks = [(mrange[indiceslast[i]:indiceslast[i+1]],
-                                IndexToR,
-                                maxblockshifted[j])
-                               for i in range(maxworkers)]
-                results_1 = [result[1] for result
-                             in sorted(list(_v5_beta(inputblocks)))]
-                L.extend(sum([result for result in results_1], []))
-                print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
-            stoptime = time.time()
-            print("{:.3f}s".format(stoptime - starttime))
-            return L
+        map__v5_beta = _v5_map_beta_withtimes(Mmax, IndexToR, maxblockshifted)
     else:
-        q, r = divmod(Mmax, maxworkers)
-        I = 0
-        indices = []
-        for i in range(r):
-            indices.append(I)
-            I += q + 1
-        for i in range(maxworkers - r):
-            indices.append(I)
-            I += q
-        indices.append(I)
-        def map__v5_beta(j):
-            L = [0]
-            mrange = list(range(1, Mmax + 1))
-            inputblocks = [(mrange[indices[i]:indices[i+1]],
-                            IndexToR,
-                            maxblockshifted[j])
-                           for i in range(maxworkers)]
-            results_1 = [result[1] for result
-                         in sorted(list(_v5_beta(inputblocks)))]
-            L.extend(sum([result for result in results_1], []))
-            return L
+        map__v5_beta = _v5_map_beta_notimes(Mmax, IndexToR, maxblockshifted)
 
     lesbetas_maxblockshifted0 = map__v5_beta(0)
 
