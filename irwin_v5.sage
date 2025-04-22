@@ -3,7 +3,7 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.2"
+__version__  = "1.5.3"
 __date__     = "2025/04/22"
 __filename__ = "irwin_v5.sage"
 
@@ -132,9 +132,6 @@ irwin_v5_fn_docstring = """\
 import time
 nbguardbits = 12
 
-# print(f"Sage voit {sage.parallel.ncpus.ncpus()} CPUs, cela est-il normal ?")
-# voir https://ask.sagemath.org/question/42439/parallel-how-to-use-all-cpus/
-# may je dois expérimenter avec SAGE_NUM_THREADS si ça existe encore.
 try:
     maxworkers_test = maxworkers
     maxworkersinfostring = ("maxworkers variable already existed "
@@ -144,17 +141,18 @@ except NameError:
     maxworkersinfostring = ("maxworkers variable has been created "
                             "and assigned value 8.")
 
-# Next one is to compute only u_{0;m} even if k>0, it was used at
-# one stage of the implementation when he test for turning on
-# parallelization was done on the computation of the u_{0;m}'s alone
-# ignoring the u_{j;m}'s for 0<j<=k.  Now unused, because timings
-# are done inclusive of all j's <=k.
-@parallel(ncpus=maxworkers)
-def _v5_u0m_partial(a, m, P, G, D, T, R):
-    # m -a will be the same value in all simultaneous calls
-    return sum(P[i]*R(G[i])*R(T[m - i][0]) for i in range(a, m + 1))
+# # Next one is to compute only u_{0;m} even if k>0, it was used at
+# # one stage of the implementation when the test for turning on
+# # parallelization was done on the computation of the u_{0;m}'s alone
+# # ignoring the u_{j;m}'s for 0<j<=k.  Now unused, because timings
+# # are done inclusive of all j's <=k.
+# @parallel(ncpus=maxworkers)
+# def _v5_u0m_partial(a, m, P, G, D, T, R):
+#     # m -a will be the same value in all simultaneous calls
+#     return sum(P[i]*R(G[i])*R(T[m - i][0]) for i in range(a, m + 1))
 
 
+# Memo: the first argument should be suitable for sorting the results.
 @parallel(ncpus=maxworkers)
 def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     # m -a will be the same value in all simultaneous calls
@@ -171,23 +169,17 @@ def _v5_beta_aux(m, R, nblock):
 # legacy comment, kept in case
 #   Si p_iter="multiprocessing"
 #   ValueError: Cannot pickle code objects from closures
-# TODO: check efficiency of way of passing the RealField.
-#       earlier version passed directly a RealField
-#       here we pass the whole IndexToR, but as
-#       this is called now only exactly maxworkers
-#       times, it should be rather efficient. I don't
-#       have time now, and will not have access to
-#       multi-core computer for a while.
+# Memo: first argument should facilitate sorting the results.
 @parallel(ncpus=maxworkers)
-def _v5_beta(mlist, IR, nblock):
-    return list(_v5_beta_aux(m, IR[m], nblock) for m in mlist)
+def _v5_beta(start, end, IR, nblock):
+    return list(_v5_beta_aux(m, IR[m], nblock) for m in range(start,end))
 
 
 def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
     """Auxiliary for sharing code between irwin() and irwinpos()
     """
     q, r = divmod(Mmax, maxworkers)
-    I = 0
+    I = 1
     indices = []
     for i in range(r):
         indices.append(I)
@@ -195,11 +187,12 @@ def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
     for i in range(maxworkers - r):
         indices.append(I)
         I += q
+    # indices[maxworkers] is Mmax + 1
     indices.append(I)
     def map__v5_beta(j):
         L = [0]
-        mrange = list(range(1, Mmax + 1))
-        inputblocks = [(mrange[indices[i]:indices[i+1]],
+        inputblocks = [(indices[i],
+                        indices[i+1],
                         IndexToR,
                         maxblock[j])
                        for i in range(maxworkers)]
@@ -226,19 +219,12 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
         L = [0]
         for rep in range(Mmax // mSize):
             mend   = mbegin + mSize
-            # TODO: find a way to not "instantiate" m range and keep
-            #       it as a generator but I have to become more
-            #       knowledgeable in Python and impact will be minor
-            #       anyhow
-            # Memo: si j'utilise range(mbegin + i*q, mbegin + (i+1)*q)
-            #       comme premier argument des tuple, cela done l'erreur
-            # TypeError: '<' not supported between instances of 'range'
-            # and 'range'
-            mrange = list(range(mbegin, mend))
             # In this loop, mSize is a multiple of q.
             # We call the parallelized _v5_beta with exactly maxworkers
             # arguments.
-            inputblocks = [(mrange[i*q:(i+1)*q],
+            # Memo: le premier argument décidera du sorted
+            inputblocks = [(mbegin + i * q,
+                            mbegin + (i + 1) * q,
                             IndexToR,
                             maxblock[j])
                            for i in range(maxworkers)]
@@ -251,9 +237,8 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
             mbegin = mend
 
         if mend < Mmax+1:
-            mrange = list(range(mend, Mmax + 1))
-            qlast, rlast = divmod(len(mrange), maxworkers)
-            I = 0
+            qlast, rlast = divmod(Mmax + 1 - mend, maxworkers)
+            I = mend
             indiceslast = []
             for i in range(rlast):
                 indiceslast.append(I)
@@ -261,11 +246,12 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
             for i in range(maxworkers - rlast):
                 indiceslast.append(I)
                 I += qlast
-            # Memo: it is possible here that qlast is zero.
-            # Then some calls below will be with an empty range,
-            # _v5_beta will return an empty list.  All is fine.
+            # Memo: it is possible here that qlast is zero.  Then some final
+            # calls below will be with an empty range, _v5_beta will return an
+            # empty list.  All is fine.
             indiceslast.append(I)
-            inputblocks = [(mrange[indiceslast[i]:indiceslast[i+1]],
+            inputblocks = [(indiceslast[i],
+                            indiceslast[i + 1],
                             IndexToR,
                             maxblock[j])
                            for i in range(maxworkers)]
@@ -493,7 +479,6 @@ def _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
 
 def _v5_setup_blocks(b, d, level):
     """Organize integers according to nb of digits and d count
-
     """
     A = [i for i in range(b)]
     A.remove(d)
@@ -699,10 +684,10 @@ def irwin(b, d, k,
     touslescoeffs.append(c1)
 
     # Note 1: PascalRows and useparallel do not have to have been
-    #         defined yet. Same with stepindex.
-    # Note 2: there is "nonlocal" keyword in Python3, which I prefer not to use
+    #         defined yet.
+    # Note 2: There is "nonlocal" keyword in Python3, which I prefer not to use
     #         as I would prefer "parentvar" kind.
-    # Note 3: one can use lists via .append, or "del" as is done with
+    # Note 3: One can use lists via .append, or "del" as is done with
     #         PascalRows, as long as no is attempted such as PascalRows = [].
     # Note 4: I could make this a module auxiliary like I did to define
     #         map__v5_beta to share with irwinpos(), and avoid code duplication
@@ -732,9 +717,11 @@ def irwin(b, d, k,
         # means we test often so let's hope persistentpara is True and
         # parallel mode is chosen early.
         # At some point I tested every 50 * maxworkers increase, which is fine
-        # with maxworkers = 8 but for large maxworkers this made the first
-        # test too late.
+        # with maxworkers = 8 but for large maxworkers this would have made the
+        # first check be done somewhat late.
         if ((M - 400) % 500 < maxworkers):
+            # OBSOLETE Code branch which measure time only for the u_{0;m}'s.
+            #
             # Finally I have reverted this to do the time measurement
             # inclusive of the computation of the u_{j;m}, j>0. 
             # # Things are a bit involved here because we want to measure
@@ -845,7 +832,7 @@ def irwin(b, d, k,
                                 for i in range(j, m+1)) for p in range(1, k+1) ]) 
                 ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
 
-        # now correct the um's (prior to dividing by b**(m+1)-b+1)
+        # now correct the u_{j;m}'s (prior to dividing by b**(m+1)-b+1)
         # with finitely missing contributions
         m = M
         for j in range(1, 1 + step):
@@ -1150,13 +1137,6 @@ def irwinpos(b, d, k,
         starttime = time.time()
 
     # calcul récursif des moments
-    # Je pense (2025) que j'avais conclu qu'il fallait mieux calculer les
-    # puissances comme des entiers exactement.
-    # In order to have to evaluate each Pascal triangle row only once, we
-    # use a slightly modified syntax compared to the 2024 version, instead
-    # of having touslescoeffs = [ [ the v_{0,m}'s ], [ the v_{1,m}'s ], ... ]
-    # it will be touslescoeffs = [[v_{0,0}, v_{1,0}, ..., v_{k,0}],
-    #                             [v_{0,1}, v_{1,1}, ..., v_{k,1}], ... ]
     touslescoeffs = [ [Rmax(b)] * (k+1) ]
     # attention to b * b  extra in first one
     c1 = [ (b * b + lesgammasprime[1] * Rmax(b)) / (b * b - bmoinsun) ]
@@ -1289,10 +1269,6 @@ def irwinpos(b, d, k,
     for P in range(Q):
         useparallel = ComputeNewCoeffs(m, useparallel, maxworkers)
         m += maxworkers
-    # Ici on va invoquer une procédure parallélisée avec <maxworkers, cela
-    # risque-t-il de créer les problèmes observés avec v4 avant le fix de #1
-    # lorsqu'on invoquait avec un nombre d'arguments très grand par rapport
-    # à maxworkers ?
     if R > 0:
         _= ComputeNewCoeffs(m, useparallel, R)
 
