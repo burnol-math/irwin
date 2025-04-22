@@ -698,12 +698,16 @@ def irwin(b, d, k,
         c1.append(((lesgammas[1] + d) * Rmax(b) + c1[-1])/Rmax(b * b - bmoinsun))
     touslescoeffs.append(c1)
 
-    # Note 1: that PascalRows and useparallel do not have to have been
+    # Note 1: PascalRows and useparallel do not have to have been
     #         defined yet. Same with stepindex.
     # Note 2: there is "nonlocal" keyword in Python3, which I prefer not to use
     #         as I would prefer "parentvar" kind.
     # Note 3: one can use lists via .append, or "del" as is done with PascalRows,
     #         as long as no is attempted such as PascalRows = [].
+    # Note 4: I could make this a module auxiliary like I did to define
+    #         map__v5_beta to share with irwinpos(), and avoid code duplication,
+    #         but it is a bit complicated due to the slight difference in the
+    #         recurrences.
     def ComputeNewCoeffs(m, useparallel, step):
         del PascalRows[:-1]
         for i in range(step):
@@ -722,9 +726,15 @@ def irwin(b, d, k,
             PascalRows.append(newPascalRow)
 
         M = m - step
-        # TODO: for very large number of digits, maybe check sooner?
-        # This will check each times m becomes larger by 50 * maxworkers
-        if stepindex % 50 == 0:
+        # The very first recurrences (here M=1) have very few terms so in
+        # general comparing times serves nothing.  Let's test every 500
+        # coefficients and do it first at 400.  For large maxworkers this
+        # means we test often so let's hope persistentpara is True and
+        # parallel mode is chosen early.
+        # At some point I tested every 50 * maxworkers increase, which is fine
+        # with maxworkers = 8 but for large maxworkers this made the first
+        # test too late.
+        if ((M - 400) % 500 < maxworkers):
             # Finally I have reverted this to do the time measurement
             # inclusive of the computation of the u_{j;m}, j>0. 
             # # Things are a bit involved here because we want to measure
@@ -868,9 +878,7 @@ def irwin(b, d, k,
     PascalRows = [ [1,1] ]
     useparallel = False
     Q, R = divmod(Mmax - 1, maxworkers)
-    stepindex = 0
     for P in range(Q):
-        stepindex += 1
         useparallel = ComputeNewCoeffs(m, useparallel, maxworkers)
         m += maxworkers
     # Ici on va invoquer une procédure parallélisée avec <maxworkers, cela
@@ -878,7 +886,6 @@ def irwin(b, d, k,
     # lorsqu'on invoquait avec un nombre d'arguments très grand par rapport
     # à maxworkers ?
     if R > 0:
-        stepindex += 1
         _= ComputeNewCoeffs(m, useparallel, R)
 
     if showtimes:
@@ -1175,9 +1182,7 @@ def irwinpos(b, d, k,
             PascalRows.append(newPascalRow)
 
         M = m - step
-        # TODO: for very large number of digits, maybe check sooner?
-        # This will check each times m becomes larger by 50 * maxworkers
-        if stepindex % 50 == 0:
+        if ((M - 400) % 500 < maxworkers):
             starttime = time.time()
             results = _v5_ukm_partial(((a, M + a,
                                         PascalRows[a],
@@ -1281,9 +1286,7 @@ def irwinpos(b, d, k,
     PascalRows = [ [1,1] ]
     useparallel = False
     Q, R = divmod(Mmax - 1, maxworkers)
-    stepindex = 0
     for P in range(Q):
-        stepindex += 1
         useparallel = ComputeNewCoeffs(m, useparallel, maxworkers)
         m += maxworkers
     # Ici on va invoquer une procédure parallélisée avec <maxworkers, cela
@@ -1291,7 +1294,6 @@ def irwinpos(b, d, k,
     # lorsqu'on invoquait avec un nombre d'arguments très grand par rapport
     # à maxworkers ?
     if R > 0:
-        stepindex += 1
         _= ComputeNewCoeffs(m, useparallel, R)
 
     if showtimes:
