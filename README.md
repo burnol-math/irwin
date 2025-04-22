@@ -64,34 +64,33 @@ perspective to make it easier and less demanding on the hardware to obtain
   [irwin_v3.sage](irwin_v3.sage) into the same interactive SageMath session.
   See the comments therein.  No guarantees though.
 
-- [irwin_v5.sage](irwin_v5.sage) and [irwin_v4.sage](irwin_v4.sage) add some
-  "parallelization".  This is experimental and mainly effective when computing
-  the `beta(m+1)`'s.
+- [irwin_v5.sage](irwin_v5.sage) uses "parallelization".  This is very
+  efficient for the computation of the `beta(m+1)`'s.  It is more difficult to
+  apply parallelization to the computation of the recurrent coefficients
+  `u_{k;m}` (or `v_{k;m}` for the series with positive coefficients).  In an
+  earlier `v4` version, now obsolete, this was done coefficient per
+  coefficient, via a division of its defining sum into subsums.  The `v5`
+  version proves more efficient: it does not use subsums but computes in
+  parallel for successive indices `m=M+1`, ..., `m=M+maxworkers`, up to
+  finitely many additive corrections done after the parallelized subprocesses
+  have returned; this is done for all `j`'s from `0` to `k` in one-go.
 
-  The `v5` version differs from `v4` mainly in the following manner: `v4`
-  tries to compute each new `u_{j;m}` (or `v_{j;m}` for the recurrences
-  with positive terms) via dividing the sum defining it into a number of
-  chunks equal to the value of `maxworkers`.  So each new coefficient will
-  cost the forking of subprocesses.  In contrast `v5` does not divide such
-  sums into subsums, but computes complete sums "in parallel" for successive
-  `m=M+1`, ..., `m=M+maxworkers` (up to finitely many additive corrections
-  done after; for all `j`'s from `0` to `k`). This requires more complex code,
-  especially for handling the `k>0` case, due to the nature of the
-  recurrences.  The memory foot-print is higher because `maxworkers+1` rows of
-  the Pascal triangle are in memory rather than only `2` for `v4`.
+  The memory foot-print is higher than in `v3` because `maxworkers+1` rows of
+  the Pascal triangle are in memory rather than only `2` for `v3` (and `v4`).
+  We could reduce this to `maxworkers` up to some complication in the code.
 
-  (*testing of `v5` has been only so far on an old hardware with only two
-  cores; a `30%` speed-up was observed for `irwin(10,9,4,10002,showtimes=True)`
-  due to parallelization being triggered for the computation of the `u_{j;m}`'s
-  and being effective; more extensive testing will have to wait for author
-  to have access to faster hardware.*)
+  The variable `maxworkers` does not have to be at most the actual number of
+  cores on the user system.  We tested `maxworkers=2` on an old hardware with
+  only 2 cores, and it gave comparable result to keeping `maxworkers=8`.  The
+  author is attow away from more efficient hardware and still has to test `v5`
+  on such.  Keep in mind any change to `maxworkers` must be followed by a
+  re-load of `irwin_v5.sage` in the interactive session.
 
-  Also `v5` has a new optional Boolean `persistentpara` (defaults to `True`)
-  which if set to `True` tells to not test anymore during the computations of
-  the recurrences if it is favourable to keep on using parallelization.  To
-  see a printed trace of such tests, use `showtimes=True` in the function
-  calls.  For `k>0`, `v5` when doing such timing tests computes with all `j`'s
-  up to `k` included whereas `v4` decided on the basis of `j=0` alone.
+  The author is still a novice in using SageMath `@parallel`.  Issue #1
+  applied to some earlier draft of the `v4`, and revealed that one should not
+  always expect documentation to convey the good practice.  This issue came to
+  light due to our sub-optimal understanding of `@parallel` documentation but
+  also revealed a possibly upstream issue for SageMath on macOS 15.
   
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
