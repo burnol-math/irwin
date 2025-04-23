@@ -3,8 +3,8 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.3"
-__date__     = "2025/04/22"
+__version__  = "1.5.4"
+__date__     = "2025/04/23"
 __filename__ = "irwin_v5.sage"
 
 irwin_v5_docstring = """
@@ -63,23 +63,32 @@ License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
 """
 
 # https://stackoverflow.com/a/10308363
-def _docstring_parameter(*sub):
+# def _docstring_parameter(*sub):
+#     def dec(obj):
+#         obj.__doc__ = obj.__doc__.format(*sub)
+#         return obj
+#     return dec
+
+def _fillin_irwin_docstring():
     def dec(obj):
-        obj.__doc__ = obj.__doc__.format(*sub)
+        obj.__doc__ = obj.__doc__.format(
+            irwin_v5_fn_docstring.format('u_{j;m}', 'irwin') if
+            (obj.__name__ == 'irwin') else
+            irwin_v5_fn_docstring.format('v_{j;m}', 'irwinpos')
+        )
         return obj
     return dec
 
-irwin_v5_fn_docstring = """\
-    :param int b: the integer base
-    :param int d: the digit
-    :param int k: the number of occurrences
+irwin_v5_fn_docstring = """:param int b: the integer base
+    :param int d: the digit.
+    :param int k: the number of occurrences.
     :param int nbdigits: (optional, default 34)
-        The whished-for number of decimal digits for the result.
+        The wished-for number of decimal digits for the result.
     :param int level: (optional, default 3)
         The level must be 2, 3 or 4.
     :param int PrecStep: (optional, default ``500``)
-        Terms of the series are computed with a RealField
-        of evolving precision, which differs from the maximal
+        Terms of the series are computed with a RealField of
+        evolving precision, which differs from the maximal
         precision by a suitable multiple of PrecStep.
     :param bool all: (optional, default ``False``)
         If ``True``  print all irwin sums for ``j`` occurrences
@@ -88,21 +97,21 @@ irwin_v5_fn_docstring = """\
         Whether to print out timings for various steps.
     :param bool verbose: (optional, default ``False``)
         Whether to print the values of intermediate contributions
-        to the final value, in particular to confirm enough
-        terms of the series were used.
+        to the final value, in particular to confirm enough terms
+        of the series were used.
     :param int Mmax: (optional, default ``-1``)
         If not ``-1`` the number of terms of the series to use.
-        Use only if the auto-choice is excessive (this will be
-        the case for k=0 and d=1, and to a lesser extent when
-        d=b-1).  Use ``verbose=True`` to check how many terms
-        are used by default.
+        Use only if the auto-choice is excessive (this will be the
+        case for k=0 and d=1, and to a lesser extent when d=b-1).
+        Use ``verbose=True`` to check how many terms are used by
+        default.
     :param bool persistentpara: (optional, default ``True``)
         Whether once parallel mode is chosen to compute the
-        coefficients u_{j;m} or v_{j;m} to check again if
-        non-parallel would be better.
+        coefficients {0}'s to check again if non-parallel would be
+        better.
 
     :rtype: :class:`sage.rings.real_mpfr.RealNumber`
-    :return: la somme d'Irwin de hauteur k pour le chiffre d en base b
+    :return: la somme d'Irwin de hauteur k pour le chiffre d en base b.
 
     The Burnol algorithm depends on a choice of "level".  The
     default is level=3 which is appropriate for obtaining
@@ -120,7 +129,7 @@ irwin_v5_fn_docstring = """\
     Example:
     --------
 
-    sage: irwin(10, 9, 4, 52, all=True)
+    sage: {1}(10, 9, 4, 52, all=True)
     (k=0) 22.92067661926415034816365709437593191494476243699848
     (k=1) 23.04428708074784831967594930973617482538959203064774
     (k=2) 23.02604026596124378845022249787272342108112267542086
@@ -700,8 +709,7 @@ def _v5_setup_blocks(b, d, level):
 
     return blocks
 
-
-@_docstring_parameter(irwin_v5_fn_docstring)
+@_fillin_irwin_docstring()
 def irwin(b, d, k,
           nbdigits=34,
           level=3,
@@ -712,7 +720,7 @@ def irwin(b, d, k,
           persistentpara=True,
           Mmax=-1
           ):
-    """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
+    """Somme d'Irwin pour b, d, k avec nbdigits chiffres décimaux (en tout).
 
     Utilise l'algorithme de Burnol, série alternée de niveau 2, 3 ou 4.
 
@@ -999,7 +1007,7 @@ def irwin(b, d, k,
     return Rfinal(S)
 
 
-@_docstring_parameter(irwin_v5_fn_docstring)
+@_fillin_irwin_docstring()
 def irwinpos(b, d, k,
              nbdigits=34,
              level=3,
@@ -1010,7 +1018,7 @@ def irwinpos(b, d, k,
              persistentpara=True,
              Mmax=-1
              ):
-    """Calcule la somme d'Irwin pour la base b et le chiffre d et l'entier k
+    """Somme d'Irwin pour b, d, k avec nbdigits chiffres décimaux (en tout).
 
     Utilise algorithme de Burnol, série positive de niveau 2, 3 ou 4.
 
