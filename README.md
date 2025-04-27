@@ -106,7 +106,11 @@ perspective to make it easier and less demanding on the hardware to obtain
   
 - [taille_pascal.pdf](taille_pascal.pdf) explains how many bits are needed to
   store in computer memory the Pascal triangle up (or rather down) to a
-  certain row, or the memory needed to store only one such row.
+  certain row, or the memory needed to store only one such row.  Thanks to
+  N. R. who asked for SageMath equivalents of the few Maple usages which
+  were inserted in the text, they are in
+  [taille_pascal_symbolic](taille_pascal_symbolic) which is more or less
+  my very first foray into actually using SageMath for symbolic computations.
 
 ## TODO
 
