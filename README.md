@@ -86,13 +86,35 @@ perspective to make it easier and less demanding on the hardware to obtain
   on such.  Keep in mind any change to `maxworkers` must be followed by a
   re-load of `irwin_v5.sage` in the interactive session.
 
-  The author is quite the novice in using SageMath `@parallel`, in part
-  because he remained for many years with old hardware.  Sadly, the newly
-  acquired speedy desktop computer seems to suffer a problem (where the blame
-  is to put, the author does not know).  See
-  [this SageMath ticket](https://github.com/sagemath/sage/issues/39960), the
-  test file [test_parallel_sleep.sage](test_parallel_sleep.sage) and issue #1.
-  This is really frustrating.  I will never get any reimbursement.
+- I should note here that there are some surprises with parallelization on my
+  macOS 15.4.1 Sequoia. To parallelize the computation of the moments of the
+  measure defined in my research, for which the known way is to proceed via
+  the recurrences I obtained, the code necessarily has to call many times
+  procedures which have been `@parallel` decorated; for example with
+  `maxworkers=8` and if we need `10000` such coefficients, we will call `1250`
+  times such a procedure.  Turns out that on macOS 15.4.1 this causes a linear
+  increase in some sort of waiting time which increases the execution times.
+  It is hard to analyse on `irwin_v5.sage` because the time increases at least
+  linearly with the index `m` purely due to the length of the recurrence (as
+  one sees with the test timings reported regularly if with the
+  `showtimes=True` option).  Anyway I reduced this to a reproducer
+  [test_parallel_sleep.sage](test_parallel_sleep.sage) and I reported as
+  [this SageMath ticket](https://github.com/sagemath/sage/issues/39960) which
+  has been closed, probably more as a "wont-fix" (see also #1).  I consider
+  the ticket was closed (twice actually) a bit fast, with no obvious desire to
+  investigate more what appears to be specific to macOS 15.4.1.  I have some
+  difficulties to fathom how a more powerful processor than most others could
+  behave so bad, and it definitely is cause to ponder why the caching done by
+  the OS has such an obvious detrimental effect in this context.  Is it a bug
+  somewhere in the OS or is it a bug in Python?  It is hard for me to consider
+  it a fact of life that when you call many times such a procedure it affects
+  what is done next... unless you kill `sage` and reload! I must admit I am
+  saying this under the impression that the problem does not show on Linux
+  boxes but I did not investigate fully myself for lack of resources.  All I
+  know is that on a quadri-core much older macOS there is absolutely **no**
+  problem.  Anyway, I am quite interested into reports on how
+  [test_parallel_sleep.sage](test_parallel_sleep.sage) behaves on various
+  systems.  Please comment at #1.
 
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
