@@ -86,12 +86,14 @@ perspective to make it easier and less demanding on the hardware to obtain
   on such.  Keep in mind any change to `maxworkers` must be followed by a
   re-load of `irwin_v5.sage` in the interactive session.
 
-  The author is still a novice in using SageMath `@parallel`.  Issue #1
-  applied to some earlier draft of the `v4`, and revealed that one should not
-  always expect documentation to convey the good practice.  This issue came to
-  light due to our sub-optimal understanding of `@parallel` documentation but
-  also revealed a possibly upstream issue for SageMath on macOS 15.
-  
+  The author is quite the novice in using SageMath `@parallel`, in part
+  because he remained for many years with old hardware.  Sadly, the newly
+  acquired speedy desktop computer seems to suffer a problem (where the blame
+  is to put, the author does not know).  See
+  [this SageMath ticket](https://github.com/sagemath/sage/issues/39960), the
+  test file [test_parallel_sleep.sage](test_parallel_sleep.sage) and issue #1.
+  This is really frustrating.  I will never get any reimbursement.
+
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
   correctly rounded to `N` decimal places.  They are currently:
@@ -107,10 +109,9 @@ perspective to make it easier and less demanding on the hardware to obtain
 - [taille_pascal.pdf](taille_pascal.pdf) explains how many bits are needed to
   store in computer memory the Pascal triangle up (or rather down) to a
   certain row, or the memory needed to store only one such row.  Thanks to
-  N. R. who asked for SageMath equivalents of the few Maple usages which
+  Nicolas Radulesco who asked for SageMath equivalents of the few Maple usages which
   were inserted in the text, they are in
-  [taille_pascal_symbolic](taille_pascal_symbolic) which is more or less
-  my very first foray into actually using SageMath for symbolic computations.
+  [taille_pascal_symbolic](taille_pascal_symbolic).
 
 ## TODO
 
