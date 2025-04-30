@@ -3,8 +3,8 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.4"
-__date__     = "2025/04/23"
+__version__  = "1.5.5"
+__date__     = "2025/04/30"
 __filename__ = "irwin_v5.sage"
 
 irwin_v5_docstring = """
@@ -214,7 +214,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
 
         M = m - step
         if ((M - 400) % 500 < maxworkers):
-            starttime = time.time()
+            starttime = time.perf_counter()
             results = _v5_ukm_partial(((a, M + a,
                                         PascalRows[a],
                                         Gammas,
@@ -225,7 +225,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                                        for a in range(1, step + 1)))
             ukm_partial = [ None ]
             ukm_partial.extend([result[1] for result in sorted(list(results))])
-            multitime = time.time() - starttime
+            multitime = time.perf_counter() - starttime
 
             if useparallel and persistentpara:
                 # do not check again
@@ -233,7 +233,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                     print(f"... mode parallèle persistant ({multitime:.3f}s; "
                           f"{M}<m<={M+step})")
             else:
-                starttime = time.time()
+                starttime = time.perf_counter()
                 m = M
                 ukm_partial = [ None ]
                 for j in range(1, 1 + step):
@@ -249,7 +249,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                                     * Rm(touslescoeffs[m-i][p-1])
                                     for i in range(j, m+1)) for p in range(1, k+1) ]) 
                     ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-                singletime = time.time() - starttime
+                singletime = time.perf_counter() - starttime
 
                 if showtimes:
                     _v5_umtimeinfo(singletime, multitime,
@@ -373,7 +373,7 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
     mSize = q * maxworkers
     def map__v5_beta(j):
         print(f"... ({j} occ.) ", end = "", flush = True)
-        starttime = time.time()
+        starttime = time.perf_counter()
         mbegin = 1
         mend = 1
         L = [0]
@@ -419,7 +419,7 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
                          in sorted(list(_v5_beta(inputblocks)))]
             L.extend(sum([result for result in results_1], []))
             print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print("{:.3f}s".format(stoptime - starttime))
         return L
     return map__v5_beta
@@ -739,7 +739,7 @@ def irwin(b, d, k,
 
     if showtimes:
         print("Préparation des RealField...", end=" ", flush=True)
-        starttime = time.time()
+        starttime = time.perf_counter()
 
     (nbbits,
      nbbits_final,
@@ -750,7 +750,7 @@ def irwin(b, d, k,
      NbOfPrec) = _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax)
 
     if showtimes:
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print("{:.3f}s".format(stoptime - starttime))
     if verbose:
         print(f"{NbOfPrec} RealField(s) de précision maximale {nbbits},")
@@ -759,7 +759,7 @@ def irwin(b, d, k,
     if showtimes:
         print("Calcul des blocs initiaux et des gammas...",
               end = ' ', flush = True)
-        starttime = time.time()
+        starttime = time.perf_counter()
 
     blocks = _v5_setup_blocks(b, d, level)
     block1 = blocks[0]
@@ -799,7 +799,7 @@ def irwin(b, d, k,
         lespuissancesded = None        
 
     if showtimes:
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
@@ -807,7 +807,7 @@ def irwin(b, d, k,
             print(f"Calcul des u_{{0;m}} pour m<={Mmax} ...")
         else:
             print(f"Calcul des u_{{j;m}} pour j<={k} et m<={Mmax} ...")
-        starttime = time.time()
+        starttime = time.perf_counter()
 
     # calcul récursif des moments
     # Je pense (2025) que j'avais conclu qu'il fallait mieux
@@ -849,7 +849,7 @@ def irwin(b, d, k,
         _ = _v5_para_recurrence(m, R, useparallel)
 
     if showtimes:
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
               + f"{stoptime-starttime:.3f}s")
 
@@ -882,7 +882,7 @@ def irwin(b, d, k,
         if showtimes:
             print(f"Calcul de l'approximation principale avec k={j}...",
                   end = ' ', flush = True)
-            starttime = time.time()
+            starttime = time.perf_counter()
 
         # calcul de la série alternée de Burnol
 
@@ -918,7 +918,7 @@ def irwin(b, d, k,
                       for i in range(1 + min(j,level))))
 
         if showtimes:
-            stoptime = time.time()
+            stoptime = time.perf_counter()
             print("{:.3f}s".format(stoptime-starttime))
 
         if verbose:
@@ -931,7 +931,7 @@ def irwin(b, d, k,
 
         if showtimes:
             print(f"Calcul de la série pour k={j}...", end = ' ', flush = True)
-            starttime = time.time()
+            starttime = time.perf_counter()
 
         # WE START WITH THE SMALLEST TERM CONTRIBUTING TO THE SERIES
         # Its sign will be set later.
@@ -976,7 +976,7 @@ def irwin(b, d, k,
                 bubu += touslescoeffs[m][j-4] * lesbetas_maxblock4[m]
 
         if showtimes:
-            stoptime = time.time()
+            stoptime = time.perf_counter()
             print("{:.3f}s".format(stoptime-starttime))
 
         # NOW COMPUTE FINAL RESULT
@@ -1037,7 +1037,7 @@ def irwinpos(b, d, k,
 
     if showtimes:
         print("Préparation des RealField...", end=" ", flush=True)
-        starttime = time.time()
+        starttime = time.perf_counter()
 
     (nbbits,
      nbbits_final,
@@ -1048,7 +1048,7 @@ def irwinpos(b, d, k,
      NbOfPrec) = _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax)
 
     if showtimes:
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print("{:.3f}s".format(stoptime - starttime))
     if verbose:
         print(f"{NbOfPrec} RealField(s) de précision maximale {nbbits},")
@@ -1057,7 +1057,7 @@ def irwinpos(b, d, k,
     if showtimes:
         print("Calcul des blocs initiaux et des gammas ...",
               end = ' ', flush = True)
-        starttime = time.time()
+        starttime = time.perf_counter()
 
     blocks = _v5_setup_blocks(b, d, level)
     block1 = blocks[0]
@@ -1099,7 +1099,7 @@ def irwinpos(b, d, k,
         lespuissancesdedprime = None
 
     if showtimes:
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print("{:.3f}s".format(stoptime - starttime))
 
     if showtimes:
@@ -1107,7 +1107,7 @@ def irwinpos(b, d, k,
             print(f"Calcul des v_{{0;m}} pour m<={Mmax} ...")
         else:
             print(f"Calcul des v_{{j;m}} pour j<={k} et m<={Mmax} ...")
-        starttime = time.time()
+        starttime = time.perf_counter()
 
     # calcul récursif des moments
     touslescoeffs = [ [Rmax(b)] * (k+1) ]
@@ -1138,7 +1138,7 @@ def irwinpos(b, d, k,
         _= _v5_para_recurrence(m, R, useparallel)
 
     if showtimes:
-        stoptime = time.time()
+        stoptime = time.perf_counter()
         print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
               + f"{stoptime-starttime:.3f}s")
 
@@ -1171,7 +1171,7 @@ def irwinpos(b, d, k,
         if showtimes:
             print(f"Calcul de l'approximation principale avec k={j}...",
                   end = ' ', flush = True)
-            starttime = time.time()
+            starttime = time.perf_counter()
 
         # calcul de la série positive de Burnol
 
@@ -1206,7 +1206,7 @@ def irwinpos(b, d, k,
                       for i in range(1 + min(j,level))))
 
         if showtimes:
-            stoptime = time.time()
+            stoptime = time.perf_counter()
             print("{:.3f}s".format(stoptime-starttime))
 
         if verbose:
@@ -1219,7 +1219,7 @@ def irwinpos(b, d, k,
 
         if showtimes:
             print(f"Calcul de la série pour k={j}...", end = ' ', flush = True)
-            starttime = time.time()
+            starttime = time.perf_counter()
 
         # WE START WITH THE SMALLEST TERM CONTRIBUTING TO THE SERIES
         # Its sign will be set later.
@@ -1273,7 +1273,7 @@ def irwinpos(b, d, k,
                 bubu += touslescoeffs[m][j-4] * lesbetas_maxblockshifted4[m]
 
         if showtimes:
-            stoptime = time.time()
+            stoptime = time.perf_counter()
             print("{:.3f}s".format(stoptime-starttime))
 
         # NOW COMPUTE FINAL RESULT
