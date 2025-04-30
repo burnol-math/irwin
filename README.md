@@ -75,9 +75,8 @@ perspective to make it easier and less demanding on the hardware to obtain
   finitely many additive corrections done after the parallelized subprocesses
   have returned; this is done for all `j`'s from `0` to `k` in one-go.
 
-  The memory foot-print is higher than in `v3` because `maxworkers+1` rows of
+  The memory foot-print is higher than in `v3` because `maxworkers` rows of
   the Pascal triangle are in memory rather than only `2` for `v3` (and `v4`).
-  We could reduce this to `maxworkers` up to some complication in the code.
 
   The variable `maxworkers` does not have to be at most the actual number of
   cores on the user system.  We tested `maxworkers=2` on an old hardware with

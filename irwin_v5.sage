@@ -212,6 +212,9 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                 newPascalRow.extend(reversed(newPascalRow))
             else:
                 newPascalRow.extend(reversed(halfPascalRow))
+            if i == 0:
+                del PascalRows[:]
+                PascalRows.append(None)
             PascalRows.append(newPascalRow)
 
         M = m - step
