@@ -173,10 +173,12 @@ def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     return [ A[j] + B[j] for j in range(k + 1) ]
 
 
-def _v5_umtimeinfo(single, multi, para, wrkrs, M, s):
+def _v5_umtimeinfo(single_ns, multi_ns, para, wrkrs, M, s):
     """Auxiliary shared between irwin() and irwinpos()
     """
-    if multi < single:
+    multi = multi_ns * 1e-9
+    single = single_ns * 1e-9
+    if multi_ns < single_ns:
         if para:
             print(f"... poursuite car {single:.3f}s>{multi:.3f}s"
                   f" en parallèle ({M}<m<={M+s})")
@@ -214,7 +216,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
 
         M = m - step
         if ((M - 400) % 500 < maxworkers):
-            starttime = time.perf_counter()
+            starttime_ns = time.perf_counter_ns()
             results = _v5_ukm_partial(((a, M + a,
                                         PascalRows[a],
                                         Gammas,
@@ -225,15 +227,15 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                                        for a in range(1, step + 1)))
             ukm_partial = [ None ]
             ukm_partial.extend([result[1] for result in sorted(list(results))])
-            multitime = time.perf_counter() - starttime
+            multitime_ns = time.perf_counter_ns() - starttime_ns
 
             if useparallel and persistentpara:
                 # do not check again
                 if showtimes:
-                    print(f"... mode parallèle persistant ({multitime:.3f}s; "
+                    print(f"... mode parallèle persistant ({multitime_ns*1e-9:.3f}s; "
                           f"{M}<m<={M+step})")
             else:
-                starttime = time.perf_counter()
+                starttime_ns = time.perf_counter_ns()
                 m = M
                 ukm_partial = [ None ]
                 for j in range(1, 1 + step):
@@ -249,14 +251,14 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                                     * Rm(touslescoeffs[m-i][p-1])
                                     for i in range(j, m+1)) for p in range(1, k+1) ]) 
                     ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
-                singletime = time.perf_counter() - starttime
+                singletime_ns = time.perf_counter_ns() - starttime_ns
 
                 if showtimes:
-                    _v5_umtimeinfo(singletime, multitime,
+                    _v5_umtimeinfo(singletime_ns, multitime_ns,
                                    useparallel,
                                    maxworkers, M, step)
 
-                useparallel = multitime < singletime
+                useparallel = multitime_ns < singletime_ns
 
         elif useparallel:
             results = _v5_ukm_partial(((a, M + a,
