@@ -86,7 +86,7 @@ perspective to make it easier and less demanding on the hardware to obtain
   re-load of `irwin_v5.sage` in the interactive session.
 
 - I should note here that there are some surprises with parallelization on my
-  macOS 15.4.1 Sequoia. To parallelize the computation of the moments of the
+  macOS 15.4.1 Sequoia.  To parallelize the computation of the moments of the
   measure defined in my research, for which the known way is to proceed via
   the recurrences I obtained, the code necessarily has to call many times
   procedures which have been `@parallel` decorated; for example with
@@ -115,6 +115,13 @@ perspective to make it easier and less demanding on the hardware to obtain
   [test_parallel_sleep.sage](test_parallel_sleep.sage) behaves on various
   systems.  Please comment at #1.
 
+  In practice this means that on macOS 15 at least one should quit `sage` and
+  restart a session before launching a run for which one needs the best
+  efficiency.  The `irwin_v5` module (version 1.5.4 of April 23, 2025) has
+  computed via `irwin()` on a Mac Mini M4 Pro with `10+4` cores `2+101010`
+  decimals of the "no-9" Kempner constant in 5h38mn, with `maxworkers` left to
+  its default `8`.
+  
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
   correctly rounded to `N` decimal places.  They are currently:
@@ -130,8 +137,8 @@ perspective to make it easier and less demanding on the hardware to obtain
 - [taille_pascal.pdf](taille_pascal.pdf) explains how many bits are needed to
   store in computer memory the Pascal triangle up (or rather down) to a
   certain row, or the memory needed to store only one such row.  Thanks to
-  Nicolas Radulesco who asked for SageMath equivalents of the few Maple usages which
-  were inserted in the text, they are in
+  Nicolas Radulesco who asked for SageMath equivalents of the few Maple usages
+  which were inserted in the text, they are in
   [taille_pascal_symbolic](taille_pascal_symbolic).
 
 ## TODO
