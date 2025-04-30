@@ -79,11 +79,11 @@ perspective to make it easier and less demanding on the hardware to obtain
   the Pascal triangle are in memory rather than only `2` for `v3` (and `v4`).
 
   The variable `maxworkers` does not have to be at most the actual number of
-  cores on the user system.  We tested `maxworkers=2` on an old hardware with
-  only 2 cores, and it gave comparable result to keeping `maxworkers=8`.  The
-  author is attow away from more efficient hardware and still has to test `v5`
-  on such.  Keep in mind any change to `maxworkers` must be followed by a
-  re-load of `irwin_v5.sage` in the interactive session.
+  cores on the user system.  We tested both `maxworkers=8` and `maxworkers=2`
+  on an old hardware with only 2 cores, timings were about the same.
+
+  **Keep in mind any change to `maxworkers` must be followed by a re-load of
+  `irwin_v5.sage` in the interactive session.**
 
 - I should note here that there are some surprises with parallelization on my
   macOS 15.4.1 Sequoia.  To parallelize the computation of the moments of the
