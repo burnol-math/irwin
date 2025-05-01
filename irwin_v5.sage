@@ -400,6 +400,7 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
     def map__v5_beta(j):
         print(f"... ({j} occ.) ", end = "", flush = True)
         starttime = time.perf_counter()
+        lasttime = starttime
         mbegin = 1  # will remain congruent to 1 modulo maxworkers
         mend = 1    # this one also
         L = [0]
@@ -417,9 +418,10 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
             results_1 = [result[1] for result
                          in sorted(list(_v5_beta(inputdata)))]
             L.extend(x for xs in zip(*results_1) for x in xs)
-            print(f"m<{mend}", end = " ", flush= True)
-            if (rep + 1) & 7 == 0:
-                print(f"\n" + " " * 12, end = " ")
+            stoptime = time.perf_counter()
+            print(f"m<{mend} ({stoptime-lasttime:.3f}s)",
+                  end = "\n             ", flush= True)
+            lasttime = stoptime
             mbegin = mend
 
         if mend < Mmax+1:
@@ -438,9 +440,11 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
                 del L[-extra:]
             else:
                 L.extend(x for xs in zip(*results_1) for x in xs)
-            print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
         stoptime = time.perf_counter()
-        print("{:.3f}s".format(stoptime - starttime))
+        if mend < Mmax + 1:
+            print(f"m<{Mmax+1} ({stoptime-lasttime:.3f}s)",
+                  end = " ")
+        print(f"Fini! En tout : {stoptime-starttime:.3f}s")
         return L
     return map__v5_beta
 
@@ -870,8 +874,8 @@ def irwin(b, d, k,
 
     if showtimes:
         stoptime = time.perf_counter()
-        print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
-              + f"{stoptime-starttime:.3f}s")
+        print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} "
+              + f"Fini! En tout : {stoptime-starttime:.3f}s")
 
     # calcul parallèle des beta (sommes d'inverses de puissances)
     if showtimes:
