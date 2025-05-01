@@ -1,3 +1,26 @@
+# -*- mode: python -*-
+
+# NOTA BENE (May 1, 2025)
+
+# This was done in April at some point in development of
+# irwin_v4.sage to test relative efficiencies of using
+# @parallel.  For some forgotten rasons, the test2(), test3(),
+# test4() and test5() all call the @parallel function with some
+# explicit list range, rather than simply a start, end, step
+# data. This probably causes some unefficiency and anyhow
+# irwin_v5.sage has improved on this later on.  But this is not
+# backported here.
+
+# Another very important point to make is that there is
+# definitely an upstream bug somewhere which causes usage or
+# @parallel decorated functions to have very counter-intuitive
+# after effects -- **after** the calls are done... See issue #1.
+# This may interfere with various benchmarking which was
+# attempted with this test file.
+
+# Finally the procedure machin() does not emulate good enough
+# the real life things done by irwin_v4 and later.
+
 ncpus=8
 
 @parallel(ncpus=ncpus)
@@ -15,10 +38,12 @@ def bar100(x):
     # choice here
     return [z**100 for z in x]
 
-# Trying to be somewhat close to real use case in irwin_v4
+# Trying to be somewhat close to real use case in irwin_v4. But
+# in powers of 999 was perhaps not a good idea and have been
+# replaced by powers of say 101.
 @parallel(ncpus=ncpus)
 def machin(x):
-    return [1/RealField(z[1] - 3*z[0])(999 ** (z[0]+1)) for z in x]
+    return [1/RealField(z[1] - 3*z[0])(101 ** (z[0]+1)) for z in x]
 
 # BAD WAY
 def test(R, check=False):
@@ -69,6 +94,7 @@ def test3(R, check=False, fn=machin):
         powers.extend([result[1][-1] for result in results_sorted[:r]])
     if check:
         print(powers)
+        assert R == len(powers)
     # do some minimal check always
     # powers[0] occupies roughly of the order of R decimal
     # digits if fn==machin
@@ -80,6 +106,17 @@ def test3(R, check=False, fn=machin):
 # Using machin for fn is closer to real-life and for R
 # in 1000, 10000, 20000, I could not measure significant
 # and obvious differences.
+#
+# Update May 1st: I should have tested with a procedure much
+# closer to the computation of the real beta()'s because this
+# testing underestimated the disadvantage of having among the 8
+# parallel jobs some taking significantly longer than others.
+# It is also very time-consuming and irritating to test things
+# due to upstream bug/feature #1 which afflicts my system and
+# makes my life lonely and miserable.  But the main problem here
+# is that I did not test the real thing and for example I am
+# using (this is bad) explicit lists rather than generators,
+# contrarily to irwin_v5 code (which this predated anyhow).
 def test4(R, check=False, fn=machin):
     q, r = divmod(R, ncpus)
     I = 0
@@ -102,6 +139,7 @@ def test4(R, check=False, fn=machin):
     powers = sum([result[1] for result in results_sorted], [])
     if check:
         print(powers)
+        assert R == len(powers)
     # do some minimal check always
     # powers[0] occupies roughly of the order of R decimal
     # digits if fn==machin
@@ -116,6 +154,10 @@ def test4(R, check=False, fn=machin):
 # Using machin for fn is closer to real-life and for R
 # in 1000, 10000, 20000, I could not measure significant
 # and obvious differences.
+#
+# Sadly this test5() when I used it while working on irwin_v4
+# was awfully wrong.  Fixed only much later when polishing
+# irwin_v5 towards 1.5.6.
 def test5(R, check=False, fn=machin):
     if fn == machin:
         Pmax = 3 * R + 20
@@ -123,15 +165,21 @@ def test5(R, check=False, fn=machin):
     else:
         inputs = list(range(R))
     blocks = [inputs[i::ncpus] for i in range(ncpus)]
+    # print(blocks)
     results_1 = [result[1] for result in sorted(list(fn(blocks)))]
-    delta = len(results_1[0])-len(results_1[-1])
-    if delta > 0:
-        results_1[-1].extend([None] * delta)
-        powers = [x for xs in zip(*results_1) for x in xs][:-delta]
+    # print(results_1)
+    r = R % ncpus
+    if r > 0:
+        for j in range(1,ncpus - r + 1):
+            results_1[-j].append(None)
+        # print(results_1)
+        # print(list(zip(*results_1)))
+        powers = [x for xs in zip(*results_1) for x in xs][:-(ncpus -r)]
     else:
         powers = [x for xs in zip(*results_1) for x in xs]
     if check:
         print(powers)
+        assert R == len(powers)
     # do some (very) minimal check always
     # powers[0] occupies roughly of the order of R decimal
     # digits if fn==machin
@@ -139,5 +187,3 @@ def test5(R, check=False, fn=machin):
     # a en fait un range assez faible d'exposants scientifiques
     # possibles... 1/float(10**324) donne 0.0
     return float(powers[10]) if R>10 else powers[0], powers[-1]
-
-    
