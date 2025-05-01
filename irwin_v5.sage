@@ -3,8 +3,8 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.5"
-__date__     = "2025/04/30"
+__version__  = "1.5.6"
+__date__     = "2025/05/01"
 __filename__ = "irwin_v5.sage"
 
 irwin_v5_docstring = """
@@ -34,6 +34,21 @@ more decimal digits of precision:
   being usable or not usable...
 
 - Parallelization, using @parallel(ncpus=8) per default.
+
+  NOTA BENE: the development is done on a macOS 15 where a very
+  problematic behavior plagues testing: the performance
+  decreases each time one calls anew any function which at some
+  point will use (hundreds of) calls to @parallel-decorated
+  procedures (it has nothing to do with the specifics of this
+  particular module, and is a general p.i.t.a.).  See issue #1
+  at the development repo on GitLab.  There is no question here
+  that this is an upstream bug, although the author is unable to
+  say what "upstream" refers to.  In practice, one needs to
+  terminate the SageMath session and relaunch each time it is
+  important to get the optimal efficiency of irwin() or
+  irwinpos().  Fortunately you may be on some other OS.  You
+  can try out the procedure bar() of test_parallel_sleep.sage
+  and see if execution times worsen each time you call it.
 
 Miscellaneous remarks:
 
@@ -142,7 +157,7 @@ import time
 nbguardbits = 12
 
 try:
-    maxworkers_test = maxworkers
+    _ = maxworkers
     maxworkersinfostring = ("maxworkers variable already existed "
                             f"and has value {maxworkers}.")
 except NameError:
@@ -203,7 +218,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
             m += 1
             newPascalRow = [ 1 ]
             halfm = m // 2
-            newPascalRow.extend([PascalRows[-1][j-1] + 
+            newPascalRow.extend([PascalRows[-1][j-1] +
                                  PascalRows[-1][j] for j in range(1, halfm)])
             if not (m&1):
                 halfPascalRow = newPascalRow.copy()
@@ -252,7 +267,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                     Bm.extend([ sum(PascalRows[j][i]
                                     * Rm(PuissancesDeD[i])
                                     * Rm(touslescoeffs[m-i][p-1])
-                                    for i in range(j, m+1)) for p in range(1, k+1) ]) 
+                                    for i in range(j, m+1)) for p in range(1, k+1) ])
                     ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
                 singletime_ns = time.perf_counter_ns() - starttime_ns
 
@@ -289,7 +304,7 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                 Bm.extend([ sum(PascalRows[j][i]
                                 * Rm(PuissancesDeD[i])
                                 * Rm(touslescoeffs[m-i][p-1])
-                                for i in range(j, m+1)) for p in range(1, k+1) ]) 
+                                for i in range(j, m+1)) for p in range(1, k+1) ])
                 ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
 
         # now correct the um's (or vm's) (prior to dividing by b**(m+1)-b+1)
@@ -337,34 +352,40 @@ def _v5_beta_aux(m, R, nblock):
 # Memo: first argument should facilitate sorting the results.
 @parallel(ncpus=maxworkers)
 def _v5_beta(start, end, IR, nblock):
-    return list(_v5_beta_aux(m, IR[m], nblock) for m in range(start,end))
+    return list(_v5_beta_aux(m, IR[m], nblock)
+                for m in range(start, end, maxworkers))
 
 
 def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
     """Auxiliary for sharing code between irwin() and irwinpos()
     """
-    q, r = divmod(Mmax, maxworkers)
-    I = 1
-    indices = []
-    for i in range(r):
-        indices.append(I)
-        I += q + 1
-    for i in range(maxworkers - r):
-        indices.append(I)
-        I += q
-    # indices[maxworkers] is Mmax + 1
-    indices.append(I)
-    def map__v5_beta(j):
-        L = [0]
-        inputblocks = [(indices[i],
-                        indices[i+1],
-                        IndexToR,
-                        maxblock[j])
-                       for i in range(maxworkers)]
-        results_1 = [result[1] for result
-                     in sorted(list(_v5_beta(inputblocks)))]
-        L.extend(sum([result for result in results_1], []))
-        return L
+    extra = maxworkers - ( Mmax % maxworkers )
+    if extra < maxworkers:
+        def map__v5_beta(j):
+            L = [0]
+            inputdata = [(i,
+                          Mmax + 1,
+                          IndexToR,
+                          maxblock[j])
+                         for i in range(1, 1 + maxworkers)]
+            results_1 = [result[1] for result
+                         in sorted(list(_v5_beta(inputdata)))]
+            for j in range(1, extra + 1):
+                results_1[-j].append(None)
+            L.extend(x for xs in zip(*results_1) for x in xs)
+            return L[:-extra]
+    else:
+        def map__v5_beta(j):
+            L = [0]
+            inputdata = [(i,
+                          Mmax + 1,
+                          IndexToR,
+                          maxblock[j])
+                         for i in range(1, 1 + maxworkers)]
+            results_1 = [result[1] for result
+                         in sorted(list(_v5_beta(inputdata)))]
+            L.extend(x for xs in zip(*results_1) for x in xs)
+            return L
     return map__v5_beta
 
 
@@ -379,8 +400,8 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
     def map__v5_beta(j):
         print(f"... ({j} occ.) ", end = "", flush = True)
         starttime = time.perf_counter()
-        mbegin = 1
-        mend = 1
+        mbegin = 1  # will remain congruent to 1 modulo maxworkers
+        mend = 1    # this one also
         L = [0]
         for rep in range(Mmax // mSize):
             mend   = mbegin + mSize
@@ -388,41 +409,35 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
             # We call the parallelized _v5_beta with exactly maxworkers
             # arguments.
             # Memo: le premier argument décidera du sorted
-            inputblocks = [(mbegin + i * q,
-                            mbegin + (i + 1) * q,
-                            IndexToR,
-                            maxblock[j])
-                           for i in range(maxworkers)]
+            inputdata = [(mbegin + i,
+                          mend,
+                          IndexToR,
+                          maxblock[j])
+                         for i in range(maxworkers)]
             results_1 = [result[1] for result
-                         in sorted(list(_v5_beta(inputblocks)))]
-            L.extend(sum([result for result in results_1], []))
+                         in sorted(list(_v5_beta(inputdata)))]
+            L.extend(x for xs in zip(*results_1) for x in xs)
             print(f"m<{mend}", end = " ", flush= True)
             if (rep + 1) & 7 == 0:
                 print(f"\n" + " " * 12, end = " ")
             mbegin = mend
 
         if mend < Mmax+1:
-            qlast, rlast = divmod(Mmax + 1 - mend, maxworkers)
-            I = mend
-            indiceslast = []
-            for i in range(rlast):
-                indiceslast.append(I)
-                I += qlast + 1
-            for i in range(maxworkers - rlast):
-                indiceslast.append(I)
-                I += qlast
-            # Memo: it is possible here that qlast is zero.  Then some final
-            # calls below will be with an empty range, _v5_beta will return an
-            # empty list.  All is fine.
-            indiceslast.append(I)
-            inputblocks = [(indiceslast[i],
-                            indiceslast[i + 1],
-                            IndexToR,
-                            maxblock[j])
-                           for i in range(maxworkers)]
+            extra = maxworkers - ( (Mmax + 1 - mend) % maxworkers )
+            inputdata = [(mend + i,
+                          Mmax + 1,
+                          IndexToR,
+                          maxblock[j])
+                         for i in range(maxworkers)]
             results_1 = [result[1] for result
-                         in sorted(list(_v5_beta(inputblocks)))]
-            L.extend(sum([result for result in results_1], []))
+                         in sorted(list(_v5_beta(inputdata)))]
+            if extra > 0:
+                for j in range(1, extra + 1):
+                    results_1[-j].append(None)
+                L.extend(x for xs in zip(*results_1) for x in xs)
+                del L[-extra:]
+            else:
+                L.extend(x for xs in zip(*results_1) for x in xs)
             print(f"m<{Mmax+1} (fait)", end = " ", flush=True)
         stoptime = time.perf_counter()
         print("{:.3f}s".format(stoptime - starttime))
@@ -801,7 +816,7 @@ def irwin(b, d, k,
             lespuissancesded.append(Rj(d**j))
     else:
         # we need the name to be defined when calling _v5_ukm_partial
-        lespuissancesded = None        
+        lespuissancesded = None
 
     if showtimes:
         stoptime = time.perf_counter()
