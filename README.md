@@ -182,15 +182,17 @@ perspective to make it easier and less demanding on the hardware to obtain
   
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
-  correctly rounded to `N` decimal places.  They are currently:
-  * [k_prec_1000](k_prec_1000)
-  * [k_prec_2000](k_prec_2000)
-  * [k_prec_5000](k_prec_5000)
-  * [k_prec_10000](k_prec_10000)
-  * [k_prec_20000](k_prec_20000)
-  * [k_prec_25000](k_prec_25000)
-  * [k_prec_50000](k_prec_50000)
-  * [k_prec_99998](k_prec_99998) (contributed by Yusuf Emin Akpınar, thanks!)
+  correctly rounded to `N` decimal places.  They are currently (sorry for the
+  `+` in the filenames which is trying to say how many digits before and after
+  decimal separator):
+  * [k_prec_2+1000](k_prec_2+1000)
+  * [k_prec_2+2000](k_prec_2+2000)
+  * [k_prec_2+5000](k_prec_2+5000)
+  * [k_prec_2+10000](k_prec_2+10000)
+  * [k_prec_2+20000](k_prec_2+20000)
+  * [k_prec_2+25000](k_prec_2+25000)
+  * [k_prec_2+50000](k_prec_2+50000)
+  * [k_prec_2+99998](k_prec_2+99998) (contributed by Yusuf Emin Akpınar, thanks!)
   
 - [taille_pascal.pdf](taille_pascal.pdf) explains how many bits are needed to
   store in computer memory the Pascal triangle up (or rather down) to a
