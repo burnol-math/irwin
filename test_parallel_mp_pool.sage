@@ -1,3 +1,4 @@
+# -*- mode:python -*-
 # test_parallel_hope.sage
 import time
 import multiprocessing as mp
