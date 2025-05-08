@@ -1,5 +1,5 @@
 # -*- mode:python -*-
-# test_parallel_hope.sage
+# test_parallel_mp_pool_fork.sage
 import time
 import multiprocessing as mp
 
@@ -9,12 +9,14 @@ def worker(args):
     a, data, precision = args
     R = RealField(precision)
     x = R(data)
-    result = x.sin() + x.cos()  # Example computation
+    result = x.sin()
     return result
 
-ncpus = 8
-
-def bar(numcalls=100, data_list=[0.1]*8, precision=128, ncpus=8, check=False):
+def bar(numcalls=100,
+        ncpus=8,
+        data_list=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
+        precision=100,
+        check=False):
     with mp.Pool(processes=ncpus) as pool:
         for i in range(numcalls):
             inputs = [(a, data_list[a], precision) for a in range(ncpus)]
