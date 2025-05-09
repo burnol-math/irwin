@@ -3,8 +3,6 @@
 import time
 import multiprocessing as mp
 
-mp.set_start_method('fork', force=True)
-
 def worker(args):
     a, data, precision = args
     R = RealField(precision)
@@ -17,6 +15,8 @@ def bar(numcalls=100,
         data_list=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8],
         precision=100,
         check=False):
+    mp.set_start_method('fork', force=True)
+    print("Setting multiprocessing start method to 'fork'")
     with mp.Pool(processes=ncpus) as pool:
         for i in range(numcalls):
             inputs = [(a, data_list[a], precision) for a in range(ncpus)]
@@ -24,3 +24,7 @@ def bar(numcalls=100,
     if check:
         print(results)
     return None
+
+if __name__ == "__main__":
+    mp.set_start_method('fork', force=True)
+    print("Setting multiprocessing start method to 'fork'")
