@@ -1,5 +1,6 @@
 # irwin
 
+[[_TOC_]]
 
 ## Description
 
@@ -8,12 +9,12 @@ February 2024 article
 [Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
 by me (aka Jean-François Burnol).
 
-## Files
+## Quick guide
 
-So far all contributed files with extension `.sage` are to be used
-interactively within a SageMath session.  Start a SageMath session and at the
-`sage` prompt, enter `load("<FOO>.sage")`.  Follow banner instructions which
-will be printed.  For example:
+The main files currently implementing the algorithm are `irwin_v3.sage` and
+`irwin_v5.sage`.  Start a SageMath session and at the `sage` prompt, enter
+`load("irwin_v3.sage")` or `load("irwin_v5.sage")`.  Follow banner
+instructions which will be printed.  For example:
 
 ```sage
 sage: load("irwin_v3.sage")
@@ -22,9 +23,11 @@ sage: irwin(10,9,0,52)
 22.92067661926415034816365709437593191494476243699848
 ```
 
-Hundreds, even thousands of digits, can be computed.  For this, prefer using
+For computing Kempner harmonic sums with thousands of decimal digits, or Irwin
+sums starting already at a few hundreds of digits it is preferable to load
 `irwin_v5.sage` which will try to take advantage of multiple cores on your
-system.
+system.  It defaults to using `8` workers, but this can be configured by
+setting `maxworkers` variable *and reloading* `irwin_v5.sage`.
 
 ```sage
 sage: load("irwin_v5.sage")
@@ -51,12 +54,6 @@ sage: irwin(10,9,0,1002)
    20275923523021897838806069615932191066192832138116
    95786715012908593756769518010810881852946961772722
    23692633510303284693132263332046629826719621921950
-```
-
-We can also compute the Irwin harmonic sums, where a given digit is allowed
-only a given number of time:
-
-```sage
 sage: irwin(10,9,1,1002)
 [the output is reformatted here to show 50 decimals per line]
 23.04428708074784831967594930973617482538959203064773
@@ -89,6 +86,8 @@ digits (Y. E. A. has obtained 100000=2+99998 digits of the classical "no-9"
 radix 10 Kempner series).  This motivated me to revisit the 2024 code with the
 perspective to make it easier and less demanding on the hardware to obtain
 10000+ digits even within some high-level front-end such as SageMath.
+
+## Additional details
 
 - [irwinfloat.py](irwinfloat.py) and [irwin.sage](irwin.sage) are the files
   available at [my arXiv paper](https://arxiv.org/abs/2402.09083). They were
@@ -193,7 +192,8 @@ perspective to make it easier and less demanding on the hardware to obtain
   cleanup" somewhere by the OS).  The initial faster execution times will
   never be matched again though.  Only way known to author at time of
   writing is to quit the SageMath interactive session and to relaunch a fresh
-  one.  Here is a typical illustration of the execution times drifting:
+  one.  Here is a typical illustration of the execution times drifting,
+  where the workers only action is to "sleep"!
 
   ```text
   $ sage
