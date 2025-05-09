@@ -269,20 +269,22 @@ perspective to make it easier and less demanding on the hardware to obtain
   happens with `@parallel`.
   
   Sadly though, all of these methods, when tried out with the computation of
-  the coefficients at the heart of my research, creates higher overhead so
-  that my algorithm as in `irwin_v5.sage` which tests if it is worthwile to go
+  the coefficients at the heart of my research, cause higher overhead. My
+  algorithm in `irwin_v5.sage` tests regularly if it is worthwile to go
   parallel for the recurrences computing the coefficients defined in my
-  research never decides (at least for say obtaining 10000 digits) to toggle
-  on the parallelized procedures and sticks with serial code.  Contrarily with
-  the `@parallel` situation for which overhead is found to be smaller.  If
-  only there was a way after each such call to tell the OS to clean up stuffs
-  so that we go back to similar state as on first execution!  Probably there
-  is a way but for this author it is quite a challenge to dig into these
-  things.  It can't be a widespread issue with `@parallel` and must be limited
-  probably to recent macOSes and perhaps only ARM architectures, else people
-  would have reported it. (But one is surprised sometimes for such things; the
-  author of these lines has more than once found bugs in decades old
-  software.)
+  research, and these new protocols the decision to toggle on the parallel
+  computations is never taken.  Hence we are back for that part to the same
+  execution times as with the `irwin_v3.sage` more or less, and gains are
+  obtained only for the later part which computes the "`beta(m+1)`'s".
+
+  If only there was a way after each call to a `@parallel`-decorated procedure
+  to tell the OS to clean up stuffs so that we go back to similar state as on
+  first execution!  Probably there is a way but for this author it is quite a
+  challenge to dig into these things.  It can't be a widespread issue with
+  `@parallel` and must be limited probably to recent macOSes and perhaps only
+  ARM architectures, else people would have reported it. (But one is surprised
+  sometimes for such things; the author of these lines has more than once
+  found bugs in decades old software.)
 
   I also tested in `C` using the `OpenMP` library if any time drift could be
   put into evidence, and none showed up.  Thanks to Yusuf Emin Akpınar for
