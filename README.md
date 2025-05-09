@@ -175,23 +175,25 @@ perspective to make it easier and less demanding on the hardware to obtain
 
 - I should note here that there are some surprises with parallelization using
   `@parallel` on my very recently acquired macOS 15.4.1 Sequoia.  To
-  parallelize the computation of the coefficients which I have associated with
-  Kempner and Irwin sums, for which the known way is to proceed via the
-  recurrences obtained in my research, the code necessarily has to call many
-  times procedures which have been `@parallel`-decorated; for example with
-  `maxworkers=8` and if we need `10000` such coefficients, we will call `1250`
-  times such a procedure.
+  parallelize the computation by recurrence of the coefficients which I have
+  associated with Kempner and Irwin sums, the code necessarily has to call
+  many times a procedure which has been `@parallel`-decorated; for example if
+  we need `10000` such coefficients and use `8` workers, we will call `1250`
+  times the `@parallel`-ized procedure each time with an input having `8`
+  entries.
 
   Turns out that on macOS 15.4.1 at least (but I can't test easily on other
   systems), as I discovered in issue #1, and as is explored in test files such
-  as [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage) repeated calls
-  to a procedure calling a `@parallel` decorated ones cause a continuous
-  seemingly linear increase of the execution time.  With
+  as [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage), iterating
+  calls to a procedure calling a `@parallel` decorated one causes a seemingly
+  linear increase of the execution time at each new call.  With
   [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage) this time drift
   seems to continue more or less forever, in more realistic situations it is
-  seen to reset from time to time, but the process never recovers the initial
-  faster execution times.  Only way is to quit the SageMath interactive
-  session and relaunch.  Here is a typical illustration:
+  seen to get reset from time to time (probably in connection with some "cache
+  cleanup" somewhere by the OS).  The initial faster execution times will
+  never be matched again though.  Only way known to author at time of
+  writing is to quit the SageMath interactive session and to relaunch a fresh
+  one.  Here is a typical illustration of the execution times drifting:
 
   ```text
   $ sage
@@ -266,15 +268,25 @@ perspective to make it easier and less demanding on the hardware to obtain
   reproduce any systematic drift in execution times, contrarily to what
   happens with `@parallel`.
   
-  Sadly though, all of these methods demonstrate much higher overhead so that
-  my algorithm as in `irwin_v5.sage` which tests if it is worthwile to go
+  Sadly though, all of these methods, when tried out with the computation of
+  the coefficients at the heart of my research, creates higher overhead so
+  that my algorithm as in `irwin_v5.sage` which tests if it is worthwile to go
   parallel for the recurrences computing the coefficients defined in my
   research never decides (at least for say obtaining 10000 digits) to toggle
-  on the parallel procedures and sticks with serial code.
+  on the parallelized procedures and sticks with serial code.  Contrarily with
+  the `@parallel` situation for which overhead is found to be smaller.  If
+  only there was a way after each such call to tell the OS to clean up stuffs
+  so that we go back to similar state as on first execution!  Probably there
+  is a way but for this author it is quite a challenge to dig into these
+  things.  It can't be a widespread issue with `@parallel` and must be limited
+  probably to recent macOSes and perhaps only ARM architectures, else people
+  would have reported it. (But one is surprised sometimes for such things; the
+  author of these lines has more than once found bugs in decades old
+  software.)
 
   I also tested in `C` using the `OpenMP` library if any time drift could be
-  put into evidence, and none showed up (thanks to Yusuf Emin Akpınar for
-  providing `C` implementation of the algorithm of my research papers).
+  put into evidence, and none showed up.  Thanks to Yusuf Emin Akpınar for
+  providing `C` implementation of the algorithm of my research papers.
   
   I wish I could test on more systems, only thing I can say is that nothing of
   this sort is seen on old macOSes such as High Sierra.  I am quite interested
