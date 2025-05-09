@@ -272,13 +272,13 @@ perspective to make it easier and less demanding on the hardware to obtain
   the coefficients at the heart of my research, cause higher overhead. My
   algorithm in `irwin_v5.sage` tests regularly if it is worthwile to go
   parallel for the recurrences computing the coefficients defined in my
-  research, and these new protocols the decision to toggle on the parallel
+  research, and for these new protocols the decision to toggle on the parallel
   computations is never taken.  Hence we are back for that part to the same
   execution times as with the `irwin_v3.sage` more or less, and gains are
   obtained only for the later part which computes the "`beta(m+1)`'s".
 
   If only there was a way after each call to a `@parallel`-decorated procedure
-  to tell the OS to clean up stuffs so that we go back to similar state as on
+  to tell the OS to clean up its stuff so that we go back to similar state as on
   first execution!  Probably there is a way but for this author it is quite a
   challenge to dig into these things.  It can't be a widespread issue with
   `@parallel` and must be limited probably to recent macOSes and perhaps only
@@ -315,9 +315,38 @@ perspective to make it easier and less demanding on the hardware to obtain
   * [test_pool_spawn_RF.py](test_pool_spawn_RF.py)
   * [test_pool_forkserver_RF.py](test_pool_forkserver_RF.py)
 
-## TODO
+## Bibliographical references
 
-Add some additional bibliographical references.
+This repository is devoted to the formulas discovered in:
+
+- [Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525)
+- [Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
+
+Earlier numerical works computing otherwise Kempner and Irwin sums include:
+
+- Robert Baillie: Sums of reciprocals of integers missing a given digit. Amer. Math.
+Monthly 86(5), 372–374 (1979) [DOI](https://doi.org/10.2307/2321096Sums)
+- Robert Baillie: Summing the curious series of Kempner and Irwin (2008).
+[arXiv:0806.4410](https://arxiv.org/abs/0806.4410)
+- Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent series. Amer.
+Math. Monthly 115(6), 525–540 (2008) [DOI](https://doi.org/10.1080/00029890.2008.11920559)
+
+My two papers quoted above have not yet been published but some of my further
+research already has appeared:
+
+- Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791)
+- Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604)
+- Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3)
+
+You will find at
+[arXiv:burnol](https://arxiv.org/search/?searchtype=author&query=Burnol%2C+J)
+some further manuscripts related to this topic, as well as earlier papers
+doing fancy mathematics on some other topics.  For fancier earlier mathematics still,
+the links are not yet public.
+
+
+TODO: perhaps add some additional bibliographical references and do the
+fancier earlier mathematics at long last.
 
 ## License
 
