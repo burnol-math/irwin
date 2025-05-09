@@ -143,43 +143,13 @@ perspective to make it easier and less demanding on the hardware to obtain
   **Keep in mind any change to `maxworkers` must be followed by a re-load of
   `irwin_v5.sage` in the interactive session.**
 
-- I should note here that there are some surprises with parallelization on my
-  macOS 15.4.1 Sequoia.  To parallelize the computation of the moments of the
-  measure defined in my research, for which the known way is to proceed via
-  the recurrences I obtained, the code necessarily has to call many times
-  procedures which have been `@parallel` decorated; for example with
-  `maxworkers=8` and if we need `10000` such coefficients, we will call `1250`
-  times such a procedure.  Turns out that on macOS 15.4.1 this causes a linear
-  increase in some sort of waiting time which increases the execution times.
-  It is hard to analyse on `irwin_v5.sage` because the time increases at least
-  linearly with the index `m` purely due to the length of the recurrence (as
-  one sees with the test timings reported regularly if with the
-  `showtimes=True` option).  Anyway I reduced this to a reproducer
-  [test_parallel_sleep.sage](test_parallel_sleep.sage) and I reported as
-  [this SageMath ticket](https://github.com/sagemath/sage/issues/39960) which
-  has been closed, probably more as a "wont-fix" (see also #1).  I consider
-  the ticket was closed (twice actually) a bit fast, with no obvious desire to
-  investigate more what appears to be specific to macOS 15.4.1.  I have some
-  difficulties to fathom how a more powerful processor than most others could
-  behave so bad, and it definitely is cause to ponder why the caching done by
-  the OS has such an obvious detrimental effect in this context.  Is it a bug
-  somewhere in the OS or is it a bug in Python?  It is hard for me to consider
-  it a fact of life that when you call many times such a procedure it affects
-  what is done next... unless you kill `sage` and reload! I must admit I am
-  saying this under the impression that the problem does not show on Linux
-  boxes but I did not investigate fully myself for lack of resources.  All I
-  know is that on a quadri-core much older macOS there is absolutely **no**
-  problem.  Anyway, I am quite interested into reports on how
-  [test_parallel_sleep.sage](test_parallel_sleep.sage) behaves on various
-  systems.  Please comment at #1.
+- Here are some timings of `irwin()` from `irwin_v5` module, on a 
+  Mac Mini M4 Pro with `10+4` cores:
+  - version 1.5.4 of April 23, 2025, computed `2+101010` decimals of the "no-9"
+    Kempner constant in `5h38mn`, with `maxworkers` left to its default `8`.
+  - version 1.5.5 of April 30, 2025, computed `2+130010` decimals in `10h10mn`,
+    using `maxworkers=10`.
 
-  In practice this means that on macOS 15 at least one should quit `sage` and
-  restart a session before launching a run for which one needs the best
-  efficiency.  The `irwin_v5` module (version 1.5.4 of April 23, 2025) has
-  computed via `irwin()` on a Mac Mini M4 Pro with `10+4` cores `2+101010`
-  decimals of the "no-9" Kempner constant in 5h38mn, with `maxworkers` left to
-  its default `8`.
-  
 - The next files with names of the type `k_prec_N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
   correctly rounded to `N` decimal places.  They are currently (sorry for the
@@ -200,6 +170,136 @@ perspective to make it easier and less demanding on the hardware to obtain
   Nicolas Radulesco who asked for SageMath equivalents of the few Maple usages
   which were inserted in the text, they are in
   [taille_pascal_symbolic](taille_pascal_symbolic).
+
+## The `@parallel` issue #1
+
+- I should note here that there are some surprises with parallelization using
+  `@parallel` on my very recently acquired macOS 15.4.1 Sequoia.  To
+  parallelize the computation of the coefficients which I have associated with
+  Kempner and Irwin sums, for which the known way is to proceed via the
+  recurrences obtained in my research, the code necessarily has to call many
+  times procedures which have been `@parallel`-decorated; for example with
+  `maxworkers=8` and if we need `10000` such coefficients, we will call `1250`
+  times such a procedure.
+
+  Turns out that on macOS 15.4.1 at least (but I can't test easily on other
+  systems), as I discovered in issue #1, and as is explored in test files such
+  as [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage) repeated calls
+  to a procedure calling a `@parallel` decorated ones cause a continuous
+  seemingly linear increase of the execution time.  With
+  [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage) this time drift
+  seems to continue more or less forever, in more realistic situations it is
+  seen to reset from time to time, but the process never recovers the initial
+  faster execution times.  Only way is to quit the SageMath interactive
+  session and relaunch.  Here is a typical illustration:
+
+  ```text
+  $ sage
+  ┌────────────────────────────────────────────────────────────────────┐
+  │ SageMath version 10.6, Release Date: 2025-03-31                    │
+  │ Using Python 3.12.5. Type "help()" for help.                       │
+  └────────────────────────────────────────────────────────────────────┘
+  sage: load("test_parallel_sleep_v2.sage")
+
+  The bar() function is set-up to use per default numcalls=1000
+  and T=0.00100000000000000.  Its execution will time consecutively
+  chunks of 100 calls to the @parallel decorated interface
+  to time.sleep().
+
+  The variable "ncpus" sets ncpus for @parallel usage. You
+  can set it and then redo load("test_parallel_sleepv2.sage").
+
+  ncpus variable has been created and assigned value 8.
+
+  sage: %time bar()
+  Using ncpus=8 parallel decorated function
+  1.131s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001289s.
+  1.154s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001317s.
+  1.209s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001386s.
+  1.251s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001439s.
+  1.267s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001458s.
+  1.337s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001546s.
+  1.394s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001617s.
+  1.427s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001659s.
+  1.442s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001677s.
+  1.450s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001688s.
+  CPU times: user 398 ms, sys: 9.75 s, total: 10.1 s
+  Wall time: 13.1 s
+  sage: %time bar()
+  Using ncpus=8 parallel decorated function
+  1.558s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001823s.
+  1.594s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001868s.
+  1.630s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.001913s.
+  1.711s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002014s.
+  1.783s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002104s.
+  1.845s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002181s.
+  1.855s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002194s.
+  1.906s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002258s.
+  1.949s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002311s.
+  2.003s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002379s.
+  CPU times: user 411 ms, sys: 14.3 s, total: 14.7 s
+  Wall time: 17.8 s
+  sage: %time bar()
+  Using ncpus=8 parallel decorated function
+  2.082s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002478s.
+  2.049s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002436s.
+  2.111s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002513s.
+  2.153s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002567s.
+  2.187s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002608s.
+  2.429s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.002911s.
+  2.519s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.003024s.
+  2.710s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.003262s.
+  2.854s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.003442s.
+  2.980s per 100 x 8 @para sleep(0.001). Cost/ncpus/calls is 0.003600s.
+  CPU times: user 424 ms, sys: 20 s, total: 20.4 s
+  Wall time: 24.1 s
+  sage:
+  ```
+  
+  It looks as if this is tied with heavy IO, as the macOS Activity Monitor
+  shows disk writes at about 1Mo/s (starting at more than 2Mo/s) which I guess
+  is related to pickling the full Sage state...
+
+  I have tested using the `multiprocessing` library via its `Pool.map()` and
+  the starting methods `'fork'`, `'forkserver'` or `'spawn'` as well as the
+  `concurrent.futures.ProcessPoolExecutor()` and I have never been able to
+  reproduce any systematic drift in execution times, contrarily to what
+  happens with `@parallel`.
+  
+  Sadly though, all of these methods demonstrate much higher overhead so that
+  my algorithm as in `irwin_v5.sage` which tests if it is worthwile to go
+  parallel for the recurrences computing the coefficients defined in my
+  research never decides (at least for say obtaining 10000 digits) to toggle
+  on the parallel procedures and sticks with serial code.
+
+  I also tested in `C` using the `OpenMP` library if any time drift could be
+  put into evidence, and none showed up (thanks to Yusuf Emin Akpınar for
+  providing `C` implementation of the algorithm of my research papers).
+  
+  I wish I could test on more systems, only thing I can say is that nothing of
+  this sort is seen on old macOSes such as High Sierra.  I am quite interested
+  into reports on how
+  [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage) behaves on
+  various systems.  Please comment at #1.
+
+  In practice, what this means is that on afflicted systems, one should quit
+  `sage` and restart a session before launching a run for which one needs the
+  best efficiency.  But it also means that one-shot runs could probably be
+  faster because the time drift does affect the successive calls internally
+  needed to build up the recurrent coefficients (cf. for example
+  [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage)).
+
+  These files are related to testing the `@parallel` issue #1:
+  * [test_openmp_sleep.c](test_openmp_sleep.c)
+  * [test_parallel_sleep.sage](test_parallel_sleep.sage)
+  * [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage)
+  * [test_executor_sleep.sage](test_executor_sleep.sage)
+  * [test_pool_fork_sleep.py](test_pool_fork_sleep.py)
+  * [test_pool_spawn_sleep.py](test_pool_spawn_sleep.py)
+  * [test_pool_fork_RF.sage](test_pool_fork_RF.sage)
+  * [test_pool_fork_RF.py](test_pool_fork_RF.py)
+  * [test_pool_spawn_RF.py](test_pool_spawn_RF.py)
+  * [test_pool_forkserver_RF.py](test_pool_forkserver_RF.py)
 
 ## TODO
 
