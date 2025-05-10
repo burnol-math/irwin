@@ -258,9 +258,13 @@ perspective to make it easier and less demanding on the hardware to obtain
   sage:
   ```
   
-  It looks as if this is tied with heavy IO, as the macOS Activity Monitor
-  shows disk writes at about 1Mo/s (starting at more than 2Mo/s) which I guess
-  is related to pickling the full Sage state...
+  One observes during execution heavy disk write activity, as reported by the
+  macOS Activity Monitor at about 1Mo/s throughout, starting at more than
+  2Mo/s.
+
+  However, testing with a pure Python imitation of SageMath `@parallel` has
+  [reproduced the time drifting](https://gitlab.com/burnolmath/irwin/-/issues/1#note_2496429776)
+  without triggering any disk activity whatsoever.
 
   I have tested using the `multiprocessing` library via its `Pool.map()` and
   the starting methods `'fork'`, `'forkserver'` or `'spawn'` as well as the
@@ -314,6 +318,9 @@ perspective to make it easier and less demanding on the hardware to obtain
   * [test_pool_fork_RF.py](test_pool_fork_RF.py)
   * [test_pool_spawn_RF.py](test_pool_spawn_RF.py)
   * [test_pool_forkserver_RF.py](test_pool_forkserver_RF.py)
+  * [test_pyparallel_sleep.py](test_pyparallel_sleep.py) Thanks Edgar Costa
+    for providing the `@parallel` emulation in pure Python.  It does reproduce
+    the problem faithfully hence may help in understanding it.
 
 ## Bibliographical references
 
