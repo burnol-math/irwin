@@ -348,9 +348,8 @@ research already has appeared:
 You will find at
 [arXiv:burnol](https://arxiv.org/search/?searchtype=author&query=Burnol%2C+J)
 some further manuscripts related to this topic, as well as earlier papers
-doing fancy mathematics on some other topics.  For fancier earlier mathematics still,
-the links are not yet public.
-
+doing fancy mathematics on some other topics.  Fancier mathematics of those times
+is not yet public.
 
 TODO: perhaps add some additional bibliographical references and do the
 fancier earlier mathematics at long last.
