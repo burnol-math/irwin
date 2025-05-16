@@ -148,18 +148,7 @@ except NameError:
     maxworkersinfostring = ("maxworkers variable has been created "
                             "and assigned value 8.")
 
-# # Next one is to compute only u_{0;m} even if k>0, it was used at
-# # one stage of the implementation when the test for turning on
-# # parallelization was done on the computation of the u_{0;m}'s alone
-# # ignoring the u_{j;m}'s for 0<j<=k.  Now unused, because timings
-# # are done inclusive of all j's <=k.
-# @parallel(ncpus=maxworkers)
-# def _v5_u0m_partial(a, m, P, G, D, T, R):
-#     # m -a will be the same value in all simultaneous calls
-#     return sum(P[i]*R(G[i])*R(T[m - i][0]) for i in range(a, m + 1))
 
-
-# Memo: the first argument should be suitable for sorting the results.
 @parallel(ncpus=maxworkers)
 def _v5_ukm_partial(a, m, P, G, D, T, R, k):
     # m -a will be the same value in all simultaneous calls
@@ -172,7 +161,7 @@ def _v5_ukm_partial(a, m, P, G, D, T, R, k):
 
 
 def _v5_umtimeinfo(single_ns, multi_ns, para, wrkrs, M, s):
-    """Auxiliary shared between irwin() and irwinpos()
+    """Auxiliary shared between irwin() and irwinpos().
     """
     multi = multi_ns * 1e-9
     single = single_ns * 1e-9
@@ -195,7 +184,11 @@ def _v5_umtimeinfo(single_ns, multi_ns, para, wrkrs, M, s):
 def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                               PascalRows, IndexToR, b, bmoinsun, k,
                               showtimes, persistentpara, is_for_vm):
+    """TODO: add some doctring.
+    """
     def _v5_para_recurrence(m, step, useparallel):
+        """TODO: add some docstring.
+        """
         del PascalRows[:-1]
         for i in range(step):
             m += 1
@@ -290,16 +283,16 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                                 for i in range(j, m+1)) for p in range(1, k+1) ])
                 ukm_partial.append([ Am[n] + Bm[n] for n in range(k+1) ])
 
-        # now correct the um's (or vm's) (prior to dividing by b**(m+1)-b+1)
-        # with finitely missing contributions
+        # Now correct the um's (or vm's) (prior to dividing by b**(m+1)-b+1)
+        # via the addition of finitely missing contributions in order of increasing
+        # m's.
         m = M
         for j in range(1, 1 + step):
             m += 1
             Rm = IndexToR[m]
             D = Rm( b**(m+1) - bmoinsun )
-            # attention to the b**(m+1) extra term specific to v_m recurrence
-            # attension that parentheses are needed to delimit what "else"
-            # catches
+            # Attention to the b**(m+1) extra term specific to v_m recurrence.
+            # Attension that parentheses are needed to delimit what "else" caches.
             cm = [ ((Rm(b ** (m+1)) if is_for_vm else 0)
                     + ukm_partial[j][0]
                     + sum(PascalRows[j][i]
@@ -322,17 +315,15 @@ def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                      ) / D
                 cm.append(_)
             touslescoeffs.append(cm)
-        # update status
+        # Update status.
         return useparallel
     return _v5_para_recurrence
 
 
 def _v5_beta_aux(m, R, nblock):
     return sum(1/R(n ** (m+1)) for n in nblock)
-# legacy comment, kept in case
-#   Si p_iter="multiprocessing"
-#   ValueError: Cannot pickle code objects from closures
-# Memo: first argument should facilitate sorting the results.
+
+
 @parallel(ncpus=maxworkers)
 def _v5_beta(start, end, IR, nblock):
     return list(_v5_beta_aux(m, IR[m], nblock)
@@ -340,11 +331,15 @@ def _v5_beta(start, end, IR, nblock):
 
 
 def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
-    """Auxiliary for sharing code between irwin() and irwinpos()
+    """Auxiliary for sharing code between irwin() and irwinpos().
+
+    TODO: explain what it does.
     """
     extra = maxworkers - ( Mmax % maxworkers )
     if extra < maxworkers:
         def map__v5_beta(j):
+            """TODO: add some docstring.
+            """
             L = [0]
             inputdata = [(i,
                           Mmax + 1,
@@ -359,6 +354,8 @@ def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
             return L[:-extra]
     else:
         def map__v5_beta(j):
+            """TODO: add some docstring.
+            """
             L = [0]
             inputdata = [(i,
                           Mmax + 1,
@@ -373,7 +370,8 @@ def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
 
 
 def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
-    """Auxiliary for sharing code between irwin() and irwinpos()
+    """Auxiliary for sharing code between irwin() and irwinpos().
+    TODO: explain what it does.
     """
     # We want to display some visual sign of progress.
     # Find the largest multiple of maxworkers at most 1000,
@@ -381,6 +379,8 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
     q = max(1000 // maxworkers, 32)
     mSize = q * maxworkers
     def map__v5_beta(j):
+        """TODO: add some docstring.
+        """
         print(f"... ({j} occ.) ", end = "", flush = True)
         starttime = time.perf_counter()
         lasttime = starttime
@@ -392,7 +392,7 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
             # In this loop, mSize is a multiple of q.
             # We call the parallelized _v5_beta with exactly maxworkers
             # arguments.
-            # Memo: le premier argument décidera du sorted
+            # Memo: le premier argument décidera du sorted.
             inputdata = [(mbegin + i,
                           mend,
                           IndexToR,
@@ -447,170 +447,62 @@ def _v5_shorten_small_real(rr):
 
 
 def _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
-    """Preparation of an array mapping index to a RealField
+    """Preparation of an array mapping each m to a RealField.
 
-    NOTE BENE: with d=b-1, there is an additional factor
-               ((b-2)/(b-1))**m in u_{0;m} which is not taken
-               into account here, so we end up using more terms
-               than needed in this case.  For example at level =
-               2, computing the classic Kempner sum for 500
-               digits will use about 500 terms but 475 would
-               have been enough as (8/9)**475 is about 5e-25.
-               For k>0 and increasing, the effect diminishes.
-               (One can use verbose=True to examine the size of
-               the smallest kept term).
-
-               For the positive series, there is no such factor
-               but the beta(m+1) is smaller for level=2 roughly
-               by (b/(b+1))**m (for d=1 this will be rather with
-               b/(b+1/2), and d=0 also has another ratio) so we
-               have a similar phenomenon of using too many terms
-               but for other reasons.  For level=3 (which is the
-               default) effect will be lower than for level=2.
-
-               With k=0 (only) and excluded digit 1, we use way
-               too many terms due to roughly a 2**-m factor not
-               taken into account.  User can set Mmax
-               explicitly to their own choosing.
-
-               Here we choose Mmax according to an analysis
-               which is supposed to work for all k's and d's
-               and level>1.
+    See irwin_v5_doc.pdf for mathematical details.
     """
 
-    # Try to guarantee we will have nbdigits radix 10 digits correct.
+    # Chose number of bits to (try to) guarantee we will have nbdigits
+    # decimal digits in output.
     nbbits_final = ceil((nbdigits+1)*log(10,2))
     Rfinal = RealField(nbbits_final)
-    # I experimented a bit with using only multiples of 32bits.
-    # But for say about digits, it causes the risk of doing
-    # computations corresponding to perhaps say 9 more decimal
-    # digits in extra of the already about 4 from the guard bits,
-    # inducing use of more terms of the series.  Perhaps there is
-    # an advantage for tens of thousands of digits when
-    # computation times may run into hours, but it is lengthy to
-    # test out...
-    #
-    # The ceiling of maximal precision to a multiple of 32bits was
-    # done if PrecStep was multiple of 8. Now dropped.
-    # This was mainly done at a time where I experimented with
-    # a PrecStep less than 50, but finally it looks preferable
-    # to set it to a higher value.
-    if True:
-        nbbits = nbbits_final + nbguardbits
-    else:
-        nbbits = 32 * ceil((nbbits_final + nbguardbits)/32)
+
+    # Computations are done (for the main terms) with elevated precision.
+    nbbits = nbbits_final + nbguardbits
     R = RealField(nbbits)
 
-    # We estimate how many terms are needed according to level and
-    # targeted final precision. This estimate relies on two things:
-    # - a priori lower bound for the final result
-    # - a priori upper bounds for the terms of the series.
-
-    # The u_{k;m}'s are bounded above by b. In fact they are
-    # bounded above by b/(m+1) but we don't have this upper bound
-    # for the v_{k;m}'s, on the other hand the beta's are smaller
-    # for them as they use inverse powers of n+1 not n.
-
-    # We always take level at least 2.  The crucial upper bound
-    # comes from the beta(m+1)'s.  We can estimate that beta(m+1)
-    # is bounded above by (1/b**(l-1) + 1/m)/b**((l-1)m) with here
-    # l=level.  For k=0 and d=1, we can improve that to
-    # (1/2b**(l-1)+1/m)/2**m/b**((l-1)m).
-
-    # We know from Farhi's theorem that blog(b) is a lower bound
-    # of total sum if k>0 or if k=0 and d=0.  If k=0 and d>0 we
-    # have Proposition 6 in my Irwin paper which says S > b*log(b)
-    # -b*log(1+1/d). Worst case is with d=1, giving b*log(b/2). For
-    # d at least 2 the lower bound improves to b*log(2b/3). Using
-    # only that the u_{k;m}'s and v_{k;m}'s are bounded above by
-    # b, we will need to compare log(b/2) with
-    # (1/2b**(l-1)+1/m)/2**m, and log(2b/3) with 1/b**(l-1) + 1/m.
-    # We always take l at least 2.  So it is log(b/2) versus
-    # (1/(2b)+1/m)/2**m or log(2b/3) versus 1/b + 1/m.
-    #
-    # Testing the worst case m=1, we have log(b/2)>(1/(2b)+1)/2
-    # starting at b=4, and log(2b/3)>1/b + 1 for b at least 5.
-    #
-    # For m=2, we have log(b/2)>(1/(2b)+1/2)/4 for b at least 3
-    # and log(2b/3)>1/b+1/2 for b at least 4.  But for b=3, the
-    # difficulty with m=2 is for for k=0 and d neither 0 (as
-    # log(3)>1>1/3+1/2) or 1, hence d=2. One finds numerically
-    # S>2.682, and S/3>0.894>1/3+1/2.
-    #
-    # Only remains to check for b=2.  The only Irwin sum not
-    # >2log(2) is with k=0 and d=1, it is the empty sum with value
-    # zero. Use irwin(2,1,0) or irwinpos(2,1,0) at your own
-    # risk...  (it seems to work fine).
-    #
-    # For level=2, beta(m+1) for b=2 is bounded above by
-    # 1/2**(m+1)+1/3**(m+1) and u_{k;m} by 2/(m+1).  We want to
-    # compare this with 2 log(2)/2**m. It is less already for m=1.
-    #
-    # For the positive series we have 2(1/3**(m+1)+1/4**(m+1)) to
-    # compare with 2log(2)/2**m. Again it is less already for m=1.
-    #
-    # For level>2 and the alternating series a more precise upper
-    # bound of the m th term is (1/b**(l-1)+1/m)b/(m+1) times
-    # b**(-(l-1)m) so we compare (1/4+1/m)/(m+1) with log(2).  And
-    # already for m=1 it is smaller. Still for b=2 and l>2, for
-    # the positive series we can bound above the mth term by
-    # (1/(b**(l-1)+1)+1/m) * (b**(l-1)/(b**(l-1)+1))**m * b times
-    # b**(-(l-1)m) using only v_{k;m}<= b. And we need to compare
-    # with 2 log(2). So we check if (1/5+1/m)*(4/5)**m is less
-    # than log(2). This is true for m at least 2.
-
-    # In conclusion it is always true that for m at least 2 the m
-    # th term of the series contributes a fraction less than
-    # b**(-(l-1)m) of the total sum (we could make a detailed
-    # examination for m=1, but drop it). For the alternative
-    # series this gives a bound for the total error made by
-    # neglecting all terms starting with the m th one; for the
-    # positive series, we have to take into account an extra
-    # factor of b**(l-1)/(b**(l-1)-1) which is at most 2.
-    # We don't worry about this 2.
-
-    # We only need to take into account the m th term of the series
-    # with a precision equal to nbbits - (l-1)*m*log(b,2). (the first
-    # one will be computed with full precision).
-    # We choose the number of terms Mmax such that it is the last
-    # with nbbits - (l-1)*Mmax*log(b,2) >= nbguardbits/2
+    # See irwin_v5_doc.pdf for the mathematical justification for this
+    # choice of Mmax, which is the number of terms used from the
+    # series given in Burnol papers.
     _Mmax = floor((nbbits - nbguardbits/2)/(level-1)/log(b,2))
 
-    # The mth term only needs to be computed with precision
-    # nbbits - (l-1)*m*log(b,2) but we will use precisions
-    # of the type nbbits - j T with T = PrecStep.
-    # So we have nbbits -jT >= nbguardbits/2
+    # The number of distinct precisions we need.
     NbOfPrec = 1 + floor((nbbits - nbguardbits/2)/PrecStep)
-
-    # We add an overhead or pre-creating all used RealFields.
-    # Maybe a bit stupid.
+    # We pre-create all needed RealField's and store them in a
+    # list.
     LesReels = [R]
     for j in range(1, NbOfPrec):
         LesReels.append(RealField(nbbits - j * PrecStep))
 
-    # We need to map m to j in such a way that j is the largest such
-    # that nbbits - jT >= nbbits - (l-1)*m*log(b,2)
-    # So j is floor((l-1)*log(b,2)*m/T)
+    # See irwin_v5_doc.pdf for the justification that we only need
     #
-    # We add the overhead of a list mapping m to the RealField
-    # it will use.  This is to avoid having to do dynamically
-    # j = floor((l-1)*log(b,2)*m/T) and this all is probably
-    # very silly.
+    #    nbbits - (l-1) * m * log(b,2)
     #
-    # To do this we need to know which m will use a given j.
-    # They verify j<= (l-1)*log(b,2)*m/T < j+1
-    # j*T/(l-1)/log(b,2)<= m < (j+1)*T/(l-1)/log(b,2)
+    # precision for the computation of the mth term.  So j is
+    # chosen to be the largest such that nbbits - jT is at least
+    # that value.  Hence j is floor((l-1)*log(b,2)*m/T) (with T =
+    # PrecStep).
+
+    # To avoid having to compute this j for each m, we prepare a
+    # list IndexToR which will hav pre-computed this for all used
+    # m's.  This all is probably very silly.
+    IndexToR = []
+    #
+    # We need to know which m will use a given j.
+    # They verify j<= (l-1)*log(b,2)*m/T < j+1, i.e.
+    # j*T/(l-1)/log(b,2)<= m < (j+1)*T/(l-1)/log(b,2), i.e.:
+    #
     # ceil(j*T/(l-1)/log(b,2))<= m < ceil((j+1)*T/(l-1)/log(b,2)).
     #
     # If T/(l-1)/log(b,2)<1 it is not guaranteed that a given j will
     # have associated m's. But this is not a problem.
     IndexToPrecRatio = PrecStep / (level - 1) / log(b,2)  # not an integer !
-    IndexToR = []
     oldindexbound = 0
     for j in range(NbOfPrec):
         newindexbound = ceil((j+1)*IndexToPrecRatio)
         IndexToR.extend([LesReels[j]] * (newindexbound - oldindexbound))
         oldindexbound = newindexbound
+
     # For j=0, newindexbound is at least 1 but may be not at least 2,
     # But we want m=1 to use always maximal precision.
     IndexToR[1] = R  # LesReels[0]
@@ -737,8 +629,7 @@ def irwin(b, d, k,
     assert 1 < level <= 4, "Le niveau (level) doit être 2 ou 3 ou 4"
 
     # SURTOUT NE PAS FAIRE if type(b) == type(1) !!!!
-    # ça marche en pour des inputs directs mais pas pour "for b in range(B)"
-    # J'avais bêtement ajouté cette erreur le samedi 24 février 2024 v2 sur arXiv
+    # Ça marche pour des inputs directs mais pas pour "for b in range(B)".
     assert b > 1, "%s doit être au moins 2" % b
     bmoinsun = b - 1
 
@@ -816,14 +707,14 @@ def irwin(b, d, k,
             print(f"Calcul des u_{{j;m}} pour j<={k} et m<={Mmax} ...")
         starttime = time.perf_counter()
 
-    # calcul récursif des moments
-    # Je pense (2025) que j'avais conclu qu'il fallait mieux
-    # calculer les puissances comme des entiers exactement.
+    # Recursive computation of the u_{k;m}'s.
     # In order to have to evaluate each Pascal triangle row only once, we
     # use a slightly modified syntax compared to the 2024 version, instead
     # of having touslescoeffs = [ [ the u_{0,m}'s ], [ the u_{1,m}'s ], ... ]
-    # it will be touslescoeffs = [[u_{0,0}, u_{1,0}, ..., u_{k,0}],
-    #                             [u_{0,1}, u_{1,1}, ..., u_{k,1}], ... ]
+    # it is now touslescoeffs = [[u_{0,0}, u_{1,0}, ..., u_{k,0}],
+    #                            [u_{0,1}, u_{1,1}, ..., u_{k,1}],
+    #                            ...
+    #                            ]
     touslescoeffs = [ [Rmax(b)] * (k+1) ]
     c1 = [ lesgammas[1] * Rmax(b) / (b * b - bmoinsun) ]
     for j in range(1, k+1):
@@ -848,10 +739,7 @@ def irwin(b, d, k,
     for P in range(Q):
         useparallel = _v5_para_recurrence(m, maxworkers, useparallel)
         m += maxworkers
-    # Ici on va invoquer une procédure parallélisée avec <maxworkers, cela
-    # risque-t-il de créer les problèmes observés avec v4 avant le fix de #1
-    # lorsqu'on invoquait avec un nombre d'arguments très grand par rapport
-    # à maxworkers ?
+    # Ici on va invoquer une procédure parallélisée avec <maxworkers.
     if R > 0:
         _ = _v5_para_recurrence(m, R, useparallel)
 
@@ -860,7 +748,7 @@ def irwin(b, d, k,
         print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} "
               + f"Fini! En tout : {stoptime-starttime:.3f}s")
 
-    # calcul parallèle des beta (sommes d'inverses de puissances)
+    # Calcul parallèle des beta (sommes d'inverses de puissances).
     if showtimes:
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
@@ -882,7 +770,7 @@ def irwin(b, d, k,
     if (k >= 4) and (level > 3):
         lesbetas_maxblock4 = map__v5_beta(4)
 
-    # boucle pour évaluer également les j < k si all = True
+    # Boucle qui évalue également la série pour les j<k (si all = True).
     Sk = []
 
     for j in range(0 if all else k, k+1):
@@ -891,7 +779,7 @@ def irwin(b, d, k,
                   end = ' ', flush = True)
             starttime = time.perf_counter()
 
-        # calcul de la série alternée de Burnol
+        # Calcul de la série alternée de Burnol.
 
         S = 0
 
@@ -919,7 +807,7 @@ def irwin(b, d, k,
                 print("Somme avec niveau 3 pour d = %s et j = %s:" % (d, j))
                 print(S)
 
-        # jusqu'à j répétitions ; si j >= level, on s'arrête à
+        # Jusqu'à j répétitions ; si j >= level, on s'arrête à
         # level répétitions max
         S += b * (sum(sum(1/Rmax(x) for x in maxblock[i])
                       for i in range(1 + min(j,level))))
@@ -1034,9 +922,6 @@ def irwinpos(b, d, k,
 
     assert 1 < level <= 4, "Le niveau (level) doit être 2 ou 3 ou 4"
 
-    # SURTOUT NE PAS FAIRE if type(b) == type(1) !!!!
-    # ça marche en pour des inputs directs mais pas pour "for b in range(B)"
-    # J'avais bêtement ajouté cette erreur le samedi 24 février v2 sur arXiv
     assert b > 1, "%s doit être au moins 2" % b
     bmoinsun = b - 1
 
@@ -1116,9 +1001,9 @@ def irwinpos(b, d, k,
             print(f"Calcul des v_{{j;m}} pour j<={k} et m<={Mmax} ...")
         starttime = time.perf_counter()
 
-    # calcul récursif des moments
+    # Recursive computation of the v_{k;m}'s.  See comments in irwin().
     touslescoeffs = [ [Rmax(b)] * (k+1) ]
-    # attention to b * b  extra in first one
+    # Attention to this b * b  extra needed for the  v_{0;1}.
     c1 = [ (b * b + lesgammasprime[1] * Rmax(b)) / (b * b - bmoinsun) ]
     for j in range(1, k+1):
         c1.append(( (lesgammasprime[1] + dprime) * Rmax(b) + c1[-1])/Rmax(b * b - bmoinsun))
@@ -1149,7 +1034,7 @@ def irwinpos(b, d, k,
         print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
               + f"{stoptime-starttime:.3f}s")
 
-    # calcul parallèle des beta (sommes d'inverses de puissances)
+    # calcul parallèle des beta (sommes d'inverses de puissances).
     if showtimes:
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
@@ -1171,7 +1056,7 @@ def irwinpos(b, d, k,
     if (k >= 4) and (level > 3):
         lesbetas_maxblockshifted4 = map__v5_beta(4)
 
-    # boucle pour évaluer si all = True également les j < k
+    # Boucle qui évalue également la série pour les j<k (si all = True).
     Sk = []
 
     for j in range(0 if all else k, k+1):
@@ -1180,8 +1065,7 @@ def irwinpos(b, d, k,
                   end = ' ', flush = True)
             starttime = time.perf_counter()
 
-        # calcul de la série positive de Burnol
-
+        # Calcul de la série positive de Burnol.
         S = 0
 
         if j == 0:
@@ -1208,7 +1092,7 @@ def irwinpos(b, d, k,
                 print("Somme avec niveau 3 pour d = %s et j = %s:" % (d, j))
                 print(S)
 
-        # Attention à emploi de maxblockshifted ici
+        # Attention à emploi de maxblockshifted ici.
         S += b * (sum(sum(1/Rmax(x) for x in maxblockshifted[i])
                       for i in range(1 + min(j,level))))
 
@@ -1231,7 +1115,7 @@ def irwinpos(b, d, k,
         # WE START WITH THE SMALLEST TERM CONTRIBUTING TO THE SERIES
         # Its sign will be set later.
 
-        # Attention à emploi de maxblockshifted ici
+        # Attention à emploi de maxblockshifted ici.
         Rm = IndexToR[-1]
         bubu = touslescoeffs[Mmax][j] * lesbetas_maxblockshifted0[Mmax]
 
@@ -1260,7 +1144,7 @@ def irwinpos(b, d, k,
         # Rm will be the RealField. When m decreases Rm changes from time to
         # time regularly and automatically to use more bits.
 
-        # Attention à emploi de maxblockshifted ici
+        # Attention à emploi de maxblockshifted ici.
         for m in range(Mmax-1, 0, -1):  # last one is m=1
             Rm = IndexToR[m]
             # extend partial sum to higher precision
