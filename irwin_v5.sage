@@ -3,8 +3,8 @@
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode
 
-__version__  = "1.5.6"
-__date__     = "2025/05/01"
+__version__  = "1.5.7"
+__date__     = "2025/05/16"
 __filename__ = "irwin_v5.sage"
 
 irwin_v5_docstring = """
@@ -17,38 +17,21 @@ more decimal digits of precision:
 
 - Use of decreasing precision for higher terms in the series.
   This is done with a granularity of PrecStep bits.  It is an
-  optional parameter to irwin() and irwinpos() which defaults to
-  500.
+  optional parameter for the procedures irwin() and irwinpos().
+  It defaults to 500.
 
-- There is no pre-computation of the Pascal triangle up to N=1000
-  anymore.  Only two rows of the Pascal triangle are kept at any
-  given time in memory.  This reduces the memory footprint by a
-  factor of N/6: the number of bytes needed goes down from about
-  N^3/(96 log(2)) (this takes into account a factor 2 from using
-  the symmetry binom(n,j)=binom(n,n-j)) to only N^2/(16 log(2))
-  (1byte=8bits).
+- There is no pre-computation of the first 1000 rows of the Pascal
+  triangle anymore.  Only maxworkers (see item on parallelization
+  next) rows of the Pascal triangle are kept at any given time in
+  memory.  See file taille_pascal.pdf for details on the storage
+  size needed for rows of the Pascal triangle.
 
-  For N=10000, N^3/(96 log(2)) is about 1.5e10 i.e. 14GiB or 15GB.
-  But N^2/(16 log(2)) is only about 9e6 i.e. 8.6MiB or 9MB.  For
-  higher N's the N/6 factor makes the difference between the code
-  being usable or not usable...
-
-- Parallelization, using @parallel(ncpus=8) per default.
-
-  NOTA BENE: the development is done on a macOS 15 where a very
-  problematic behavior plagues testing: the performance
-  decreases each time one calls anew any function which at some
-  point will use (hundreds of) calls to @parallel-decorated
-  procedures (it has nothing to do with the specifics of this
-  particular module, and is a general p.i.t.a.).  See issue #1
-  at the development repo on GitLab.  There is no question here
-  that this is an upstream bug, although the author is unable to
-  say what "upstream" refers to.  In practice, one needs to
-  terminate the SageMath session and relaunch each time it is
-  important to get the optimal efficiency of irwin() or
-  irwinpos().  Fortunately you may be on some other OS.  You
-  can try out the procedure bar() of test_parallel_sleep.sage
-  and see if execution times worsen each time you call it.
+- Parallelization, using @parallel(ncpus=maxworkers), where
+  maxworkers defaults to 8 and can be defined prior to loading
+  this file (no attempt is made to adjust dynamically to the
+  number of cores available).  Users of macOS are advised to
+  look at issue #1 at the repository and check if it applies
+  to their system.
 
 Miscellaneous remarks:
 
