@@ -150,12 +150,41 @@ except NameError:
 
 
 @parallel(ncpus=maxworkers)
-def _v5_ukm_partial(a, m, P, G, D, T, R, k):
-    # m -a will be the same value in all simultaneous calls
-    A = list(sum(P[i]*R(G[i])*R(T[m - i][j]) for i in range(a, m + 1))
+def _v5_ukm_partial(a, m, Pm, G, D, T, Rm, k):
+    """Recurrences (partial) for the u_{j;m}'s or v_{j;m}'s.
+
+    - This handles all j's from 0 to k (because to compute
+      for k we need for k-1, and to compute for k-1, we
+      need for k-2 and so on until j=0).
+    - Pm[i] stands for binomial coefficient "m choose i".
+    - G[i] stands for gamma (or gammaprime) power sum.
+    - D[i] is d**i or dprime**i (dprime = b-1-d)
+    - T[n][j] holds previously known u_{j;n}'s or v_{j;n}'s.
+    - Rm is a RealField using a precision suitable for the
+      evaluation of the u_{j;m}'s or v_{j;m}'s.
+
+    The formulas are those of Theorem 1 (equations (2) and (3))
+    and Theorem 4 (equations (5) and (6)) in the numeration as
+    in arXiv:2402.09083v5.  Up to the division by b**(m+1)-b+1
+    which will be done later, because finitely many terms are
+    still lacking at this stage.
+
+    When the procedure is called we have computed all u_{j;n}'s
+    or v_{j;n}'s up to some M.  The procedure will be called in
+    parallel with m=M+1, M+2, ...., M+n with a=1, 2, ..., q.
+    The quantity m-a is thus the same M for this parallelized
+    bunch.  Once this procedure returns we have value for m=M+1
+    exactly, but will need correction for M+2, then M+3, ... up
+    to the last one M+n where n is most of the time a multiple
+    of maxworkers.  And there will be division by b**(m+1)-b+1.
+
+    Memo: for j=0 and the v_{0;m}'s there is an extra contribution
+    b**(m+1) which is added by the caller.
+    """
+    A = list(sum(Pm[i]*Rm(G[i])*Rm(T[m - i][j]) for i in range(a, m + 1))
              for j in range(k + 1))
     B = [ 0 ]
-    B.extend(sum(P[i]*R(D[i])*R(T[m - i][j-1]) for i in range(a, m + 1))
+    B.extend(sum(Pm[i]*Rm(D[i])*Rm(T[m - i][j-1]) for i in range(a, m + 1))
              for j in range(1, k + 1))
     return [ A[j] + B[j] for j in range(k + 1) ]
 
