@@ -386,19 +386,54 @@ def _v5_beta_aux(m, R, nblock):
 
 @parallel(ncpus=maxworkers)
 def _v5_beta(start, end, IR, nblock):
+    """Parallelized caller to computation of beta coefficients.
+
+    For m varying in a given range via steps of value maxworkers, we
+    compute the sum of 1/n**(m+1) for n varying in given "nblock".
+    IR stands for IndexToR which maps indices m to suitable
+    RealField specifying the used precision.  Higher indices use
+    lower precision, this is why the range of m's is split according
+    to value modulo maxworkers, so that the computation costs are
+    about equal across workers.
+
+    The start will be an integer from 1 (not zero) to maxworkers.
+    The end is simply Mmax+1, so the last index m used is Mmax.
+    """
     return list(_v5_beta_aux(m, IR[m], nblock)
                 for m in range(start, end, maxworkers))
 
 
 def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
-    """Auxiliary for sharing code between irwin() and irwinpos().
+    """Sets up a procedure to call _v5_beta() and assembles its results.
 
-    TODO: explain what it does.
+    The defined procedure will receive an argument j which is in the
+    range from 0 to k inclusive.  It will then use the integers in
+    the "block" maxblock[j] as the ones for which the sum of inverse
+    powers needs to be computed.
+
+    The procedure defined by this does not display intermediate
+    computing times.  Depending on whether Mmax is a multiple of
+    maxworkers or not two procedures are defined, but this is a bit
+    silly because the gain is minuscule as the defined procedures
+    will be called only k+1 times.
     """
     extra = maxworkers - ( Mmax % maxworkers )
     if extra < maxworkers:
         def map__v5_beta(j):
-            """TODO: add some docstring.
+            """Calls parallelized _v5_beta() and assembles its results.
+
+            After having computed beta_{m+1}'s for m's split by
+            their modulo maxworkers value (in (1,..., maxworkers))
+            we reorganize the maxworkers lists of values into a
+            single list in order of increasing m's.
+
+            When Mmax is not a multiple of maxworkers, the returned
+            lists have two distinct lengths, and before zipping we
+            extend the shorter ones by None.  Zipping will then have
+            a number of extra None's at the end which we then
+            remove.  The syntax used appears to be Pythonic, I don't
+            know it is the most efficient and if going via zip() is
+            good idea.  As said, it is Pythonic at least.
             """
             L = [0]
             inputdata = [(i,
@@ -414,7 +449,12 @@ def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
             return L[:-extra]
     else:
         def map__v5_beta(j):
-            """TODO: add some docstring.
+            """Calls parallelized _v5_beta() and assembles its results.
+
+            After having computed beta_{m+1}'s for m's split by
+            their modulo maxworkers value (in (1,..., maxworkers))
+            we reorganize the maxworkers lists of values into a
+            single list in order of increasing m's.
             """
             L = [0]
             inputdata = [(i,
@@ -430,8 +470,18 @@ def _v5_map_beta_notimes(Mmax, IndexToR, maxblock):
 
 
 def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
-    """Auxiliary for sharing code between irwin() and irwinpos().
-    TODO: explain what it does.
+    """Sets up a procedure to call _v5_beta() and assembles its results.
+
+    The defined procedure will receive an argument j which is in the
+    range from 0 to k inclusive.  It will then use the integers in
+    the "block" maxblock[j] as the ones for which the sum of inverse
+    powers needs to be computed.
+
+    The procedure defined by this does displays intermediate
+    computing times.  It will divide fomr this the range from 1 to
+    Mmax in chunks of size a multiple of maxworkers near to 1000.
+    If maxworkers if 32 or more, chunks of size 32*maxworkers are
+    used for displaying their timings.
     """
     # We want to display some visual sign of progress.
     # Find the largest multiple of maxworkers at most 1000,
@@ -439,7 +489,15 @@ def _v5_map_beta_withtimes(Mmax, IndexToR, maxblock):
     q = max(1000 // maxworkers, 32)
     mSize = q * maxworkers
     def map__v5_beta(j):
-        """TODO: add some docstring.
+        """Calls parallelized _v5_beta() and assembles its results.
+
+        And compute intermediate timings while doing it.
+
+        After having computed beta_{m+1}'s for m's split by their
+        modulo maxworkers value (in (1,..., maxworkers)) in various
+        ranges we need to reorganize the maxworkers lists of values
+        in order of increasing m's and extend the list which will
+        hold all the values.
         """
         print(f"... ({j} occ.) ", end = "", flush = True)
         starttime = time.perf_counter()
