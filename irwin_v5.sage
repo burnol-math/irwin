@@ -213,10 +213,41 @@ def _v5_umtimeinfo(single_ns, multi_ns, para, wrkrs, M, s):
 def _v5_setup_para_recurrence(touslescoeffs, Gammas, PuissancesDeD,
                               PascalRows, IndexToR, b, bmoinsun, k,
                               showtimes, persistentpara, is_for_vm):
-    """TODO: add some doctring.
+    """Set up procedure calling _v5_ukm_partial and completing its job.
     """
     def _v5_para_recurrence(m, step, useparallel):
-        """TODO: add some docstring.
+        """Wrapper of parallelized calls to _v5_ukm_partial().
+
+        First we compute "step" (which is maxworkers or less than it)
+        new rows of the Pascal triangle of binomial coefficients.  We
+        use some specificities of how Python handles list type to do
+        that in a way persistent in memory across calls.
+
+        Then, if useparallel is True we call the parallelized
+        _v5_ukm_partial() for m varying from M+1 to M+step, where M
+        is the initial value of argument m.  If useparallel is False
+        we still do that from time to time to compare with computing
+        serially.  Even with useparallel True and except if
+        persistentpara is False we will check from time to time the
+        comparison between parallel and serial.
+
+        If useparallel is False, we compute serially new u_{j;m}'s
+        or v_{j;m}'s.
+
+        In all cases the formulas of arXiv:2402.09083 are applied.
+        In order to share code, when computing serially we do as in
+        the parallel branch and first evaluate only partially the
+        recurrent formulas.  So we can then correct via the missing
+        terms in both cases.  The recurrences for the v_{j;m}'s
+        differ from those for the u_{j;m}'s in what Gammas and
+        PuissancesDeD stand for, as well as one unique extra term in
+        the recurrence computing v_{0;m}.
+
+        We do the computation of the u_{j;m}, v_{j;m} for given m
+        from j=0 upto j=k.  This gives a list which is appended to
+        the list touslescoeffs holding all such coefficients (so the
+        indexing is in reverse order compared to the mathematical
+        notation: m first, and j second).
         """
         del PascalRows[:-1]
         for i in range(step):
