@@ -4,7 +4,7 @@
 # Use via load("irwin_v5.sage") in sage interactive mode
 
 __version__  = "1.5.7"
-__date__     = "2025/05/16"
+__date__     = "2025/05/17"
 __filename__ = "irwin_v5.sage"
 
 irwin_v5_docstring = """
