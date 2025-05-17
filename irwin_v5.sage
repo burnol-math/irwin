@@ -799,12 +799,16 @@ def irwin(b, d, k,
         starttime = time.perf_counter()
 
     blocks = _v5_setup_blocks(b, d, level)
-    block1 = blocks[0]
-    block2 = blocks[1]
+    block1 = blocks[0]  # [[non-zero digits not d], [d] or []]
+    block2 = blocks[1]  # blocks2[j] = integers with 2 digits and j among
+                        # them are equal to d.
     if level >2:
-        block3 = blocks[2]
+        block3 = blocks[2]  # integers with 3 digits, assembled according
+                            # to d-count.
         if level >3:
-            block4 = blocks[3]
+            block4 = blocks[3]  # integers with 4 digits, according to d-count.
+
+    # The integers with level digits, according to their d-counts.
     maxblock = blocks[-1]
     # NOTA BENE: maxblock will have as last element an empty [] if d=0
     #            This empty [] will not cause problems for the sum()'s
@@ -895,17 +899,31 @@ def irwin(b, d, k,
     else:
         map__v5_beta = _v5_map_beta_notimes(Mmax, IndexToR, maxblock)
 
+    # According to Theorem 1, formula (1) of arXiv:2402.09083, to
+    # to compute the m th term of the Burnol series for the Irwin sum
+    # associated to exactly j occurrences to combine u_{j;m},
+    # u_{j-1;m}, u_{j-2;m}, ... with weights which are the sum of the
+    # inverse (m+1)-powers of the integers with level digits having
+    # respectively 0, 1, 2, ... occurrences of digit d.
+
+    # This returns the list L0 such that L0[m] is the sum of the 1/n**(m+1)
+    # where n has level digits and none of them is d.
     lesbetas_maxblock0 = map__v5_beta(0)
 
+    # This returns the list L1 such that L1[m] is the sum of the 1/n**(m+1)
+    # where n has level digits and exactly one of them is d.
     if k >= 1:
         lesbetas_maxblock1 = map__v5_beta(1)
 
+    # This returns the list L2 such that L2[m] is the sum of the 1/n**(m+1)
+    # where n has level digits and exactly two of them are d.
     if k >= 2:
         lesbetas_maxblock2 = map__v5_beta(2)
 
+    # idem
     if (k >= 3) and (level > 2):
         lesbetas_maxblock3 = map__v5_beta(3)
-
+    # idem
     if (k >= 4) and (level > 3):
         lesbetas_maxblock4 = map__v5_beta(4)
 
@@ -922,6 +940,11 @@ def irwin(b, d, k,
 
         S = 0
 
+        # The Burnol formula starts with the harmonic sum of all
+        # positive integers having strictly less than level digits
+        # AND exactly j occurrences of the digit d.  We start with
+        # the length-1 integers.  So they contribute only if j is 0
+        # or 1.
         if j == 0:
             S = sum(1/Rmax(x) for x in block1[0])
         elif j == 1:
@@ -932,6 +955,8 @@ def irwin(b, d, k,
             print("\nSomme du niveau 1 pour d = %s et j = %s:" % (d, j))
             print(S)
 
+        # We add contribution of the length-2 integers.  This regards only
+        # j=0, 1, or 2 and level must be >2.
         if 2 < level:
             if j <= 2:
                 S += sum(1/Rmax(x) for x in block2[j])
@@ -939,6 +964,8 @@ def irwin(b, d, k,
                 print("Somme avec niveau 2 pour d = %s et j = %s:" % (d, j))
                 print(S)
 
+        # We add contribution of the length-3 integers.  This regards only
+        # j=0, 1, 2 or 3 and level must be >3.
         if 3 < level:
             if j <= 3:
                 S += sum(1/Rmax(x) for x in block3[j])
@@ -946,6 +973,9 @@ def irwin(b, d, k,
                 print("Somme avec niveau 3 pour d = %s et j = %s:" % (d, j))
                 print(S)
 
+        # The next contribution in the Burnol series is b times the
+        # harmonic sum of length=level integers having *at most* j
+        # occurrences of digit d.
         # Jusqu'à j répétitions ; si j >= level, on s'arrête à
         # level répétitions max
         S += b * (sum(sum(1/Rmax(x) for x in maxblock[i])
@@ -967,20 +997,33 @@ def irwin(b, d, k,
             print(f"Calcul de la série pour k={j}...", end = ' ', flush = True)
             starttime = time.perf_counter()
 
-        # WE START WITH THE SMALLEST TERM CONTRIBUTING TO THE SERIES
-        # Its sign will be set later.
+        # We now compute the Burnol series which is the alternating series
+        # as in equation (1) (Theorem 1) of arXiv:2402.09083.
 
-        Rm = IndexToR[-1]
+        # We start with the smallest term contributing to the series
+        # Its sign will be set later.
+        Rm = IndexToR[-1]  # RealField at lowest used precision.
 
         # Compared to 2024 version touslescoeffs has its two indices permuted
+        # Each integer n with level digits and no occurrence of d contributes
+        # u_{j;m}/n**(m+1).
         bubu = touslescoeffs[Mmax][j] * lesbetas_maxblock0[Mmax]
-
+        # Each integer n with level digits and 1 occurrence of d contributes
+        # u_{j-1;m}/n**(m+1).
         if j >= 1:
             bubu += touslescoeffs[Mmax][j-1] * lesbetas_maxblock1[Mmax]
+        # Each integer n with level digits and 2 occurrences of d contributes
+        # u_{j-2;m}/n**(m+1).
         if j >= 2:
             bubu += touslescoeffs[Mmax][j-2] * lesbetas_maxblock2[Mmax]
+        # Each integer n with level digits and 3 occurrences of d contributes
+        # u_{j-3;m}/n**(m+1).
         if (level > 2) and (j >= 3):
             bubu += touslescoeffs[Mmax][j-3] * lesbetas_maxblock3[Mmax]
+        # Each integer n with level digits and 4 occurrences of d contributes
+        # u_{j-4;m}/n**(m+1).  This can happen here only if level is 4,
+        # as we have not implemented higher levels.  And if d is non zero,
+        # there is one contribution, if d is zero there are none.
         if (level == 4) and (j >= 4):
             bubu += touslescoeffs[Mmax][j-4] * lesbetas_maxblock4[Mmax]
 
@@ -997,7 +1040,14 @@ def irwin(b, d, k,
         # time regularly and automatically to use more bits.
         for m in range(Mmax-1, 0, -1):  # last one is m=1
             Rm = IndexToR[m]
+            # Extend the partial sum obtained to a RealField using
+            # higher precision to prepare addition of a new term,
+            # which is computed with higher precision.
             bubu = Rm(-bubu)
+            #
+            # See comments above about the contributions 1/n**(m+1)
+            # for integers n having level digits, depending on the count
+            # of d's.
             bubu += touslescoeffs[m][j] * lesbetas_maxblock0[m]
 
             if j >= 1:
@@ -1098,6 +1148,7 @@ def irwinpos(b, d, k,
         if level >3:
             block4 = blocks[3]
     maxblock = blocks[-1]
+    # ATTENTION!
     # COMPARED TO FEB 2024 VERSION WE SHIFT BY +1 ALL INTEGERS IN
     # SUBLISTS OF maxblock. This is to avoid having to use n+1
     # afterwards for inverse power sums.
@@ -1106,7 +1157,6 @@ def irwinpos(b, d, k,
     #            if d=0
     #            This empty [] will not cause problems for the sum()'s
     #            such as sum(1/Rmax(x) for x in maxblockshifted[i])
-
 
     # ATTENTION que la série positive a des récurrences avec b-1-d
     # à la place de d
@@ -1174,6 +1224,11 @@ def irwinpos(b, d, k,
               + f"{stoptime-starttime:.3f}s")
 
     # calcul parallèle des beta (sommes d'inverses de puissances).
+    # For comments, see irwin().  Pay attention though that map__v5_beta
+    # produces here beta's which are sums of 1/(n+1)**(m+1)'s for certain
+    # n's whereas in irwin() it was sums of 1/n**(m+1).
+    # Hence the word "shifted" and usage of maxblockshifted.
+    # TODO: rename map__v5_beta to map__v5_betashifted?
     if showtimes:
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
@@ -1231,7 +1286,13 @@ def irwinpos(b, d, k,
                 print("Somme avec niveau 3 pour d = %s et j = %s:" % (d, j))
                 print(S)
 
-        # Attention à emploi de maxblockshifted ici.
+        # ATTENTION
+        # So far the S value is the same as for irwin(). But for the
+        # positive series, the next contribution in the Burnol
+        # series is b times the sum of the 1/(n+1) where the n's
+        # have exactly level digits and *at most* j occurrences of
+        # digit d.
+        # This is why we have the maxblockshifted[i] here.
         S += b * (sum(sum(1/Rmax(x) for x in maxblockshifted[i])
                       for i in range(1 + min(j,level))))
 
@@ -1251,26 +1312,38 @@ def irwinpos(b, d, k,
             print(f"Calcul de la série pour k={j}...", end = ' ', flush = True)
             starttime = time.perf_counter()
 
-        # WE START WITH THE SMALLEST TERM CONTRIBUTING TO THE SERIES
-        # Its sign will be set later.
+        # We now compute the Burnol series which is the positive series
+        # as in equation (4) (Theorem 4) of arXiv:2402.09083.
+        # We start with the smallest term contributing to the series
 
-        # Attention à emploi de maxblockshifted ici.
+        # Each integer n with level digits and no occurrence of d contributes
+        # v_{j;m}/(n+1)**(m+1).
         Rm = IndexToR[-1]
         bubu = touslescoeffs[Mmax][j] * lesbetas_maxblockshifted0[Mmax]
-
+        # Each integer n with level digits and 1 occurrence of d contributes
+        # v_{j-1;m}/(n+1)**(m+1).
         if j >= 1:
             bubu += touslescoeffs[Mmax][j-1] * lesbetas_maxblockshifted1[Mmax]
+        # Each integer n with level digits and 2 occurrences of d contributes
+        # v_{j-2;m}/(n+1)**(m+1).
         if j >= 2:
             bubu += touslescoeffs[Mmax][j-2] * lesbetas_maxblockshifted2[Mmax]
+        # Each integer n with level digits and 3 occurrences of d contributes
+        # v_{j-3;m}/(n+1)**(m+1).
         if (level > 2) and (j >= 3):
             bubu += touslescoeffs[Mmax][j-3] * lesbetas_maxblockshifted3[Mmax]
+        # Each integer n with level digits and 4 occurrences of d contributes
+        # v_{j-4;m}/(n+1)**(m+1).  This can happen here only if level is 4,
+        # as we have not implemented higher levels.  And if d is non zero,
+        # there is one contribution, if d is zero there are none.
         if (level == 4) and (j >= 4):
             bubu += touslescoeffs[Mmax][j-4] * lesbetas_maxblockshifted4[Mmax]
 
         if verbose:
-            lastterm = bubu  # the Feb 2024 version had a bug here
-                             # doing -bubu if Mmax was odd
-                             # (as copy pasted from alternating series code)
+            lastterm = bubu  # The Feb 2024 version had a bug here in this
+                             # branch printing some info, it had kept -bubu
+                             # copied-pasted from irwin() code.
+                             # This had no incidence on final result.
             if float(lastterm) == 0.:
                 u, E = _v5_shorten_small_real(lastterm)
                 print(f"The {Mmax}th term is about {u:f} 10^{E} i.e. ",
@@ -1283,14 +1356,20 @@ def irwinpos(b, d, k,
         # Rm will be the RealField. When m decreases Rm changes from time to
         # time regularly and automatically to use more bits.
 
-        # Attention à emploi de maxblockshifted ici.
         for m in range(Mmax-1, 0, -1):  # last one is m=1
             Rm = IndexToR[m]
-            # extend partial sum to higher precision
+            # Extend the partial sum obtained to a RealField using
+            # higher precision to prepare addition of a new term,
+            # which is computed with higher precision.
             bubu = Rm(bubu)
-            # and add new term (if previous step is skipped, the result will get
-            #                   coerced to lower precision, hence ultimately the
-            #                   final result is completely wrong).
+            # and add the new term
+            # (if previous step had been  skipped, the value here would
+            #  be coerced to the lower precision, hence a completely wrong
+            #  final result).
+            #
+            # See comments above about the contributions 1/(n+1)**(m+1)
+            # for integers n having level digits, depending on the count
+            # of d's.
             bubu += touslescoeffs[m][j] * lesbetas_maxblockshifted0[m]
 
             if j >= 1:
