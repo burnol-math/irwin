@@ -171,7 +171,7 @@ def _v5_ukm_partial(a, m, Pm, G, D, T, Rm, k):
 
     When the procedure is called we have computed all u_{j;n}'s
     or v_{j;n}'s up to some M.  The procedure will be called in
-    parallel with m=M+1, M+2, ...., M+n with a=1, 2, ..., q.
+    parallel with m=M+1, M+2, ...., M+n with a=1, 2, ..., n.
     The quantity m-a is thus the same M for this parallelized
     bunch.  Once this procedure returns we have value for m=M+1
     exactly, but will need correction for M+2, then M+3, ... up
@@ -657,7 +657,7 @@ def _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
 def _v5_setup_blocks(b, d, level):
     """Organize integers according to nb of digits and d-count.
 
-    It return a list of lists of lists: blocks[l][j] is the list
+    It returns a list of lists of lists: blocks[l][j] is the list
     of integers having (l+1) digits in radix b, among whose exactly j
     are equal to d.  The "level" parameter is the maximal "l+1".
 
@@ -724,28 +724,28 @@ def _v5_setup_blocks(b, d, level):
 
         blocks.append(block3)
 
-        # Probably I should dedent for legibility sake.
-        if level > 3:
-            block4 = []
-            block4.append([b * x + a for x in block3[0] for a in A])  # k=0
-            L = [b * x + d for x in block3[0]]
-            L.extend([b * x + a for x in block3[1] for a in A])
-            block4.append(L)  # k=1
-            L = [b * x + d for x in block3[1]]
-            L.extend([b * x + a for x in block3[2] for a in A])
-            block4.append(L)  # k=2
-            L = [b * x + d for x in block3[2]]
-            L.extend([b * x + a for x in block3[3] for a in A])
-            block4.append(L)  # k=3
+    if level > 3:
+        block4 = []
+        block4.append([b * x + a for x in block3[0] for a in A])  # k=0
+        L = [b * x + d for x in block3[0]]
+        L.extend([b * x + a for x in block3[1] for a in A])
+        block4.append(L)  # k=1
+        L = [b * x + d for x in block3[1]]
+        L.extend([b * x + a for x in block3[2] for a in A])
+        block4.append(L)  # k=2
+        L = [b * x + d for x in block3[2]]
+        L.extend([b * x + a for x in block3[3] for a in A])
+        block4.append(L)  # k=3
 
-            if d == 0:
-                block4.append([])
-            else:
-                block4.append([(b*b*b + b*b + b + 1) * d])  # k = 4
+        if d == 0:
+            block4.append([])
+        else:
+            block4.append([(b*b*b + b*b + b + 1) * d])  # k = 4
 
-            blocks.append(block4)
+        blocks.append(block4)
 
     return blocks
+
 
 @_fillin_irwin_docstring()
 def irwin(b, d, k,
@@ -794,25 +794,9 @@ def irwin(b, d, k,
         print(f"décrémentée par multiples de {PrecStep}")
 
     if showtimes:
-        print("Calcul des blocs initiaux et des gammas...",
+        print("Calcul des gammas...",
               end = ' ', flush = True)
         starttime = time.perf_counter()
-
-    blocks = _v5_setup_blocks(b, d, level)
-    block1 = blocks[0]  # [[non-zero digits not d], [d] or []]
-    block2 = blocks[1]  # blocks2[j] = integers with 2 digits and j among
-                        # them are equal to d.
-    if level >2:
-        block3 = blocks[2]  # integers with 3 digits, assembled according
-                            # to d-count.
-        if level >3:
-            block4 = blocks[3]  # integers with 4 digits, according to d-count.
-
-    # The integers with level digits, according to their d-counts.
-    maxblock = blocks[-1]
-    # NOTA BENE: maxblock will have as last element an empty [] if d=0
-    #            This empty [] will not cause problems for the sum()'s
-    #            such as sum(1/Rmax(x) for x in maxblock[i])
 
     # lesgammas[j] is only ever needed to compute a u_{k;m} for m
     # at least equal to j. It is used only in a sum with
@@ -823,18 +807,21 @@ def irwin(b, d, k,
     # safety cushion we have in place in evaluating the needed
     # precision.  Perhaps if k is very large, this safety cushion
     # could prove defective.
+    A1 = list(range(1, b))
+    if d != 0:
+        A1.remove(d)
     lesgammas = [ bmoinsun ]
-    for j in range(1, Mmax+1):
-        Rj = IndexToR[j]
-        lesgammas.append(Rj(sum(a**j for a in block1[0])))
+    for m in range(1, Mmax+1):
+        Rm = IndexToR[m]
+        lesgammas.append(Rm(sum(a**m for a in A1)))
 
     # Those are only needed for k>O.  Same remark as for
     # lesgammas[j] relative to the precision to use.
     if k > 0:
         lespuissancesded = [ 1 ]
-        for j in range(1, Mmax+1):
-            Rj = IndexToR[j]
-            lespuissancesded.append(Rj(d**j))
+        for m in range(1, Mmax+1):
+            Rm = IndexToR[m]
+            lespuissancesded.append(Rm(d**m))
     else:
         # we need the name to be defined when calling _v5_ukm_partial
         lespuissancesded = None
@@ -878,11 +865,13 @@ def irwin(b, d, k,
                                                     False)
 
     m = 1
+    # We have initialized touslescoeffs[0] and touslescoeffs[1]
+    # We now need for m from 2 to Mmax inclusive.
     Q, R = divmod(Mmax - 1, maxworkers)
     for P in range(Q):
         useparallel = _v5_para_recurrence(m, maxworkers, useparallel)
         m += maxworkers
-    # Ici on va invoquer une procédure parallélisée avec <maxworkers.
+    # Ici on va invoquer une procédure parallélisée avec < maxworkers.
     if R > 0:
         _ = _v5_para_recurrence(m, R, useparallel)
 
@@ -891,43 +880,73 @@ def irwin(b, d, k,
         print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} "
               + f"Fini! En tout : {stoptime-starttime:.3f}s")
 
+    if showtimes:
+        print(f"Calcul des blocs d'entiers...",
+              end = ' ', flush = True)
+        starttime = time.perf_counter()
+
+    # Calcul des blocs d'entiers suivant longueur et nombre d'occurrences.
+    blocks = _v5_setup_blocks(b, d, level)
+    block1 = blocks[0]  # list [ [non-zero digits not d], [d] or []]
+    block2 = blocks[1]  # blocks2[j] = integers with 2 digits and j among
+                        # them are equal to d.
+    if level > 2:
+        block3 = blocks[2]  # integers with 3 digits, assembled according
+                            # to d-count.
+    if level > 3:
+        block4 = blocks[3]  # integers with 4 digits, according to d-count.
+
+    # The integers with level digits, according to their d-counts.
+    maxblock = blocks[-1]
+    # NOTA BENE: maxblock will have as last element an empty [] if d=0
+    #            This empty [] will not cause problems for the sum()'s
+    #            such as sum(1/Rmax(x) for x in maxblock[i])
+
     # Calcul parallèle des beta (sommes d'inverses de puissances).
     if showtimes:
+        stoptime = time.perf_counter()
+        print("{:.3f}s".format(stoptime - starttime))
+
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
-        map__v5_beta = _v5_map_beta_withtimes(Mmax, IndexToR, maxblock)
+        _lesbetas_par_nb_occurrences = _v5_map_beta_withtimes(Mmax,
+                                                              IndexToR,
+                                                              maxblock)
     else:
-        map__v5_beta = _v5_map_beta_notimes(Mmax, IndexToR, maxblock)
+        _lesbetas_par_nb_occurrences = _v5_map_beta_notimes(Mmax,
+                                                            IndexToR,
+                                                            maxblock)
 
     # According to Theorem 1, formula (1) of arXiv:2402.09083, to
-    # to compute the m th term of the Burnol series for the Irwin sum
-    # associated to exactly j occurrences to combine u_{j;m},
+    # compute the m th term of the Burnol series for the Irwin sum
+    # associated to exactly j occurrences we need to combine u_{j;m},
     # u_{j-1;m}, u_{j-2;m}, ... with weights which are the sum of the
     # inverse (m+1)-powers of the integers with level digits having
     # respectively 0, 1, 2, ... occurrences of digit d.
 
     # This returns the list L0 such that L0[m] is the sum of the 1/n**(m+1)
     # where n has level digits and none of them is d.
-    lesbetas_maxblock0 = map__v5_beta(0)
+    # If showtimes is True it prints timings.
+    lesbetas_maxblock0 = _lesbetas_par_nb_occurrences(0)
 
     # This returns the list L1 such that L1[m] is the sum of the 1/n**(m+1)
     # where n has level digits and exactly one of them is d.
     if k >= 1:
-        lesbetas_maxblock1 = map__v5_beta(1)
+        lesbetas_maxblock1 = _lesbetas_par_nb_occurrences(1)
 
     # This returns the list L2 such that L2[m] is the sum of the 1/n**(m+1)
     # where n has level digits and exactly two of them are d.
     if k >= 2:
-        lesbetas_maxblock2 = map__v5_beta(2)
+        lesbetas_maxblock2 = _lesbetas_par_nb_occurrences(2)
 
-    # idem
+    # idem for 3 occurrences
     if (k >= 3) and (level > 2):
-        lesbetas_maxblock3 = map__v5_beta(3)
-    # idem
+        lesbetas_maxblock3 = _lesbetas_par_nb_occurrences(3)
+    # idem for 4 occurrences
     if (k >= 4) and (level > 3):
-        lesbetas_maxblock4 = map__v5_beta(4)
+        lesbetas_maxblock4 = _lesbetas_par_nb_occurrences(4)
 
-    # Boucle qui évalue également la série pour les j<k (si all = True).
+    # Boucle qui évalue également, si all=True la série pour les j<k.
     Sk = []
 
     for j in range(0 if all else k, k+1):
@@ -1136,41 +1155,21 @@ def irwinpos(b, d, k,
         print(f"décrémentée par multiples de {PrecStep}")
 
     if showtimes:
-        print("Calcul des blocs initiaux et des gammas ...",
+        print("Calcul des gammas ...",
               end = ' ', flush = True)
         starttime = time.perf_counter()
 
-    blocks = _v5_setup_blocks(b, d, level)
-    block1 = blocks[0]
-    block2 = blocks[1]
-    if level >2:
-        block3 = blocks[2]
-        if level >3:
-            block4 = blocks[3]
-    maxblock = blocks[-1]
-    # ATTENTION!
-    # COMPARED TO FEB 2024 VERSION WE SHIFT BY +1 ALL INTEGERS IN
-    # SUBLISTS OF maxblock. This is to avoid having to use n+1
-    # afterwards for inverse power sums.
-    maxblockshifted = [[ n + 1  for n in L] for L in maxblock]
-    # NOTA BENE: maxblockshifted will have as last element an empty []
-    #            if d=0
-    #            This empty [] will not cause problems for the sum()'s
-    #            such as sum(1/Rmax(x) for x in maxblockshifted[i])
-
     # ATTENTION que la série positive a des récurrences avec b-1-d
     # à la place de d
-    Aprime = [i for i in range(b)]
     dprime = b - 1 - d
-    Aprime.remove(dprime)
-
-    # See comments in irwin() for the precision used.
+    A1prime = list(range(1, b))
+    if dprime != 0:
+        A1prime.remove(dprime)
     lesgammasprime = [ bmoinsun ]
-    for j in range(1, Mmax+1):
-        Rj = IndexToR[j]
-        lesgammasprime.append(Rj(sum(a**j for a in Aprime if a != 0)))
+    for m in range(1, Mmax+1):
+        Rm = IndexToR[m]
+        lesgammasprime.append(Rm(sum(a**m for a in A1prime)))
 
-    # Same reasoning for the precision.
     if k > 0:
         lespuissancesdedprime = [ 1 ]
         for j in range(1, Mmax+1):
@@ -1192,10 +1191,11 @@ def irwinpos(b, d, k,
 
     # Recursive computation of the v_{k;m}'s.  See comments in irwin().
     touslescoeffs = [ [Rmax(b)] * (k+1) ]
-    # Attention to this b * b  extra needed for the  v_{0;1}.
+    # ATTENTION: this b * b  extra is needed for the  v_{0;1}.
     c1 = [ (b * b + lesgammasprime[1] * Rmax(b)) / (b * b - bmoinsun) ]
     for j in range(1, k+1):
-        c1.append(( (lesgammasprime[1] + dprime) * Rmax(b) + c1[-1])/Rmax(b * b - bmoinsun))
+        c1.append(( (lesgammasprime[1] + dprime) * Rmax(b)
+                    + c1[-1])/Rmax(b * b - bmoinsun))
     touslescoeffs.append(c1)
 
     PascalRows = [ [1,1] ]
@@ -1211,6 +1211,8 @@ def irwinpos(b, d, k,
                                                     persistentpara,
                                                     True)
     m = 1
+    # We have initialized touslescoeffs[0] and touslescoeffs[1]
+    # We now need for m from 2 to Mmax inclusive.
     Q, R = divmod(Mmax - 1, maxworkers)
     for P in range(Q):
         useparallel = _v5_para_recurrence(m, maxworkers, useparallel)
@@ -1223,34 +1225,68 @@ def irwinpos(b, d, k,
         print(f"... m<={Mmax}{f' et j<={k}' if k>0 else ''} (fait) "
               + f"{stoptime-starttime:.3f}s")
 
+    if showtimes:
+        print(f"Calcul des blocs d'entiers...",
+              end = ' ', flush = True)
+        starttime = time.perf_counter()
+
+    # Calcul des blocs d'entiers suivant longueur et nombre d'occurrences.
+    blocks = _v5_setup_blocks(b, d, level)
+    block1 = blocks[0]
+    block2 = blocks[1]
+    if level > 2:
+        block3 = blocks[2]
+    if level > 3:
+        block4 = blocks[3]
+    maxblock = blocks[-1]
+    # ATTENTION!
+    # COMPARED TO FEB 2024 VERSION WE SHIFT BY +1 ALL INTEGERS IN
+    # SUBLISTS OF maxblock. This is to avoid having to use n+1
+    # afterwards for inverse power sums.
+    maxblockshifted = [[ n + 1  for n in L] for L in maxblock]
+    # NOTA BENE: maxblockshifted will have as last element an empty []
+    #            if d=0
+    #            This empty [] will not cause problems for the sum()'s
+    #            such as sum(1/Rmax(x) for x in maxblockshifted[i])
+
     # calcul parallèle des beta (sommes d'inverses de puissances).
-    # For comments, see irwin().  Pay attention though that map__v5_beta
+    # For comments, see irwin().
+    # Pay attention though that _lesbetas_par_nb_occurrences
     # produces here beta's which are sums of 1/(n+1)**(m+1)'s for certain
     # n's whereas in irwin() it was sums of 1/n**(m+1).
     # Hence the word "shifted" and usage of maxblockshifted.
-    # TODO: rename map__v5_beta to map__v5_betashifted?
     if showtimes:
+        stoptime = time.perf_counter()
+        print("{:.3f}s".format(stoptime - starttime))
+
         print("Calcul parallélisé des beta(m+1) avec "
               f"maxworkers={maxworkers} ...")
-        map__v5_beta = _v5_map_beta_withtimes(Mmax, IndexToR, maxblockshifted)
+        _lesbetas_par_nb_occurrences = _v5_map_beta_withtimes(Mmax,
+                                                              IndexToR,
+                                                              maxblockshifted)
     else:
-        map__v5_beta = _v5_map_beta_notimes(Mmax, IndexToR, maxblockshifted)
+        _lesbetas_par_nb_occurrences = _v5_map_beta_notimes(Mmax,
+                                                            IndexToR,
+                                                            maxblockshifted)
 
-    lesbetas_maxblockshifted0 = map__v5_beta(0)
-
+    # This returns the list L0 such that L0[m] is the sum of the 1/(n+1)**(m+1)
+    # where n has level digits and none of them is d.
+    # If showtimes is True it prints timings.
+    lesbetas_maxblockshifted0 = _lesbetas_par_nb_occurrences(0)
+    # idem for 1 occurrence of d
     if k >= 1:
-        lesbetas_maxblockshifted1 = map__v5_beta(1)
-
+        lesbetas_maxblockshifted1 = _lesbetas_par_nb_occurrences(1)
+    # idem for 2 occurrences of d
     if k >= 2:
-        lesbetas_maxblockshifted2 = map__v5_beta(2)
-
+        lesbetas_maxblockshifted2 = _lesbetas_par_nb_occurrences(2)
+    # idem for 3 occurrences of d
     if (k >= 3) and (level > 2):
-        lesbetas_maxblockshifted3 = map__v5_beta(3)
-
+        lesbetas_maxblockshifted3 = _lesbetas_par_nb_occurrences(3)
+    # idem for 4 occurrences of d
     if (k >= 4) and (level > 3):
-        lesbetas_maxblockshifted4 = map__v5_beta(4)
+        lesbetas_maxblockshifted4 = _lesbetas_par_nb_occurrences(4)
 
-    # Boucle qui évalue également la série pour les j<k (si all = True).
+    # Boucle qui évalue également, si all=True la série pour les j<k.
     Sk = []
 
     for j in range(0 if all else k, k+1):
@@ -1287,12 +1323,13 @@ def irwinpos(b, d, k,
                 print(S)
 
         # ATTENTION
+        #
         # So far the S value is the same as for irwin(). But for the
         # positive series, the next contribution in the Burnol
-        # series is b times the sum of the 1/(n+1) where the n's
-        # have exactly level digits and *at most* j occurrences of
-        # digit d.
-        # This is why we have the maxblockshifted[i] here.
+        # series is b times the sum of the 1/(n+1) (not 1/n) where
+        # the n's have exactly "level" digits and *at most* j
+        # occurrences of digit d.  This is why we have the
+        # maxblockshifted[i] here.
         S += b * (sum(sum(1/Rmax(x) for x in maxblockshifted[i])
                       for i in range(1 + min(j,level))))
 
@@ -1355,7 +1392,6 @@ def irwinpos(b, d, k,
         # COMPUTATION OF THE MAIN SERIES BUILDING UP FROM SMALLEST TERMS
         # Rm will be the RealField. When m decreases Rm changes from time to
         # time regularly and automatically to use more bits.
-
         for m in range(Mmax-1, 0, -1):  # last one is m=1
             Rm = IndexToR[m]
             # Extend the partial sum obtained to a RealField using
