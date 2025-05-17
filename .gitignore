@@ -3,3 +3,4 @@ test_openmp_sleep
 *.aux
 *.dvi
 *.log
+*.out
