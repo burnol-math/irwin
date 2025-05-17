@@ -655,8 +655,28 @@ def _v5_setup_realfields(nbdigits, PrecStep, b, level, Mmax=-1):
 
 
 def _v5_setup_blocks(b, d, level):
-    """Organize integers according to nb of digits and d count
+    """Organize integers according to nb of digits and d-count.
+
+    It return a list of lists of lists: blocks[l][j] is the list
+    of integers having (l+1) digits in radix b, among whose exactly j
+    are equal to d.  The "level" parameter is the maximal "l+1".
+
+    - In particular for l=0, length-1 integers are exactly the non
+    zero digits. blocks[0] always contains 2 entries
+      * first one is the list of all non-zero digits distinct from d,
+      * second one is either [d] or [] whether d is non-zero or zero.
+    - blocks[1][0] = list of 2-digits integers (NOT strings!) with no d.
+      blocks[1][1] = list of 2-digits integers with one occurrence of d.
+      blocks[1][2] = [b*d+d] if d is not zero else [].
+    - blocks[2][0] = list of 3-digits integers all whose digits are distinct
+                     from d.
+      blocks[2][1] = list of 3-digits integers with one digit equal to d.
+      blocks[2][2] = list of 3-digits integers with two digits equal to d.
+      blocks[2][3] = [b*b*d+b*d+d] if d is not zero else [].
+    - idem for blocks[3] regarding 4-digits integers.
+    We stop there as level accepted values are only 2, 3 or 4.
     """
+    # A is the list of digits (inclusive of 0) not equal to d.
     A = [i for i in range(b)]
     A.remove(d)
 
@@ -704,6 +724,7 @@ def _v5_setup_blocks(b, d, level):
 
         blocks.append(block3)
 
+        # Probably I should dedent for legibility sake.
         if level > 3:
             block4 = []
             block4.append([b * x + a for x in block3[0] for a in A])  # k=0
