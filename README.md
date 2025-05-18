@@ -4,33 +4,48 @@
 
 ## Description
 
+*This README was last updated on May 18, 2025.*
+
 This repository is to document implementations of the formulas from the
 February 2024 article
 [Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
-by me (aka Jean-François Burnol).
+by Jean-François Burnol (who is also the author of these lines).
 
-## Quick guide
+The above paper is devoted to a new approach to a venerable topic which got
+started in 1914 in
+[A Curious Convergent Series](https://doi.org/10.2307/2972074) by
+A. J. Kempner, extended in 1916 by an
+[article with the same title](https://doi.org/10.2307/2974352) by F. Irwin.
 
-The main files currently implementing the algorithm are `irwin_v3.sage` and
-`irwin_v5.sage`.  Start a SageMath session and at the `sage` prompt, enter
-`load("irwin_v3.sage")` or `load("irwin_v5.sage")`.  Follow banner
-instructions which will be printed.  For example:
+Let $b>1$ be an integer (called *base* or *radix*), $d\in\{0,...,b-1\}$ a
+digit, $k$ a non-negative integer.  We want to compute $S(b,d,k)$ which is the
+(convergent) sub-series of the (divergent) harmonic series $\sum\frac{1}{n}$
+where only those positive integers $n$ are kept whose radix-$b$ representation
+contains *exactly* $k$ occurrences of the digit $d$.  Kempner and
+Irwin considered only $b=10$ (decimal system), and Irwin added the parameter
+$k$ where Kempner had considered only excluding a given digit (i.e. $k=0$ in
+the Kempner case).  Further generalizations are found in the litterature, see
+the [Bibliographical references](#bibliographical-references) section.
+
+To compute such quantities with the help of the SageMath code provided in this
+repository, start a SageMath session, enter `load("irwin.sage")` and then use
+either `irwin()` or `irwinpos()` procedure.  For example:
 
 ```sage
-sage: load("irwin_v3.sage")
+sage: load("irwin.sage")
 [some info printed]
 sage: irwin(10,9,0,52)
 22.92067661926415034816365709437593191494476243699848
 ```
 
-For computing Kempner harmonic sums with thousands of decimal digits, or Irwin
-sums starting already at a few hundreds of digits it is preferable to load
-`irwin_v5.sage` which will try to take advantage of multiple cores on your
-system.  It defaults to using `8` workers, but this can be configured by
-setting `maxworkers` variable *and reloading* `irwin_v5.sage`.
+The first argument is the radix $b$, the second the special digit $d$, the
+third is the number of occurrences $k$, and the fourth is the number of
+significant figures asked for.
+
+Hundreds or thousands of decimal digits are computed easily:
 
 ```sage
-sage: load("irwin_v5.sage")
+sage: load("irwin.sage")
 [some info printed mentioning maxworkers which defaults to 8]
 sage: irwin(10,9,0,1002)
 [the output is reformatted here to show 50 decimals per line]
@@ -78,6 +93,10 @@ sage: irwin(10,9,1,1002)
    89207555878085304702890838585263137514388675244390
 ```
 
+Check `help(irwin)` for additional parameters.
+
+## Thanks
+
 Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest into
 the Irwin paper and its predecessor
 [Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525),
@@ -87,73 +106,104 @@ radix 10 Kempner series).  This motivated me to revisit the 2024 code with the
 perspective to make it easier and less demanding on the hardware to obtain
 10000+ digits even within some high-level front-end such as SageMath.
 
+I spent an inordinate amount of time on refactoring and improving the code
+prototypes I had quickly done in Feburary 2024 (as a revival of Maple coding
+done in 2012 for the Kempner case, at the time the new approach described in
+my research papers was first invented), in particular on parallelization
+issues due to some OS aspects (see issue #1), and decided that my efforts
+deserved some permanent archival and world-wide public access...
+
 ## Additional details
 
-- [irwinfloat.py](irwinfloat.py) and [irwin.sage](irwin.sage) are the files
-  available at [my arXiv paper](https://arxiv.org/abs/2402.09083). They were
-  last updated there at v4 of April 6, 2024.
+This repository is mainly interested into making the software available.  For
+the mathematical aspects, see the research papers.
 
-- [irwin_v3.sage](irwin_v3.sage) is an evolution ot the latter which is better
-  suited to computing thousands of digits (say, starting at around 2000
-  digits).  It considerably reduces the memory footprint, and has some speed
-  gain from using multiple precisions for the `RealField` objects.  On a
-  current personal computer it will obtain 50000 digits of the classic Kempner
-  sum in a matter of hours (depending on your hardware).  This computation
-  attempted with the 2024 version would have needed (with level=3, hence
-  needing binomial coefficients up to `N=25000`) **at least 470 gigabytes** of
-  computer memory.  In contrast, the 2025 version needs (theoretically,
-  i.e. using the base-2 logarithm as estimate of the number of bits needed) of
-  the order of 113 megabytes.
+- [irwin.sage](irwin.sage) is a symlink to [irwin_v5.sage](irwin_v5.sage)
+  which is the latest installment of my code, as described further below.
+  This is the file you should use preferentially to compute thousands of
+  decimal digits.
 
-  The `irwin()` and `irwinpos()` provided by this file use by default
-  `level=3` which is better for getting thousands of digits.  They also have a
-  slightly safer way of estimating how many terms of the series should be kept
-  in order for the result to be the correctly rounded one, also if using
-  `level=4` or if handling Irwin series (`k>0`). The code does not check
-  though if the computed value is near to be exactly half-way between floor
-  and ceil, so to be absolutely certain the printed value is really the
-  correctly rounded one, one should redo the computation asking for some extra
-  digits (say 5 more)...
+  > [!note]
+  > Notice also that [irwin_v5.sage](irwin_v5.sage) has
+  > internal code comments covering all key parts of the implementation,
+  > which is not the case of [irwin_v3.sage](irwin_v3.sage).
 
-- [irwin_v3_loader.py](irwin_v3_loader.py) and
-  [irwin_loader.py](irwin_loader.py) and similarly named files can be used to
-  load concurrently [irwin.sage](irwin.sage) and
-  [irwin_v3.sage](irwin_v3.sage) into the same interactive SageMath session.
-  See the comments therein.  No guarantees though.
+- [irwinfloat_legacy.py](irwinfloat_legacy.py) and
+  [irwin_legacy.sage](irwin_legacy.sage) are the (renamed) files joined to
+  [my arXiv paper](https://arxiv.org/abs/2402.09083), and were last updated
+  on April 6, 2024.
 
-- [irwin_v5.sage](irwin_v5.sage) uses "parallelization".  This is very
-  efficient for the computation of the `beta(m+1)`'s.  It is more difficult to
+- [irwin_v3.sage](irwin_v3.sage) is a 2025 evolution of
+  [irwin_legacy.sage](irwin_legacy.sage) which is better suited to computing
+  thousands of digits (say, starting at around 2000 digits).
+  * it considerably reduces the memory footprint (for mathematical background
+  related to the storage size of the binomial coefficients, see
+  [taille_pascal.pdf](taille_pascal.pdf)),
+  * and has gains from using multiple precisions for the `RealField` objects
+  (i.e. it computes tail terms with lower precision).
+  * it uses by default `level=3` which is better for
+  getting thousands of digits.
+
+  Compared to the 2024 legacy implementation, the manner of estimating how
+  many terms of the Burnol series should be used has been made a bit safer
+  (i.e. also for $k>0$ or if using `level=4`).  Note though: as the code does
+  not check in dropping guard digits if the value is very near a half-way
+  point, to be absolutely certain to get the correctly rounded value at a
+  given precision, one should do the computation asking for some extra digits
+  (say 5 more)...
+
+- [irwin_v5.sage](irwin_v5.sage) uses "parallelization".  This is easy to do
+  and efficient for the computation of the `beta`'s.
+
+  > [!note]
+  > The quantities `beta`'s (which depend on a basis $b$, a number of digits $l$,
+  > a number of occurrences $j$ and an exponent $m+1$) are defined
+  > in my [Kempner paper](https://arxiv.org/abs/2402.08525) for $j=0$.
+  > The notation is absent from my [Irwin paper](https://arxiv.org/abs/2402.09083),
+  > due to condensed notations in the main Theorems.  They are natural to consider
+  > in view of implementations and are fully documented via code comments to be found
+  > inside [irwin_v5.sage](irwin_v5.sage).
+  
+  It is more difficult to
   apply parallelization to the computation of the recurrent coefficients
-  `u_{k;m}` (or `v_{k;m}` for the series with positive coefficients).  In an
-  earlier `v4` version, now obsolete, this was done coefficient per
-  coefficient, via a division of its defining sum into subsums.  The `v5`
-  version proves more efficient: it does not use subsums but computes in
-  parallel for successive indices `m=M+1`, ..., `m=M+maxworkers`, up to
-  finitely many additive corrections done after the parallelized subprocesses
-  have returned; this is done for all `j`'s from `0` to `k` in one-go.
+  `u_{k;m}` (or `v_{k;m}` for the series with positive coefficients).
 
-  The memory foot-print is higher than in `v3` because `maxworkers` rows of
-  the Pascal triangle are in memory rather than only `2` for `v3` (and `v4`).
-
-  The variable `maxworkers` does not have to be at most the actual number of
-  cores on the user system.  We tested both `maxworkers=8` and `maxworkers=2`
-  on an old hardware with only 2 cores, timings were about the same.
+  A variable `maxworkers` (defaulting to `8`) configures how many cores
+  the code will try to use (via `@parallel` decorator).
 
   **Keep in mind any change to `maxworkers` must be followed by a re-load of
   `irwin_v5.sage` in the interactive session.**
 
-- Here are some timings of `irwin()` from `irwin_v5` module, on a 
+  `maxworkers` does not have to be at most the actual number of cores on the
+  user system.  We tested both `maxworkers=2` and `maxworkers=8` on an old
+  hardware with only 2 cores, timings were about the same.
+
+  The memory footprint is higher than in `v3` because `maxworkers` rows of
+  the Pascal triangle are in memory rather than only `2` for `v3`.
+
+  > [!note]
+  > The number `Mmax` of terms to use from the Burnol series could be determined
+  > by the algorithm on an empirical basis, but due to inheritance from the
+  > original code written in 2012 by the author using Maple, its choice is
+  > made a priori, see [irwin_v5_doc.pdf](irwin_v5_doc.pdf) for the mathematical
+  > basis of this choice.  When the excluded digit $d$ is $b-1$, `Mmax` could
+  > be chosen somewhat smaller, leading to some efficiency improvement, but it
+  > was chosen to keep the code simpler and not treat such case separately.
+  > Besides, with the 2025 versions, the higher terms are computed with much
+  > smaller precision than the main terms so that although they are more costly
+  > to compute theoretically, in practice dropping them would bring limited gain.
+
+  Here are some timings of `irwin()` from the `irwin_v5` module, on a
   Mac Mini M4 Pro with `10+4` cores:
   - version 1.5.4 of April 23, 2025, computed `2+101010` decimals of the "no-9"
     Kempner constant in `5h38mn`, with `maxworkers` left to its default `8`.
   - version 1.5.5 of April 30, 2025, computed `2+130010` decimals in `10h10mn`,
     using `maxworkers=10`.
 
-- The next files with names of the type `k_prec_N` contain decimal expansions
+
+- Files with names of the type `k_prec_2+N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
-  correctly rounded to `N` decimal places.  They are currently (sorry for the
-  `+` in the filenames which is trying to say how many digits before and after
-  decimal separator):
+  correctly rounded to `N` decimal places.
   * [k_prec_2+1000](k_prec_2+1000)
   * [k_prec_2+2000](k_prec_2+2000)
   * [k_prec_2+5000](k_prec_2+5000)
@@ -162,7 +212,8 @@ perspective to make it easier and less demanding on the hardware to obtain
   * [k_prec_2+25000](k_prec_2+25000)
   * [k_prec_2+50000](k_prec_2+50000)
   * [k_prec_2+99998](k_prec_2+99998) (contributed by Yusuf Emin Akpınar, thanks!)
-  
+
+
 - [taille_pascal.pdf](taille_pascal.pdf) explains how many bits are needed to
   store in computer memory the Pascal triangle up (or rather down) to a
   certain row, or the memory needed to store only one such row.  Thanks to
@@ -257,7 +308,7 @@ perspective to make it easier and less demanding on the hardware to obtain
   Wall time: 24.1 s
   sage:
   ```
-  
+
   One observes during execution heavy disk write activity, as reported by the
   macOS Activity Monitor at about 1Mo/s throughout, starting at more than
   2Mo/s.
@@ -271,7 +322,7 @@ perspective to make it easier and less demanding on the hardware to obtain
   `concurrent.futures.ProcessPoolExecutor()` and I have never been able to
   reproduce any systematic drift in execution times, contrarily to what
   happens with `@parallel`.
-  
+
   Sadly though, all of these methods, when tried out with the computation of
   the coefficients at the heart of my research, cause higher overhead. My
   algorithm in `irwin_v5.sage` tests regularly if it is worthwile to go
@@ -293,7 +344,7 @@ perspective to make it easier and less demanding on the hardware to obtain
   I also tested in `C` using the `OpenMP` library if any time drift could be
   put into evidence, and none showed up.  Thanks to Yusuf Emin Akpınar for
   providing `C` implementation of the algorithm of my research papers.
-  
+
   I wish I could test on more systems, only thing I can say is that nothing of
   this sort is seen on old macOSes such as High Sierra.  I am quite interested
   into reports on how
