@@ -82,7 +82,7 @@ to 20 decimal places as they were published in the Baillie paper::
     S(10,9,0) = 22.92067 66192 64150 34816...
 
 We do not describe here the details of Baillie's method, which are explained
-in the following references
+in the following references:
 
 - Robert Baillie: Sums of reciprocals of integers missing a given
   digit. Amer. Math. Monthly 86(5), 372–374 (1979) `DOI link
@@ -149,14 +149,14 @@ $$S(b,d,k) = \sum_{1\leq n<b^{l-1}, k(n)=k}\frac1n
 \frac{u_{k-k(n);m}}{n^{m+1}}$$
 
 It can be shown that the alternating series has its contributions decreasing
-in absolute values (except if $b=2$, $d=1$, $k=0$ or $k=1$ then all
+in absolute values (except if $b=2$, $d=1$, $k=0$ or $k=1$ as then all
 contributions to the alternating series vanish).  So using its partial sums
 gives upper and lower bounds.  For example dropping the alternating series
 altogether (whose first term is negative) gives as upper bound for
 $S(10,9,0)$:
 
 $$S(10,9,0) < \sum_{1\leq d\leq 8}\frac1d + 10\sum_{1\leq d\leq 8, 0\leq e\leq
-8}\frac1{10*d+e} =23.2577...$$
+8}\frac1{10d+e} =23.2577...$$
 
 (the numerical value is truncated). It is interesting that this is actually
 exactly the upper bound given by Irwin in his paper, but he computed
@@ -187,16 +187,16 @@ $$S(b,d,k) = \sum_{1\leq n<b^{l-1}, k(n)=k}\frac1n
 \frac{v_{k-k(n);m}}{(n+1)^{m+1}}$$
 
 Dropping the series indexed by $m\geq1$ altogether (all whose terms are
-positive, except for if $b=2$, $d=1$, $k=0$) gives the following lower bound for
-$S(10,9,0)$:
+positive, except for $b=2$, $d=1$, $k=0$, then they all vanish) gives the
+following lower bound for $S(10,9,0)$:
 
 $$S(10,9,0) > \sum_{1\leq d\leq 8}\frac1d + 10\sum_{1\leq d\leq 8, 0\leq e\leq
-8}\frac1{10*d+e+1}= 22.4249\dots$$
+8}\frac1{10d+e+1}= 22.4249\dots$$
 
 It is interesting that Irwin had actually obtained a slightly sharper lower bound:
 
 $$S(10,9,0) > \sum_{1\leq d\leq 8}\frac1d + \sum_{1\leq d\leq 8, 0\leq e\leq
-8}\frac1{10*d+e} + 9\sum_{1\leq d\leq 8, 0\leq e\leq 8}\frac1{10*d+e+1}
+8}\frac1{10d+e} + 9\sum_{1\leq d\leq 8, 0\leq e\leq 8}\frac1{10d+e+1}
 =22.5081\dots $$
 
 But he computed it with not enough precision and ended the paper with the
