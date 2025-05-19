@@ -131,7 +131,7 @@ Then define (rational) coefficients $u_{j;m}$ via the following recurrences:
 
 - $u_{0;0} = b$ and for $m\geq1$:
 
-  $$u_{0;m} = (b^{m+1} - b +1)^{-1}\sum_{j=1}^{m} \binom{m}{j} \gamma_j u_{0:m-j}$$
+  $$u_{0;m} = (b^{m+1} - b +1)^{-1}\sum_{n=1}^{m} \binom{m}{n} \gamma_n u_{0:m-n}$$
 - For $j\geq1$, $u_{j;0}=b$ and for $m\geq1$:
   $$u_{j;m}=(b^{m+1} - b +1)^{-1}\left(\sum_{n=1}^{m}\binom{m}{n}\gamma_n u_{j;m-n} 
   + \sum_{n=0}^{m}\binom{m}{n}d^n u_{j-1;m-n}\right)$$
@@ -173,7 +173,7 @@ Then define (rational) coefficients $v_{j;m}$ via the following recurrences:
 - $v_{0;0} = b$ and for $m\geq1$:
 
   $$v_{0;m} = (b^{m+1} - b +1)^{-1}\left(b^{m+1}
-  +\sum_{j=1}^{m} \binom{m}{j} \gamma_j' v_{0:m-j}\right)$$
+  +\sum_{n=1}^{m} \binom{m}{n} \gamma_n' v_{0:m-n}\right)$$
 - For $j\geq1$, $v_{j;0}=b$ and for $m\geq1$:
   $$v_{j;m}=(b^{m+1} - b +1)^{-1}\left(\sum_{n=1}^{m}\binom{m}{n}\gamma_n' v_{j;m-n} 
   + \sum_{n=0}^{m}\binom{m}{n}(b-1-d)^n v_{j-1;m-n}\right)$$
