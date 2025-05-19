@@ -4,3 +4,4 @@ test_openmp_sleep
 *.dvi
 *.log
 *.out
+docs/_build/
