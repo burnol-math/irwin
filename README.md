@@ -159,8 +159,9 @@ underlying core formulas, start with
   the code will try to use, via the `@parallel` decorator.
 
   > [!warning] The @parallel issue
-  > Sadly on macOS Sequoia at least, an annoying issue has arisen with the use
-  > of `@parallel`.  It is described in [ParallelIssue](ParallelIssue.md).
+  > Sadly, an annoying issue has arisen with the use of `@parallel`, on the
+  > author recent Apple Silicon M4 hardware using macOS Sequoia.  It is
+  > described in [ParallelIssue](ParallelIssue.md).
 
   **Keep in mind any change to `maxworkers` must be followed by a re-load of
   `irwin_v5.sage` in the interactive session.**
@@ -258,9 +259,9 @@ perspective to make it easier and less demanding on the hardware to obtain
 I spent an inordinate amount of time on refactoring and improving the code
 prototypes I had quickly done in Feburary 2024 (as a revival of Maple coding
 done in 2012 for the Kempner case, at the time the new approach described in
-my research papers was first invented), in particular on parallelization
-issues due to some OS aspects (see issue #1), and decided that my efforts
-deserved some permanent archival and world-wide public access...
+my research papers was first invented), due in particular to issue #1.  I
+decided that my efforts deserved some permanent archival and world-wide public
+access...
 
 ## License
 
