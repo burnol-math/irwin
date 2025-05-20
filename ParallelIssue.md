@@ -1,27 +1,27 @@
 # The `@parallel` issue #1
 
-There are some surprises with parallelization using
-`@parallel` on my very recently acquired macOS 15.4.1 Sequoia.  To
-parallelize the computation by recurrence of the coefficients which I have
-associated with Kempner and Irwin sums, the code necessarily has to call
-many times a procedure which has been `@parallel`-decorated; for example if
-we need `10000` such coefficients and use `8` workers, we will call `1250`
-times the `@parallel`-ized procedure each time with an input having `8`
-entries.
+There are some surprises with parallelization using `@parallel` on my very
+recently acquired Mac Mini M4 Pro under macOS 15.4.1 Sequoia.  To parallelize
+the computation by recurrence of the coefficients which I have associated with
+Kempner and Irwin sums, the code necessarily has to call many times a
+procedure which has been `@parallel`-decorated; for example if we need `10000`
+such coefficients and use `8` workers, we will call `1250` times the
+`@parallel`-ized procedure each time with an input having `8` entries.
 
-Turns out that on macOS 15.4.1 at least (but I can't test easily on other
-systems), as I discovered in issue #1, and as is explored in test files such
-as [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage), iterating
-calls to a procedure calling a `@parallel` decorated one causes a seemingly
-linear increase of the execution time at each new call.  With
+Turns out that on my system (I can't test easily on other systems, I only
+compared to older Intel Macs, and there is no issue there), as I discovered in
+issue #1, and as is explored in test files such as
+[test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage), iterating calls to
+a procedure calling a `@parallel` decorated one causes a seemingly linear
+increase of the execution time at each new call.  With
 [test_parallel_sleep_v2.sage](test_parallel_sleep_v2.sage) this time drift
 seems to continue more or less forever, in more realistic situations it is
 seen to get reset from time to time (probably in connection with some "cache
-cleanup" somewhere by the OS).  The initial faster execution times will
-never be matched again though.  Only way known to author at time of
-writing is to quit the SageMath interactive session and to relaunch a fresh
-one.  Here is a typical illustration of the execution times drifting,
-where the workers only action is to "sleep"!
+cleanup" somewhere by the OS).  The initial faster execution times will never
+be matched again though.  Only way known to author at time of writing is to
+quit the SageMath interactive session and to relaunch a fresh one.  Here is a
+typical illustration of the execution times drifting, where the workers only
+action is to "sleep"!
 
 ```text
 $ sage
@@ -87,10 +87,10 @@ sage:
 ```
 
 One observes during execution heavy disk write activity, as reported by the
-macOS Activity Monitor at about 1Mo/s throughout, starting at more than
-2Mo/s.  But this may be not really relevant as the pure Python reproducer
-(which is commented below) does not trigger any disk activity but does
-show the timings drift.
+macOS Activity Monitor at about 1Mo/s throughout, starting at more than 2Mo/s.
+But this may be not really relevant as the pure Python reproducer (test file
+[test_pyparallel_sleep.py](test_pyparallel_sleep.py); comments below) does not
+trigger any disk activity but does show the timings drift.
 
 I have tested using the `multiprocessing` library via its `Pool.map()` and
 the starting methods `'fork'`, `'forkserver'` or `'spawn'` as well as the
