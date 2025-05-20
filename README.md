@@ -4,7 +4,7 @@
 
 ## Description
 
-*This README was last updated on May 18, 2025.*
+*This README was last updated on May 20, 2025.*
 
 This repository is to document implementations of the formulas from the
 February 2024 article
@@ -94,24 +94,6 @@ sage: irwin(10,9,1,1002)
 ```
 
 Check `help(irwin)` for additional parameters.
-
-## Thanks
-
-Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest into
-the Irwin paper and its predecessor
-[Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525),
-and in particular for reporting progress in computing tens of thousands of
-digits (Y. E. A. has obtained 100000=2+99998 digits of the classical "no-9"
-radix 10 Kempner series).  This motivated me to revisit the 2024 code with the
-perspective to make it easier and less demanding on the hardware to obtain
-10000+ digits even within some high-level front-end such as SageMath.
-
-I spent an inordinate amount of time on refactoring and improving the code
-prototypes I had quickly done in Feburary 2024 (as a revival of Maple coding
-done in 2012 for the Kempner case, at the time the new approach described in
-my research papers was first invented), in particular on parallelization
-issues due to some OS aspects (see issue #1), and decided that my efforts
-deserved some permanent archival and world-wide public access...
 
 ## Additional details
 
@@ -254,6 +236,24 @@ is not yet public.
 
 TODO: perhaps add some additional bibliographical references and do the
 fancier earlier mathematics at long last.
+
+## Thanks
+
+Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest into
+the Irwin paper and its predecessor
+[Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525),
+and in particular for reporting progress in computing tens of thousands of
+digits (Y. E. A. has obtained 100000=2+99998 digits of the classical "no-9"
+radix 10 Kempner series).  This motivated me to revisit the 2024 code with the
+perspective to make it easier and less demanding on the hardware to obtain
+10000+ digits even within some high-level front-end such as SageMath.
+
+I spent an inordinate amount of time on refactoring and improving the code
+prototypes I had quickly done in Feburary 2024 (as a revival of Maple coding
+done in 2012 for the Kempner case, at the time the new approach described in
+my research papers was first invented), in particular on parallelization
+issues due to some OS aspects (see issue #1), and decided that my efforts
+deserved some permanent archival and world-wide public access...
 
 ## License
 
