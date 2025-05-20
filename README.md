@@ -156,9 +156,11 @@ underlying core formulas, start with
   `u_{k;m}` (or `v_{k;m}` for the series with positive coefficients).
 
   A variable `maxworkers` (defaulting to `8`) configures how many cores
-  the code will try to use, via the `@parallel` decorator.  Sadly on macOS
-  Sequoia at least, an annoying issue has arisen with the use of `@parallel`.
-  It is described in [ParallelIssue](ParallelIssue.md).
+  the code will try to use, via the `@parallel` decorator.
+
+  > [!warning] The @parallel issue
+  > Sadly on macOS Sequoia at least, an annoying issue has arisen with the use
+  > of `@parallel`.  It is described in [ParallelIssue](ParallelIssue.md).
 
   **Keep in mind any change to `maxworkers` must be followed by a re-load of
   `irwin_v5.sage` in the interactive session.**
