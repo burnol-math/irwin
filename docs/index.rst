@@ -205,43 +205,6 @@ bound can be deduced from the series using the fact that in this case
 the $v_{0;m}$'s are larger than $1$ (they are even $>10/9$).
 
 
-References
-==========
-
-For $k=0$ the alternating series was first published in:
-
-- Moments in the exact summation of the curious series of Kempner type,
-  https://arxiv.org/abs/2402.08525.
-
-The latter paper (which is to appear in *Amer. Math. Monthly* in 2025 or 2026)
-also gives exact theoretical formulas for Kempner-like series where multiple
-digits are simultaneously excluded.
-
-The series for $k>0$ from the previous section have been first published in:
-
-- Measures for the summation of Irwin series, https://arxiv.org/abs/2402.09083.
-
-This manuscript is currently submitted.  Some of my further research
-has already appeared:
-
-- Summing the "exactly one 42" and similar subsums of the harmonic series,
-  Advances in Applied Mathematics Volume 162, January 2025, 102791. `DOI link
-  <https://doi.org/10.1016/j.aam.2024.102791>`_.
-- Digamma function and general Fischer series in the theory of Kempner sums,
-  Expositiones Mathematicae, Volume 42, Issue 6, December
-  2024, 125604. `DOI link <https://doi.org/10.1016/j.exmath.2024.125604>`_.
-- Measures associated with certain ellipsephic harmonic series and the
-  Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025)
-  `DOI link <https://doi.org/10.1007/s10474-025-01525-3>`_.
-
-These next two manuscripts by the author are awaiting referee reports.
-
-- Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`_.
-- Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`_.
-
-
 SageMath implementation
 =======================
 
@@ -286,7 +249,7 @@ Hundreds or thousands of decimal digits are computed easily::
     sage: load("irwin.sage")
     [some info printed mentioning maxworkers which defaults to 8]
     sage: irwin(10,9,0,1002)
-    [the output is reformatted here to show 50 decimals per line]
+    "the output is reformatted here to show 50 decimals per line"
     22.92067661926415034816365709437593191494476243699848
        15685419983565721563381899111294456260374482018989
        90964125332346922160471190478310297506146968857121
@@ -308,7 +271,7 @@ Hundreds or thousands of decimal digits are computed easily::
        95786715012908593756769518010810881852946961772722
        23692633510303284693132263332046629826719621921950
     sage: irwin(10,9,1,1002)
-    [the output is reformatted here to show 50 decimals per line]
+    "the output is reformatted here to show 50 decimals per line"
     23.04428708074784831967594930973617482538959203064773
        62135578783008262042579280261007145671482118830782
        57921943364250671219896744152423420975036205340023
@@ -334,3 +297,41 @@ Hundreds or thousands of decimal digits are computed easily::
 Use ``irwinpos()`` for the implementation of the positive series rather than
 the alternating one.
 Check ``help(irwin)`` or ``help(irwinpos)`` for additional parameters.
+
+
+References
+==========
+
+For $k=0$ the alternating series was first published in:
+
+- Moments in the exact summation of the curious series of Kempner type,
+  https://arxiv.org/abs/2402.08525.
+
+The latter paper (which is to appear in *Amer. Math. Monthly* in 2025 or 2026)
+also gives exact theoretical formulas for Kempner-like series where multiple
+digits are simultaneously excluded.
+
+The general case of both alternating and positive series have been first
+published in:
+
+- Measures for the summation of Irwin series, https://arxiv.org/abs/2402.09083.
+
+This manuscript is currently submitted.  Some of my further research
+has already appeared:
+
+- Summing the "exactly one 42" and similar subsums of the harmonic series,
+  Advances in Applied Mathematics Volume 162, January 2025, 102791. `DOI link
+  <https://doi.org/10.1016/j.aam.2024.102791>`_.
+- Digamma function and general Fischer series in the theory of Kempner sums,
+  Expositiones Mathematicae, Volume 42, Issue 6, December
+  2024, 125604. `DOI link <https://doi.org/10.1016/j.exmath.2024.125604>`_.
+- Measures associated with certain ellipsephic harmonic series and the
+  Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025)
+  `DOI link <https://doi.org/10.1007/s10474-025-01525-3>`_.
+
+These next two manuscripts by the author are awaiting referee reports.
+
+- Sur l'asymptotique des sommes de Kempner pour de grandes bases,
+  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`_.
+- Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
+  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`_.
