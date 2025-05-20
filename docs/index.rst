@@ -334,14 +334,3 @@ Hundreds or thousands of decimal digits are computed easily::
 Use ``irwinpos()`` for the implementation of the positive series rather than
 the alternating one.
 Check ``help(irwin)`` or ``help(irwinpos)`` for additional parameters.
-
-Thanks
-======
-
-Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest into
-my Kempner and Irwin papers
-and in particular for reporting progress in computing tens of thousands of
-digits (Y. E. A. has obtained 100000=2+99998 digits of the classical "no-9"
-radix 10 Kempner series).  This motivated me to revisit the 2024 code with the
-perspective to make it easier and less demanding on the hardware to obtain
-10000+ digits even within some high-level front-end such as SageMath.
