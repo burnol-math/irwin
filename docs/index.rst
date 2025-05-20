@@ -311,7 +311,7 @@ The latter paper (which is to appear in *Amer. Math. Monthly* in 2025 or 2026)
 also gives exact theoretical formulas for Kempner-like series where multiple
 digits are simultaneously excluded.
 
-The general case of both alternating and positive series have been first
+The alternating and positive series for all $k\geq0$ have been first
 published in:
 
 - Measures for the summation of Irwin series, https://arxiv.org/abs/2402.09083.
