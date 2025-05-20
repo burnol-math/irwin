@@ -97,8 +97,13 @@ Check `help(irwin)` for additional parameters.
 
 ## Additional details
 
-This repository is mainly interested into making the software available.  For
-the mathematical aspects, see the research papers.
+This repository is mainly there in order to make the software available.  It
+does provide some additional mathematical content (see files
+[irwin_v5_doc.pdf](irwin_v5_doc.pdf) and
+[taille_pascal.pdf](taille_pascal.pdf)), which is in relation with
+implementation choices or constraints, but for an introduction to the actual
+underlying core formulas, start with
+[burnolmath.gitlab.io/irwin](https://burnolmath.gitlab.io/irwin).
 
 - [irwin.sage](irwin.sage) is a symlink to [irwin_v5.sage](irwin_v5.sage)
   which is the latest installment of my code, as described further below.
