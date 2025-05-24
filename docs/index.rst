@@ -85,13 +85,15 @@ We do not describe here the details of Baillie's method, which are explained
 in the following references:
 
 - Robert Baillie: Sums of reciprocals of integers missing a given
-  digit. Amer. Math. Monthly 86(5), 372–374 (1979) `DOI link
-  <https://doi.org/10.2307/2321096Sums>`_.
+  digit. Amer. Math. Monthly 86(5), 372–374 (1979). `DOI link`__
+
+  __ https://doi.org/10.2307/2321096
 - Robert Baillie: Summing the curious series of Kempner and Irwin (2008).
   `arXiv:0806.4410 <https://arxiv.org/abs/0806.4410>`_.
 - Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent
-  series. Amer. Math. Monthly 115(6), 525–540 (2008) `DOI link
-  <https://doi.org/10.1080/00029890.2008.11920559>`_.
+  series. Amer. Math. Monthly 115(6), 525–540 (2008). `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2008.11920559
 
 In the latter paper of Schmelzer and Baillie an interesting further
 generalization is considered about excluding not a digit but a *word* of
@@ -133,7 +135,7 @@ Then define (rational) coefficients $u_{j;m}$ via the following recurrences:
 
   $$u_{0;m} = (b^{m+1} - b +1)^{-1}\sum_{n=1}^{m} \binom{m}{n} \gamma_n u_{0:m-n}$$
 - For $j\geq1$, $u_{j;0}=b$ and for $m\geq1$:
-  $$u_{j;m}=(b^{m+1} - b +1)^{-1}\left(\sum_{n=1}^{m}\binom{m}{n}\gamma_n u_{j;m-n} 
+  $$u_{j;m}=(b^{m+1} - b +1)^{-1}\left(\sum_{n=1}^{m}\binom{m}{n}\gamma_n u_{j;m-n}
   + \sum_{n=0}^{m}\binom{m}{n}d^n u_{j-1;m-n}\right)$$
 
 Let now $l$ be a positive integer (also called the "level").  Preferably we will
@@ -143,7 +145,7 @@ convergence.
 We then have the following exact formula, which uses the $k(n)$ notation
 defined earlier:
 
-$$S(b,d,k) = \sum_{1\leq n<b^{l-1}, k(n)=k}\frac1n 
+$$S(b,d,k) = \sum_{1\leq n<b^{l-1}, k(n)=k}\frac1n
 + b\sum_{b^{l-1}\leq n<b^l, k(n)\leq k}\frac1n
 + \sum_{m=1}^\infty (-1)^{m}\sum_{b^{l-1}\leq n<b^l, k(n)\leq k}
 \frac{u_{k-k(n);m}}{n^{m+1}}$$
@@ -175,7 +177,7 @@ Then define (rational) coefficients $v_{j;m}$ via the following recurrences:
   $$v_{0;m} = (b^{m+1} - b +1)^{-1}\left(b^{m+1}
   +\sum_{n=1}^{m} \binom{m}{n} \gamma_n' v_{0:m-n}\right)$$
 - For $j\geq1$, $v_{j;0}=b$ and for $m\geq1$:
-  $$v_{j;m}=(b^{m+1} - b +1)^{-1}\left(\sum_{n=1}^{m}\binom{m}{n}\gamma_n' v_{j;m-n} 
+  $$v_{j;m}=(b^{m+1} - b +1)^{-1}\left(\sum_{n=1}^{m}\binom{m}{n}\gamma_n' v_{j;m-n}
   + \sum_{n=0}^{m}\binom{m}{n}(b-1-d)^n v_{j-1;m-n}\right)$$
 
 Let now $l$ be positive integer (also called the "level").
@@ -211,7 +213,7 @@ SageMath implementation
 The formulas of the previous section have been implemented in a SageMath_
 script ``irwin.sage`` available at https://gitlab.com/burnolmath/irwin.
 
-.. _SageMath: https://www.sagemath.org  
+.. _SageMath: https://www.sagemath.org
 
 Here is an example of use::
 
@@ -320,14 +322,21 @@ This manuscript is currently submitted.  Some of my further research
 has already appeared:
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,
-  Advances in Applied Mathematics Volume 162, January 2025, 102791. `DOI link
-  <https://doi.org/10.1016/j.aam.2024.102791>`_.
+  Advances in Applied Mathematics Volume 162, January 2025, 102791. `DOI link`__
+
+  __ https://doi.org/10.1016/j.aam.2024.102791
+
 - Digamma function and general Fischer series in the theory of Kempner sums,
   Expositiones Mathematicae, Volume 42, Issue 6, December
-  2024, 125604. `DOI link <https://doi.org/10.1016/j.exmath.2024.125604>`_.
+  2024, 125604. `DOI link`__
+
+  __ https://doi.org/10.1016/j.exmath.2024.125604
+
 - Measures associated with certain ellipsephic harmonic series and the
-  Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025)
-  `DOI link <https://doi.org/10.1007/s10474-025-01525-3>`_.
+  Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025).
+  `DOI link`__
+
+  __ https://doi.org/10.1007/s10474-025-01525-3
 
 These next two manuscripts by the author are awaiting referee reports.
 
