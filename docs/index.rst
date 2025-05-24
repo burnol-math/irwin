@@ -105,9 +105,13 @@ converge to $b^p\log(b)$ (with the natural logarithm here of course).  For
 $p=1$ this had been shown earlier by Farhi.
 
 - Farhi, B., A curious result related to Kempner’s series. Amer. Math. Monthly
-  115(10), 933–938 (2008).
+  115(10), 933–938 (2008). `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2008.11920611
 - Allouche, J.-P., Hu, Y. and Morin, C.: Ellipsephic harmonic series
-  revisited.  Acta Math. Hungar. 173, 461–470 (2024).
+  revisited.  Acta Math. Hungar. 173, 461–470 (2024). `DOI link`__
+
+  __ https://doi.org/10.1007/s10474-024-01448-5
 
 The new series
 ==============
