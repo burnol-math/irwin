@@ -20,9 +20,9 @@ kept whose radix-$b$ (aka $b$-ary) representation contains *exactly* $k$
 occurrences of the digit $d$.
 
 \F. Irwin established the convergence of this sub-series in 1916 in `A Curious
-Convergent Series <irwin_>`_.  Earlier in 1914, A. J. Kempner had initiated
+Convergent Series <irwin_>`__.  Earlier in 1914, A. J. Kempner had initiated
 the topic in a note with the same title `A Curious Convergent Series
-<kempner_>`_.  He made the observation that keeping from the harmonic series
+<kempner_>`__.  He made the observation that keeping from the harmonic series
 only those terms not using the decimal digit $9$ (or any other given decimal
 digit) gives a convergent series.  Both Kempner and Irwin considered only
 $b=10$.  In the special case with $b=2$, $d=1$ and $k=0$, $S(2,1,0)$ is
@@ -89,7 +89,7 @@ in the following references:
 
   __ https://doi.org/10.2307/2321096
 - Robert Baillie: Summing the curious series of Kempner and Irwin (2008).
-  `arXiv:0806.4410 <https://arxiv.org/abs/0806.4410>`_.
+  `arXiv:0806.4410 <https://arxiv.org/abs/0806.4410>`__.
 - Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent
   series. Amer. Math. Monthly 115(6), 525–540 (2008). `DOI link`__
 
@@ -119,9 +119,9 @@ The new series
 In 2024, the author of this page published novel theoretical formulas
 representing exactly the Kempner-Irwin series.  Here are these formulas, as
 proven in `Measures for the summation of Irwin series
-<https://arxiv.org/abs/2402.09083>`_ and earlier for $k=0$ (and only the
+<https://arxiv.org/abs/2402.09083>`__ and earlier for $k=0$ (and only the
 alternating series) in `Moments in the exact summation of the curious series
-of Kempner type <https://arxiv.org/abs/2402.08525>`_.
+of Kempner type <https://arxiv.org/abs/2402.08525>`__.
 
 Let $b>1$, $d$ a $b$-ary digit, and $k$ a non-negative integer.  We will need
 the following notation: for $n$ a positive integer, $k(n)$ is the number of
@@ -345,6 +345,6 @@ has already appeared:
 These next two manuscripts by the author are awaiting referee reports.
 
 - Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`_.
+  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`__.
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`_.
+  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`__.
