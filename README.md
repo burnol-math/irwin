@@ -230,38 +230,42 @@ Monthly 86(5), 372–374 (1979) [DOI](https://doi.org/10.2307/2321096Sums)
 - Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent series. Amer.
 Math. Monthly 115(6), 525–540 (2008) [DOI](https://doi.org/10.1080/00029890.2008.11920559)
 
-The first of my papers quoted above has by now been published (online, so far) at The American Mathematical Monthly.   Further research which these two papers initiated has been published:
+The first of my papers quoted above has by now been published (online, so far) at The American Mathematical Monthly.   Further research by myself which these two papers initiated has already appeared:
 
-- Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791)
-- Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604)
-- Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3)
+- Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791).
+- Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
+- Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
 
-You will find at
-[arXiv:burnol](https://arxiv.org/search/?searchtype=author&query=Burnol%2C+J)
-some more manuscripts which I authored in relation to this topic, as well as earlier papers
-doing fancy mathematics on some other topics.  Fancier mathematics of those times
-is not yet public.
+Those next two manuscripts (in French), also from first half of 2024, are
+still awaiting referee reports:
 
-TODO: perhaps add some additional bibliographical references and do the
-fancier earlier mathematics at long last.
+- Sur l'asymptotique des sommes de Kempner pour de grandes bases,
+  [arXiv:2403.01957](https://arxiv.org/abs/2403.01957).
+- Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
+  [arXiv:2404.13763](https://arxiv.org/abs/2404.13763).
+
 
 ## Thanks
 
-Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest into
-the Irwin paper and its predecessor
-[Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525) ([DOI](https://doi.org/10.1080/00029890.2025.2554555)),
-and in particular for reporting progress in computing tens of thousands of
-digits (Y. E. A. has obtained 100000=2+99998 digits of the classical "no-9"
-radix 10 Kempner series).  This motivated me to revisit the 2024 code with the
-perspective to make it easier and less demanding on the hardware to obtain
-10000+ digits even within some high-level front-end such as SageMath.
+The February 2024 original version or ``irwin.sage`` which accompanied
+[Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
+was a revival and extension of Maple coding which I had done in 2012 and which
+regarded the results later described in
+[Moments in the exact summation of the curious series of Kempner type](https://doi.org/10.1080/00029890.2025.2554555)
+([arXiv:2402.08525](https://arxiv.org/abs/2402.08525)).
 
-I spent an inordinate amount of time on refactoring and improving the code
-prototypes I had quickly done in Feburary 2024 (as a revival of Maple coding
-done in 2012 for the Kempner case, at the time the new approach described in
-my research papers was first invented), due in particular to issue #1.  I
-decided that my efforts deserved some permanent archival and world-wide public
-access...
+Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest
+during 2025 into the results of these two papers, and in particular for
+reporting progress in computing tens of thousands of digits of the classical
+"no-9" Kempner sum (Y. E. A. had obtained 100000=2+99998 digits using his C
+implementation of the formulas from my paper).  This motivated me to revisit
+the February 2024 SageMath code to improve its usability for 10000 or more
+digits.
+
+The changes allowed indeed to significantly improve computation times when
+asking for 10000+ digits.  I then spent an inordinate amount of time about
+issue #1, and the sad conclusion I reached is that Python/SageMath are
+not suitable for parallelism on Apple's macOS and newer Macs.
 
 ## License
 
