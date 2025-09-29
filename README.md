@@ -116,8 +116,9 @@ underlying core formulas, start with
   > which is not the case of [irwin_v3.sage](irwin_v3.sage).
 
 - [irwinfloat_legacy.py](irwinfloat_legacy.py) and
-  [irwin_legacy.sage](irwin_legacy.sage) are the (renamed) files joined to
-  [my arXiv paper](https://arxiv.org/abs/2402.09083), and were last updated
+  [irwin_legacy.sage](irwin_legacy.sage) are the same files as
+  initially joined (with different names) to
+  [my arXiv paper](https://arxiv.org/abs/2402.09083) v1 and last updated
   on April 6, 2024.
 
 - [irwin_v3.sage](irwin_v3.sage) is a 2025 evolution of
@@ -217,8 +218,8 @@ underlying core formulas, start with
 
 This repository is devoted to the formulas discovered in:
 
-- [Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525)
-- [Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
+- Moments in the exact summation of the curious series of Kempner type [arXiv:2402.08525](https://arxiv.org/abs/2402.08525) [DOI](https://doi.org/10.1080/00029890.2025.2554555)
+- Measures for the summation of Irwin series [arXiv:2402.09083](https://arxiv.org/abs/2402.09083)
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
@@ -229,8 +230,7 @@ Monthly 86(5), 372–374 (1979) [DOI](https://doi.org/10.2307/2321096Sums)
 - Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent series. Amer.
 Math. Monthly 115(6), 525–540 (2008) [DOI](https://doi.org/10.1080/00029890.2008.11920559)
 
-My two papers quoted above have not yet been published but some of my further
-research already has appeared:
+The first of my papers quoted above has by now been published (online, so far) at The American Mathematical Monthly.   Further research which these two papers initiated has been published:
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791)
 - Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604)
@@ -238,7 +238,7 @@ research already has appeared:
 
 You will find at
 [arXiv:burnol](https://arxiv.org/search/?searchtype=author&query=Burnol%2C+J)
-some further manuscripts related to this topic, as well as earlier papers
+some more manuscripts which I authored in relation to this topic, as well as earlier papers
 doing fancy mathematics on some other topics.  Fancier mathematics of those times
 is not yet public.
 
@@ -249,7 +249,7 @@ fancier earlier mathematics at long last.
 
 Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest into
 the Irwin paper and its predecessor
-[Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525),
+[Moments in the exact summation of the curious series of Kempner type](https://arxiv.org/abs/2402.08525) ([DOI](https://doi.org/10.1080/00029890.2025.2554555)),
 and in particular for reporting progress in computing tens of thousands of
 digits (Y. E. A. has obtained 100000=2+99998 digits of the classical "no-9"
 radix 10 Kempner series).  This motivated me to revisit the 2024 code with the

@@ -121,7 +121,8 @@ representing exactly the Kempner-Irwin series.  Here are these formulas, as
 proven in `Measures for the summation of Irwin series
 <https://arxiv.org/abs/2402.09083>`__ and earlier for $k=0$ (and only the
 alternating series) in `Moments in the exact summation of the curious series
-of Kempner type <https://arxiv.org/abs/2402.08525>`__.
+of Kempner type <https://arxiv.org/abs/2402.08525>`__
+(`DOI link <https://doi.org/10.1080/00029890.2025.2554555>`__).
 
 Let $b>1$, $d$ a $b$-ary digit, and $k$ a non-negative integer.  We will need
 the following notation: for $n$ a positive integer, $k(n)$ is the number of
@@ -311,9 +312,10 @@ References
 For $k=0$ the alternating series was first published in:
 
 - Moments in the exact summation of the curious series of Kempner type,
-  https://arxiv.org/abs/2402.08525.
+  https://doi.org/10.1080/00029890.2025.2554555
+  (`arXiv:2402.08525 <https://arxiv.org/abs/2402.08525>`__).
 
-The latter paper (which is to appear in *Amer. Math. Monthly* in 2025 or 2026)
+This has appeared in *The American Mathematical Monthly* in 2025.  It
 also gives exact theoretical formulas for Kempner-like series where multiple
 digits are simultaneously excluded.
 
