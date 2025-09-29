@@ -4,7 +4,7 @@
 
 ## Description
 
-*This README was last updated on May 20, 2025.*
+*This README was last updated on September 29, 2025.*
 
 This repository is to document implementations of the formulas from the
 February 2024 article
