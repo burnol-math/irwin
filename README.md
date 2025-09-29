@@ -218,8 +218,8 @@ underlying core formulas, start with
 
 This repository is devoted to the formulas discovered in:
 
-- Moments in the exact summation of the curious series of Kempner type [arXiv:2402.08525](https://arxiv.org/abs/2402.08525) [DOI](https://doi.org/10.1080/00029890.2025.2554555)
-- Measures for the summation of Irwin series [arXiv:2402.09083](https://arxiv.org/abs/2402.09083)
+- Moments in the exact summation of the curious series of Kempner type. Amer. Math. Monthly 2025 ([DOI](https://doi.org/10.1080/00029890.2025.2554555); preprint was [arXiv:2402.08525](https://arxiv.org/abs/2402.08525)).
+- Measures for the summation of Irwin series. Available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
@@ -230,19 +230,18 @@ Monthly 86(5), 372–374 (1979) [DOI](https://doi.org/10.2307/2321096Sums)
 - Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent series. Amer.
 Math. Monthly 115(6), 525–540 (2008) [DOI](https://doi.org/10.1080/00029890.2008.11920559)
 
-The first of my papers quoted above has by now been published (online, so far) at The American Mathematical Monthly.   Further research by myself which these two papers initiated has already appeared:
+More research by the author:
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791).
-- Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
-- Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
-
-Those next two manuscripts (in French), also from first half of 2024, are
-still awaiting referee reports:
-
 - Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  [arXiv:2403.01957](https://arxiv.org/abs/2403.01957).
+  [arXiv:2403.01957](https://arxiv.org/abs/2403.01957). Currently waiting for
+  referee report.
+- Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  [arXiv:2404.13763](https://arxiv.org/abs/2404.13763).
+  [arXiv:2404.13763](https://arxiv.org/abs/2404.13763). A (favourable) referee
+  report was received and responded to early July 2025.  Waiting since for
+  news from editors.
+- Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
 
 
 ## Thanks

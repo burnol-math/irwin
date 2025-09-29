@@ -312,25 +312,31 @@ References
 For $k=0$ the alternating series was first published in:
 
 - Moments in the exact summation of the curious series of Kempner type,
-  https://doi.org/10.1080/00029890.2025.2554555
-  (`arXiv:2402.08525 <https://arxiv.org/abs/2402.08525>`__).
+  Amer. Math. Monthly (2025) https://doi.org/10.1080/00029890.2025.2554555
+  (the preprint version: `arXiv:2402.08525 <https://arxiv.org/abs/2402.08525>`__).
 
-This has appeared in *The American Mathematical Monthly* in 2025.  It
+The above paper
 also gives exact theoretical formulas for Kempner-like series where multiple
 digits are simultaneously excluded.
 
 The alternating and positive series for all $k\geq0$ have been first
 published in:
 
-- Measures for the summation of Irwin series, https://arxiv.org/abs/2402.09083.
+- Measures for the summation of Irwin series,
+  https://arxiv.org/abs/2402.09083.  A referee's report has been received
+  as of late September 2025, and further news from editors is hoped for soon.
 
-This manuscript is currently submitted.  Some of my further research
-has already appeared:
+Further research by the author:
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,
   Advances in Applied Mathematics Volume 162, January 2025, 102791. `DOI link`__
 
   __ https://doi.org/10.1016/j.aam.2024.102791
+
+- Sur l'asymptotique des sommes de Kempner pour de grandes bases,
+  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`__.  Currently
+  (late September 2025) waiting for referee's report and editorial
+  decision.
 
 - Digamma function and general Fischer series in the theory of Kempner sums,
   Expositiones Mathematicae, Volume 42, Issue 6, December
@@ -338,15 +344,14 @@ has already appeared:
 
   __ https://doi.org/10.1016/j.exmath.2024.125604
 
+- Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
+  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`__.  A (in principle,
+  positive) referee report was received early July 2025, and the author
+  awaits since from editors the final decision.
+
 - Measures associated with certain ellipsephic harmonic series and the
   Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025).
   `DOI link`__
 
   __ https://doi.org/10.1007/s10474-025-01525-3
 
-These next two manuscripts by the author are awaiting referee reports.
-
-- Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`__.
-- Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`__.
