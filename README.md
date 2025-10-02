@@ -219,7 +219,7 @@ underlying core formulas, start with
 This repository is devoted to the formulas discovered in:
 
 - Moments in the exact summation of the curious series of Kempner type. Amer. Math. Monthly 2025 ([DOI](https://doi.org/10.1080/00029890.2025.2554555); preprint was [arXiv:2402.08525](https://arxiv.org/abs/2402.08525)).
-- Measures for the summation of Irwin series. Available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).
+- Measures for the summation of Irwin series. Available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083). Submitted.
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 

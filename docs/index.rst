@@ -323,8 +323,7 @@ The alternating and positive series for all $k\geq0$ have been first
 published in:
 
 - Measures for the summation of Irwin series,
-  https://arxiv.org/abs/2402.09083.  A referee's report has been received
-  as of late September 2025, and further news from editors is hoped for soon.
+  https://arxiv.org/abs/2402.09083.  Submitted.
 
 Further research by the author:
 
