@@ -334,9 +334,8 @@ Further research by the author:
   __ https://doi.org/10.1016/j.aam.2024.102791
 
 - Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`__.  Currently
-  (late September 2025) waiting for referee's report and editorial
-  decision.
+  Publications Mathématiques de Besançon, à paraître.  Prépublication :
+  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`__.
 
 - Digamma function and general Fischer series in the theory of Kempner sums,
   Expositiones Mathematicae, Volume 42, Issue 6, December
@@ -345,9 +344,7 @@ Further research by the author:
   __ https://doi.org/10.1016/j.exmath.2024.125604
 
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`__.  A (in principle,
-  positive) referee report was received early July 2025, and the author
-  awaits since from editors the final decision.
+  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`__.  Submitted.
 
 - Measures associated with certain ellipsephic harmonic series and the
   Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025).

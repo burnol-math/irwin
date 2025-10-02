@@ -234,13 +234,11 @@ More research by the author:
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791).
 - Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  [arXiv:2403.01957](https://arxiv.org/abs/2403.01957). Currently waiting for
-  referee report.
+  Publications Mathématiques de Besançon, à paraître. Prépublication :
+  [arXiv:2403.01957](https://arxiv.org/abs/2403.01957)
 - Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  [arXiv:2404.13763](https://arxiv.org/abs/2404.13763). A (favourable) referee
-  report was received and responded to early July 2025.  Waiting since for
-  news from editors.
+  [arXiv:2404.13763](https://arxiv.org/abs/2404.13763). Submitted.
 - Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
 
 
