@@ -218,8 +218,8 @@ underlying core formulas, start with
 
 This repository is devoted to the formulas discovered in:
 
-- Moments in the exact summation of the curious series of Kempner type. Amer. Math. Monthly 2025 ([DOI](https://doi.org/10.1080/00029890.2025.2554555); preprint was [arXiv:2402.08525](https://arxiv.org/abs/2402.08525)).
-- Measures for the summation of Irwin series. Available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083). Submitted.
+- Moments in the exact summation of the curious series of Kempner type. Amer. Math. Monthly 2025, 1--12.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
+- Measures for the summation of Irwin series. To appear in Integers (2025).  Preprint available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
@@ -233,9 +233,7 @@ Math. Monthly 115(6), 525–540 (2008) [DOI](https://doi.org/10.1080/00029890.20
 More research by the author:
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791).
-- Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  Publications Mathématiques de Besançon, à paraître. Prépublication :
-  [arXiv:2403.01957](https://arxiv.org/abs/2403.01957)
+- Sur l'asymptotique des sommes de Kempner pour de grandes bases, Publications Mathématiques de Besançon (2025 or 2026), to appear. Preprint available at [arXiv:2403.01957](https://arxiv.org/abs/2403.01957).
 - Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
   [arXiv:2404.13763](https://arxiv.org/abs/2404.13763). Submitted.

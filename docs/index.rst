@@ -312,8 +312,9 @@ References
 For $k=0$ the alternating series was first published in:
 
 - Moments in the exact summation of the curious series of Kempner type,
-  Amer. Math. Monthly (2025) https://doi.org/10.1080/00029890.2025.2554555
-  (the preprint version: `arXiv:2402.08525 <https://arxiv.org/abs/2402.08525>`__).
+  Amer. Math. Monthly (2025). `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2025.2554555
 
 The above paper
 also gives exact theoretical formulas for Kempner-like series where multiple
@@ -322,8 +323,8 @@ digits are simultaneously excluded.
 The alternating and positive series for all $k\geq0$ have been first
 published in:
 
-- Measures for the summation of Irwin series,
-  https://arxiv.org/abs/2402.09083.  Submitted.
+- Measures for the summation of Irwin series, Integers (2025) (to appear;
+  preprint:  `arXiv:2402.09083 <https://arxiv.org/abs/2402.09083>`_)
 
 Further research by the author:
 
@@ -333,8 +334,8 @@ Further research by the author:
   __ https://doi.org/10.1016/j.aam.2024.102791
 
 - Sur l'asymptotique des sommes de Kempner pour de grandes bases,
-  Publications Mathématiques de Besançon, à paraître.  Prépublication :
-  `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`__.
+  Publications Mathématiques de Besançon (2025 or 2026) (to appear;
+  preprint: `arXiv:2403.01957 <https://arxiv.org/abs/2403.01957>`_).
 
 - Digamma function and general Fischer series in the theory of Kempner sums,
   Expositiones Mathematicae, Volume 42, Issue 6, December
@@ -343,7 +344,7 @@ Further research by the author:
   __ https://doi.org/10.1016/j.exmath.2024.125604
 
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`__.  Submitted.
+  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`_.  Submitted.
 
 - Measures associated with certain ellipsephic harmonic series and the
   Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025).
