@@ -352,3 +352,35 @@ Further research by the author:
 
   __ https://doi.org/10.1007/s10474-025-01525-3
 
+
+Let us also repeat here for convenience, in chronological order, the already
+cited worksfrom earlier authors (the list is of course very incomplete):
+
+- A. J. Kempner, A curious convergent series, *Amer. Math. Monthly*
+  **21** (2) (1914), 48-50. `DOI link <https://doi.org/10.2307/2972074>`__
+
+- F. Irwin, A curious convergent series, *Amer. Math. Monthly*
+  **23** (5) (1916), 149-152. `DOI link <https://doi.org/10.2307/2974352>`__
+
+- R. Baillie, Sums of reciprocals of integers missing a given digit,
+  *Amer. Math. Monthly* **86** (5) (1979), 372-374. `DOI link`__
+
+  __ https://doi.org/10.2307/2321096
+
+- T. Schmelzer and R. Baillie, Summing a curious, slowly convergent series,
+  *Amer. Math. Monthly* **115** (6) (2008), 525--540. `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2008.11920559
+
+- R. Baillie, Summing the curious series of Kempner and Irwin, 2008,
+  https://arxiv.org/abs/0806.4410
+
+- B. Farhi, A curious result related to Kempner's series,
+  *Amer. Math. Monthly* **115** (10) (2008), 933--938. `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2008.11920611
+
+- J.-P. Allouche, Y. Hu, and C. Morin, Ellipsephic harmonic series revisited,
+  *Acta Math. Hungar.* **173** (2024), 461--470. `DOI link`__
+
+  __ https://doi.org/10.1007/s10474-024-01448-5
