@@ -4,8 +4,6 @@
 
 ## Description
 
-*This README was last updated on October 13, 2025.*
-
 This repository is to document implementations of the formulas from the
 February 2024 article
 [Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
