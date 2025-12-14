@@ -312,7 +312,7 @@ References
 For $k=0$ the alternating series was first published in:
 
 - Moments in the exact summation of the curious series of Kempner type,
-  Amer. Math. Monthly (2025). `DOI link`__
+  *Amer. Math. Monthly* **132**\ :10 (2025), 995--1006. `DOI link`__
 
   __ https://doi.org/10.1080/00029890.2025.2554555
 
@@ -323,8 +323,8 @@ digits are simultaneously excluded.
 The alternating and positive series for all $k\geq0$ have been first
 published in:
 
-- Measures for the summation of Irwin series, Integers (2025) (to appear;
-  preprint:  `arXiv:2402.09083 <https://arxiv.org/abs/2402.09083>`_)
+- Measures for the summation of Irwin series
+  (`arXiv:2402.09083 <https://arxiv.org/abs/2402.09083>`_)
 
 Further research by the author:
 

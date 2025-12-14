@@ -218,8 +218,8 @@ underlying core formulas, start with
 
 This repository is devoted to the formulas discovered in:
 
-- Moments in the exact summation of the curious series of Kempner type. Amer. Math. Monthly 2025, 1--12.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
-- Measures for the summation of Irwin series. To appear in Integers (2025).  Preprint available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).
+- Moments in the exact summation of the curious series of Kempner type. *Amer. Math. Monthly* **132**:10 (2025), 995--1006.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
+- Measures for the summation of Irwin series.  Preprint available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
@@ -247,7 +247,7 @@ The February 2024 original version or ``irwin.sage`` which accompanied
 was a revival and extension of Maple coding which I had done in 2012 and which
 regarded the results later described in
 [Moments in the exact summation of the curious series of Kempner type](https://doi.org/10.1080/00029890.2025.2554555)
-([arXiv:2402.08525](https://arxiv.org/abs/2402.08525)).
+(*The American Mathematical Monthly* **132**:10 (2025), 995-1006).  Preprint version at [arXiv:2402.08525](https://arxiv.org/abs/2402.08525)).
 
 Thanks to Arnaud Bodin and Yusuf Emin Akpınar for sharing their interest
 during 2025 into the results of these two papers, and in particular for
