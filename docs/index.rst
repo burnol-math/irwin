@@ -119,9 +119,11 @@ The new series
 In 2024, the author of this page published novel theoretical formulas
 representing exactly the Kempner-Irwin series.  Here are these formulas, as
 proven in `Measures for the summation of Irwin series
-<https://arxiv.org/abs/2402.09083>`__ and earlier for $k=0$ (and only the
+<https://arxiv.org/abs/2402.09083>`_ (to appear during 2026
+in `Integers <https://math.colgate.edu/~integers/>`_)
+and earlier for $k=0$ (and only the
 alternating series) in `Moments in the exact summation of the curious series
-of Kempner type <https://arxiv.org/abs/2402.08525>`__
+of Kempner type <https://arxiv.org/abs/2402.08525>`_
 (`DOI link <https://doi.org/10.1080/00029890.2025.2554555>`__).
 
 Let $b>1$, $d$ a $b$-ary digit, and $k$ a non-negative integer.  We will need
@@ -324,7 +326,8 @@ The alternating and positive series for all $k\geq0$ have been first
 published in:
 
 - Measures for the summation of Irwin series
-  (`arXiv:2402.09083 <https://arxiv.org/abs/2402.09083>`_)
+  (`arXiv:2402.09083 <https://arxiv.org/abs/2402.09083>`_,
+   to appear during 2026 in `Integers <https://math.colgate.edu/~integers/>`_).
 
 Further research by the author:
 

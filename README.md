@@ -7,7 +7,7 @@
 This repository is to document implementations of the formulas from the
 February 2024 article
 [Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
-by Jean-François Burnol (who is also the author of these lines).
+(to appear during 2026 in [Integers](https://math.colgate.edu/~integers/)).
 
 The above paper is devoted to a new approach to a venerable topic which got
 started in 1914 in
@@ -217,7 +217,7 @@ underlying core formulas, start with
 This repository is devoted to the formulas discovered in:
 
 - Moments in the exact summation of the curious series of Kempner type. *Amer. Math. Monthly* **132**:10 (2025), 995--1006.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
-- Measures for the summation of Irwin series.  Preprint available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).
+- Measures for the summation of Irwin series.  Preprint available at [arXiv:2402.09083](https://arxiv.org/abs/2402.09083).  [Integers](https://math.colgate.edu/~integers/) (2026, to appear).
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
