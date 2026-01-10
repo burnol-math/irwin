@@ -4,26 +4,24 @@
 
 ## Description
 
-This repository is to document implementations of the formulas from the
-February 2024 article
-[Measures for the summation of Irwin series](https://arxiv.org/abs/2402.09083)
-(to appear during 2026 in [Integers](https://math.colgate.edu/~integers/)).
+This repository is to document implementations of formulas from my pubication
+[Measures for the summation of Irwin series](https://doi.org/10.5281/zenodo.18154150), *Integers* **26**:A11 (2026). 
 
-The above paper is devoted to a new approach to a venerable topic which got
-started in 1914 in
+The above paper explains a novel approach to a venerable topic which got
+started in 1914 with
 [A Curious Convergent Series](https://doi.org/10.2307/2972074) by
-A. J. Kempner, extended in 1916 by an
+A. J. Kempner, and then in 1916 by with an
 [article with the same title](https://doi.org/10.2307/2974352) by F. Irwin.
 
 Let $b>1$ be an integer (called *base* or *radix*), $d\in\{0,...,b-1\}$ a
 digit, $k$ a non-negative integer.  We want to compute $S(b,d,k)$ which is the
-(convergent) sub-series of the (divergent) harmonic series $\sum\frac{1}{n}$
-where only those positive integers $n$ are kept whose radix-$b$ representation
-contains *exactly* $k$ occurrences of the digit $d$.  Kempner and
-Irwin considered only $b=10$ (decimal system), and Irwin added the parameter
-$k$ where Kempner had considered only excluding a given digit (i.e. $k=0$ in
-the Kempner case).  Further generalizations are found in the litterature, see
-the [Bibliographical references](#bibliographical-references) section.
+(convergent) sub-series of the harmonic series $\sum\frac{1}{n}$ where only
+those positive integers $n$ are kept whose radix-$b$ representation contains
+*exactly* $k$ occurrences of the digit $d$.  Kempner and Irwin considered only
+$b=10$ (decimal system).  Irwin added the parameter $k$ where Kempner had
+considered only excluding a given digit (i.e. $k=0$).  Further generalizations
+are found in the litterature, see the
+[Bibliographical references](#bibliographical-references) section.
 
 To compute such quantities with the help of the SageMath code provided in this
 repository, start a SageMath session, enter `load("irwin.sage")` and then use
@@ -214,7 +212,7 @@ underlying core formulas, start with
 
 ## Bibliographical references
 
-This repository is devoted to the formulas presented in:
+This repository is devoted to the formulas now published in:
 
 - Moments in the exact summation of the curious series of Kempner type. *Amer. Math. Monthly* **132**:10 (2025), 995--1006.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
 - Measures for the summation of Irwin series.  Integers **26**:A11 (2026), 20pp.  [DOI](https://doi.org/10.5281/zenodo.18154150).
