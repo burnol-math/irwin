@@ -7,7 +7,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'Irwin'
-copyright = '2025, Jean-François Burnol'
+copyright = '2025-2026, Jean-François Burnol'
 author = 'Jean-François Burnol'
 release = ''
 
