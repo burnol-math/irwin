@@ -10,7 +10,7 @@ This repository is to document implementations of formulas from my pubication
 The above paper explains a novel approach to a venerable topic which got
 started in 1914 with
 [A Curious Convergent Series](https://doi.org/10.2307/2972074) by
-A. J. Kempner, and then in 1916 by with an
+A. J. Kempner, and then was continued in 1916 with an
 [article with the same title](https://doi.org/10.2307/2974352) by F. Irwin.
 
 Let $b>1$ be an integer (called *base* or *radix*), $d\in\{0,...,b-1\}$ a
