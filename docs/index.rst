@@ -322,12 +322,12 @@ The above paper
 also gives exact theoretical formulas for Kempner-like series where multiple
 digits are simultaneously excluded.
 
-The alternating and positive series for all $k\geq0$ have been first
-published in:
+The alternating and positive series for all $k\geq0$ are to be found in:
 
-- Measures for the summation of Irwin series
-  (`arXiv:2402.09083 <https://arxiv.org/abs/2402.09083>`_,
-   to appear during 2026 in `Integers <https://math.colgate.edu/~integers/>`_).
+- Measures for the summation of Irwin series,
+  *Integers* **26**\ :A11 (2026), 20pp. `DOI link`__
+
+  __ https://doi.org/10.5281/zenodo.18154150
 
 Further research by the author:
 
