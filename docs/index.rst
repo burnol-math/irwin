@@ -116,15 +116,9 @@ $p=1$ this had been shown earlier by Farhi.
 The new series
 ==============
 
-In 2024, the author of this page published novel theoretical formulas
-representing exactly the Kempner-Irwin series.  Here are these formulas, as
-proven in `Measures for the summation of Irwin series
-<https://arxiv.org/abs/2402.09083>`_ (to appear during 2026
-in `Integers <https://math.colgate.edu/~integers/>`_)
-and earlier for $k=0$ (and only the
-alternating series) in `Moments in the exact summation of the curious series
-of Kempner type <https://arxiv.org/abs/2402.08525>`_
-(`DOI link <https://doi.org/10.1080/00029890.2025.2554555>`__).
+Some years ago, the author of this page obtained some theoretical exact
+formulas allowing to compute the Kempner-Irwin series (they have now been
+published, see the references at bottom of this page).
 
 Let $b>1$, $d$ a $b$-ary digit, and $k$ a non-negative integer.  We will need
 the following notation: for $n$ a positive integer, $k(n)$ is the number of
