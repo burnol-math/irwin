@@ -113,12 +113,76 @@ $p=1$ this had been shown earlier by Farhi.
 
   __ https://doi.org/10.1007/s10474-024-01448-5
 
+
+Some references to the literature
+=================================
+
+Let us repeat here for convenience, in chronological order, the already
+cited works from earlier authors (this list is of course very incomplete):
+
+- A. J. Kempner, A curious convergent series, *Amer. Math. Monthly*
+  **21** (2) (1914), 48-50. `DOI link <https://doi.org/10.2307/2972074>`__
+
+- F. Irwin, A curious convergent series, *Amer. Math. Monthly*
+  **23** (5) (1916), 149-152. `DOI link <https://doi.org/10.2307/2974352>`__
+
+- R. Baillie, Sums of reciprocals of integers missing a given digit,
+  *Amer. Math. Monthly* **86** (5) (1979), 372-374. `DOI link`__
+
+  __ https://doi.org/10.2307/2321096
+
+- T. Schmelzer and R. Baillie, Summing a curious, slowly convergent series,
+  *Amer. Math. Monthly* **115** (6) (2008), 525--540. `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2008.11920559
+
+- R. Baillie, Summing the curious series of Kempner and Irwin, 2008,
+  https://arxiv.org/abs/0806.4410
+
+- B. Farhi, A curious result related to Kempner's series,
+  *Amer. Math. Monthly* **115** (10) (2008), 933--938. `DOI link`__
+
+  __ https://doi.org/10.1080/00029890.2008.11920611
+
+- J.-P. Allouche, Y. Hu, and C. Morin, Ellipsephic harmonic series revisited,
+  *Acta Math. Hungar.* **173** (2024), 461--470. `DOI link`__
+
+  __ https://doi.org/10.1007/s10474-024-01448-5
+
+Recently, I learned from a talk (see `expmath seminar abstract page`_ for
+slides and video) by Victor S. Miller about a 1953 two-paragraphs note
+by G. W. Brewster in *The Mathematical Gazette*.  Therein, the sum of the
+inverses of integers, all written with decimal digits, is interpreted to refer
+to a higher base, for example ``11``.  We thus obtain the sum of reciprocals
+of integers lacking digit ``10`` in base ``11``, and for base ``12`` it would
+be the sum of reciprocals of integers lacking both digits ``10`` and ``11``,
+etc...  They fall under the scope of the work we will be referring to in the
+next section, but https://gitlab.com/burnolmath/irwin provides code only for
+one excluded digit.  See https://gitlab.com/burnolmath/kempner for code
+handling multiple excluded digits (it will need to be updated though to handle
+bases other than ``10``).
+
+Neil Sloane reformulated the Brewster point-of-view using a ``V(n)`` notation
+for the integer ``n`` written in base ``10`` then re-read in base ``11`` (for
+example).  This changes the perspective and opens up new questions such as
+estimating ``\sum 1/V(p)`` over the prime number, which has been succesfully
+addressed by Victor S. Miller.
+
+- G. W. Brewster, 2365. An Old Result in a New Dress.
+  *The Mathematical Gazette*, **37** (322) (1953), 269–270. `DOI linl`__
+
+  __ https://doi.org/10.2307/3610047
+
+.. _expmath seminar abstract page: https://sites.math.rutgers.edu/~zeilberg/expmath/archive26.html  
+
+
 The new series
 ==============
 
 Some years ago, the author of this page obtained some theoretical exact
 formulas allowing to compute the Kempner-Irwin series (they have now been
-published, see the references at bottom of this page).
+published, see the references at bottom of this page).  Here we describe the
+formulas for the case of one excluded digit.
 
 Let $b>1$, $d$ a $b$-ary digit, and $k$ a non-negative integer.  We will need
 the following notation: for $n$ a positive integer, $k(n)$ is the number of
@@ -351,8 +415,8 @@ the alternating one.
 Check ``help(irwin)`` or ``help(irwinpos)`` for additional parameters.
 
 
-References
-==========
+References to my own work
+=========================
 
 For $k=0$ the alternating series was first published in:
 
@@ -361,9 +425,9 @@ For $k=0$ the alternating series was first published in:
 
   __ https://doi.org/10.1080/00029890.2025.2554555
 
-The above paper
-also gives exact theoretical formulas for Kempner-like series where multiple
-digits are simultaneously excluded.
+The above paper also gives exact theoretical formulas for Kempner-like series
+where multiple digits are simultaneously excluded (like is needed for the
+Brewster 1953 question referred to above).
 
 The alternating and positive series for all $k\geq0$ are to be found in:
 
@@ -372,7 +436,9 @@ The alternating and positive series for all $k\geq0$ are to be found in:
 
   __ https://doi.org/10.5281/zenodo.18154150
 
-Further research by the author:
+Further research posted to arXiv_ in 2024:
+
+.. _arxiv: https://arxiv.org
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,
   Advances in Applied Mathematics Volume 162, January 2025, 102791. `DOI link`__
@@ -397,36 +463,3 @@ Further research by the author:
   `DOI link`__
 
   __ https://doi.org/10.1007/s10474-025-01525-3
-
-
-Let us also repeat here for convenience, in chronological order, the already
-cited worksfrom earlier authors (the list is of course very incomplete):
-
-- A. J. Kempner, A curious convergent series, *Amer. Math. Monthly*
-  **21** (2) (1914), 48-50. `DOI link <https://doi.org/10.2307/2972074>`__
-
-- F. Irwin, A curious convergent series, *Amer. Math. Monthly*
-  **23** (5) (1916), 149-152. `DOI link <https://doi.org/10.2307/2974352>`__
-
-- R. Baillie, Sums of reciprocals of integers missing a given digit,
-  *Amer. Math. Monthly* **86** (5) (1979), 372-374. `DOI link`__
-
-  __ https://doi.org/10.2307/2321096
-
-- T. Schmelzer and R. Baillie, Summing a curious, slowly convergent series,
-  *Amer. Math. Monthly* **115** (6) (2008), 525--540. `DOI link`__
-
-  __ https://doi.org/10.1080/00029890.2008.11920559
-
-- R. Baillie, Summing the curious series of Kempner and Irwin, 2008,
-  https://arxiv.org/abs/0806.4410
-
-- B. Farhi, A curious result related to Kempner's series,
-  *Amer. Math. Monthly* **115** (10) (2008), 933--938. `DOI link`__
-
-  __ https://doi.org/10.1080/00029890.2008.11920611
-
-- J.-P. Allouche, Y. Hu, and C. Morin, Ellipsephic harmonic series revisited,
-  *Acta Math. Hungar.* **173** (2024), 461--470. `DOI link`__
-
-  __ https://doi.org/10.1007/s10474-024-01448-5
