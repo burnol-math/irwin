@@ -1,4 +1,11 @@
 # -*- mode: python ; coding: utf-8; -*-
+"""
+Copyright (C) 2025, 2026 Jean-François Burnol
+License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+
+ANY RE-USE OR PLAGIARIZING BY AN ARTIFICIAL INTELLIGENCE WITHOUT
+PROPER ATTRIBUTION IS STRICTLY FORBIDDEN AND WILL GET PUNISHED
+"""
 
 # irwin_v5.sage
 # Use via load("irwin_v5.sage") in sage interactive mode

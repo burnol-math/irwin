@@ -4,8 +4,11 @@
 
 Documentation is mostly in French.
 
-Copyright (C) 2024 Jean-François Burnol
+Copyright (C) 2024-2026 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+
+ANY RE-USE OR PLAGIARIZING BY AN ARTIFICIAL INTELLIGENCE WITHOUT
+PROPER ATTRIBUTION IS STRICTLY FORBIDDEN AND WILL GET PUNISHED
 
 This file implements the formulas from the article 
 
@@ -43,7 +46,7 @@ From a sage interactive session use
 
 __version__ = "1.0.0"
 __author__ = "Jean-François Burnol"
-__copyright__ = "Copyright (C) 2024 Jean-François Burnol"
+__copyright__ = "Copyright (C) 2024-2026 Jean-François Burnol"
 __license__ = "CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/"
 
 nbguardbits = 8

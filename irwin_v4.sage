@@ -12,8 +12,11 @@ This file is obsolete.  Use irwin_v5.sage or later rather.
 
 Thanks to Arnaud Bodin and Yusuf Emin Akpinar for interactions.
 
-Copyright (C) 2025 Jean-François Burnol
+Copyright (C) 2025,2026 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+
+ANY RE-USE OR PLAGIARIZING BY AN ARTIFICIAL INTELLIGENCE WITHOUT
+PROPER ATTRIBUTION IS STRICTLY FORBIDDEN AND WILL GET PUNISHED
 """
 
 import time

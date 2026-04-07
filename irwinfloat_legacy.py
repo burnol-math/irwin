@@ -7,8 +7,11 @@ Documentation is in French.
 date: vendredi 9 février 2024
 authors: Jean-François Burnol
 
-Copyright (C) 2024 Jean-François Burnol
+Copyright (C) 2024-2026 Jean-François Burnol
 License: CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/
+
+ANY RE-USE OR PLAGIARIZING BY AN ARTIFICIAL INTELLIGENCE WITHOUT
+PROPER ATTRIBUTION IS STRICTLY FORBIDDEN AND WILL GET PUNISHED
 
 Ce fichier définit deux procédures irwinfloat() et irwinposfloat() qui
 implémentent avec des floats en Python les deux algorithmes de Burnol pour le
