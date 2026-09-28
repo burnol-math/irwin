@@ -210,7 +210,7 @@ underlying core formulas, start with
   which were inserted in the text, they are in
   [taille_pascal_symbolic](taille_pascal_symbolic).
 
-## Bibliographical references
+## Bibliographical references (2024)
 
 This repository is devoted to the formulas published in:
 
@@ -233,6 +233,8 @@ More research by the author written up in 2024.  All of it has finally appeared 
 - Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
 - On the asymptotics of Kempner–Irwin sums, International Journal of Number Theory, 40 pages, "Online Ready" (July 30, 2026), [DOI](https://doi.org/10.1142/s1793042126501319).
 - Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
+
+## Further works (2026)
 
 The author has extended in September 2026 the scope to block-count constrained harmonic sums:
 
