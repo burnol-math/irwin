@@ -215,7 +215,7 @@ underlying core formulas, start with
 This repository is devoted to the formulas now published in:
 
 - Moments in the exact summation of the curious series of Kempner type. *Amer. Math. Monthly* **132**:10 (2025), 995--1006.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
-- Measures for the summation of Irwin series.  Integers **26**:A11 (2026), 20pp.  [DOI](https://doi.org/10.5281/zenodo.18154150).
+- Measures for the summation of Irwin series.  Integers **26**:A11 (2026), 20pp.  [DOI](https://doi.org/10.5281/zenodo.18154150).  There is an error (with no other consequence) in Lemma 3, see the [corrigendum](aa11_errata.pdf).
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
@@ -234,7 +234,6 @@ More research by the author:
 - Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
   [arXiv:2404.13763](https://arxiv.org/abs/2404.13763). Submitted.
 - Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
-
 
 ## Thanks
 
