@@ -226,14 +226,18 @@ Monthly 86(5), 372–374 (1979) [DOI](https://doi.org/10.2307/2321096Sums)
 - Thomas Schmelzer and Robert Baillie: Summing a curious, slowly convergent series. Amer.
 Math. Monthly 115(6), 525–540 (2008) [DOI](https://doi.org/10.1080/00029890.2008.11920559)
 
-More research by the author:
+More research by the author written up in 2024.  All of it has finally appeared in 2926 (or is going to).
 
 - Summing the "exactly one 42" and similar subsums of the harmonic series,  Advances in Applied Mathematics Volume 162, January 2025, 102791. [DOI](https://doi.org/10.1016/j.aam.2024.102791).
 - Sur l'asymptotique des sommes de Kempner pour de grandes bases, Publications Mathématiques de Besançon (2025 or 2026), to appear. Preprint available at [arXiv:2403.01957](https://arxiv.org/abs/2403.01957).
 - Digamma function and general Fischer series in the theory of Kempner sums, Expositiones Mathematicae, Volume 42, Issue 6, December 2024, 125604. [DOI](https://doi.org/10.1016/j.exmath.2024.125604).
-- Un développement asymptotique des sommes harmoniques de Kempner-Irwin,
-  [arXiv:2404.13763](https://arxiv.org/abs/2404.13763). Submitted.
+- On the asymptotics of Kempner–Irwin sums, International Journal of Number Theory, 40 pages, "Online Ready" (July 30, 2026), [DOI](https://doi.org/10.1142/s1793042126501319).
 - Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
+
+New related research by the author in 2026 includes the full extension to the multi-digit case:
+
+- Block-constrained harmonic sums: spectral expansion and block-directed Euler-Maclaurin, [arXiv:2609.17045](https://arxiv.org/abs/2609.17045), 15 Sep 2026.
+- The modal expansion of Kempner sums, 25 sep 2026. To be announced on arXiv:math.CO on Tuesday 29 September 2026.
 
 ## Thanks
 
