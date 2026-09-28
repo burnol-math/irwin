@@ -189,6 +189,13 @@ underlying core formulas, start with
   - version 1.5.5 of April 30, 2025, computed `2+130010` decimals in `10h10mn`,
     using `maxworkers=10`.
 
+- **NEW IN 2026** [irwin_v5_mpmath_spawn.py](irwin_v5_mpmath_spawn.py) was
+  produced on September 28, 2026 by Claude Opus 5.5 on request by the author,
+  as a conversion of [irwin_v5.sage](irwin_v5.sage) to Python + mpmath (+
+  gmpy2).  Very brief testing indicated it does run faster on my macOS ARM
+  hardware than the SageMath original. For details check first the code
+  comments at top of the Python script, as well as
+  [irwin_v5_claude.md](irwin_v5_claude.md).
 
 - Files with names of the type `k_prec_2+N` contain decimal expansions
   of the classic "no-9 radix-10" Kempner series `22.92067661926415...`,
