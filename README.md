@@ -212,10 +212,10 @@ underlying core formulas, start with
 
 ## Bibliographical references
 
-This repository is devoted to the formulas now published in:
+This repository is devoted to the formulas published in:
 
 - Moments in the exact summation of the curious series of Kempner type. *Amer. Math. Monthly* **132**:10 (2025), 995--1006.  [DOI](https://doi.org/10.1080/00029890.2025.2554555).
-- Measures for the summation of Irwin series.  Integers **26**:A11 (2026), 20pp.  [DOI](https://doi.org/10.5281/zenodo.18154150).  There is an error (with no other consequence) in Lemma 3, see the [corrigendum](aa11_errata.pdf).
+- Measures for the summation of Irwin series.  Integers **26**:A11 (2026), 20pp.  [DOI](https://doi.org/10.5281/zenodo.18154150).  There is an error (with no other consequence) in Lemma 3, see the [pdf corrigendum](aa11_errata.pdf).
 
 Earlier numerical works computing otherwise Kempner and Irwin sums include:
 
@@ -234,10 +234,10 @@ More research by the author written up in 2024.  All of it has finally appeared 
 - On the asymptotics of Kempner–Irwin sums, International Journal of Number Theory, 40 pages, "Online Ready" (July 30, 2026), [DOI](https://doi.org/10.1142/s1793042126501319).
 - Measures associated with certain ellipsephic harmonic series and the Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025) [DOI](https://doi.org/10.1007/s10474-025-01525-3).
 
-New related research by the author in 2026 includes the full extension to the multi-digit case:
+The author has extended in September 2026 the scope to block-count constrained harmonic sums:
 
-- Block-constrained harmonic sums: spectral expansion and block-directed Euler-Maclaurin, [arXiv:2609.17045](https://arxiv.org/abs/2609.17045), 15 Sep 2026.
-- The modal expansion of Kempner sums, 25 sep 2026. To be announced on arXiv:math.CO on Tuesday 29 September 2026.
+- *Block-count constrained harmonic sums: spectral expansion and block-directed Euler-Maclaurin*,  15 Sep 2026, [arXiv:2609.17045](https://arxiv.org/abs/2609.17045).
+- *The modal expansion of Kempner sums*, 25 Sep 2026. To be announced on arXiv:math.CO on Tuesday 29 September 2026.
 
 ## Thanks
 
