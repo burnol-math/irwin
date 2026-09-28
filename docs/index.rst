@@ -414,6 +414,18 @@ Use ``irwinpos()`` for the implementation of the positive series rather than
 the alternating one.
 Check ``help(irwin)`` or ``help(irwinpos)`` for additional parameters.
 
+Python + mpmath implementation
+==============================
+
+On September 28, 2026 I asked Claude Opus 5.5 to convert my SageMath
+code into pure Python with mpmath_.   Here is an example of use::
+
+    import irwin_v5_mpmath_spawn
+    irwin_v5_mpmath_spawn.maxworkers = 10      # optional, defaults to 8
+    from irwin_v5_mpmath_spawn import irwin    # and irwinpos if desired
+    irwin(10, 9, 0, 1002)
+
+.. _mpmath: https://mpmath.org
 
 References to my own work
 =========================
@@ -436,6 +448,9 @@ The alternating and positive series for all $k\geq0$ are to be found in:
 
   __ https://doi.org/10.5281/zenodo.18154150
 
+  The statement of Lemma 3 has an error, which has no consequences.
+  Check at https://gitlab.com/burnolmath/irwin the corrigendum (as pdf).
+
 Further research posted to arXiv_ in 2024:
 
 .. _arxiv: https://arxiv.org
@@ -456,7 +471,10 @@ Further research posted to arXiv_ in 2024:
   __ https://doi.org/10.1016/j.exmath.2024.125604
 
 - On the asymptotics of Kempner-Irwin sums,
-  `arXiv:2404.13763 <https://arxiv.org/abs/2404.13763>`_.  currently submitted.
+  International Journal of Number Theory, 40 pages, "Online Ready" July 30, 2026,
+  `DOI link`__
+
+  __ https://doi.org/10.1142/s1793042126501319
 
 - Measures associated with certain ellipsephic harmonic series and the
   Allouche-Hu-Morin limit theorem, Acta Mathematica Hungarica (2025).
